@@ -2,7 +2,7 @@
   "name": "airborne-base",
   "version": "0.1.1",
   "description": "Airborne mappers for Airborne Framework",
-  "main": "start.js",
+  "main": "index.js",
   "scripts": {
     "start": "nodemon start.js"
   },
