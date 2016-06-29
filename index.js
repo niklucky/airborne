@@ -1,18 +1,18 @@
 'use strict';
 
-import BaseController from './lib/base.controller';
-import BaseService from './lib/base.service';
-import BaseMapper from './lib/base.mapper';
-import BaseModel from './lib/base.model';
+const BaseController = require('./lib/base.controller');
+const BaseService = require('./lib/base.service');
+const BaseMapper = require('./lib/base.mapper');
+const BaseModel = require('./lib/base.model');
 
-import HATEOASDecorator from './lib/hateoas.decorator';
+const HATEOASDecorator = require('./lib/hateoas.decorator');
 
-import HTTPMapper from './lib/http.mapper';
-import MySQLMapper from './lib/mysql.mapper';
-import MySQLQueryBuilder from './lib/mysql.query.builder';
-import RedisMapper from './lib/redis.mapper';
+const HTTPMapper = require('./lib/http.mapper');
+const MySQLMapper = require('./lib/mysql.mapper');
+const MySQLQueryBuilder = require('./lib/mysql.query.builder');
+const RedisMapper = require('./lib/redis.mapper');
 
-export {
+module.exports = {
   BaseController,
   BaseService,
   BaseMapper,
