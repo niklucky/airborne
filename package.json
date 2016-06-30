@@ -1,6 +1,6 @@
 {
   "name": "airborne-base",
-  "version": "0.1.20",
+  "version": "0.2.0",
   "description": "Airborne mappers for Airborne Framework",
   "main": "index.js",
   "scripts": {
