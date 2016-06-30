@@ -1,5 +1,5 @@
 {
-  "name": "airborne-base",
+  "name": "airborne-engine",
   "version": "0.2.0",
   "description": "Airborne mappers for Airborne Framework",
   "main": "index.js",
@@ -20,5 +20,13 @@
   "devDependencies": {
     "eslint": "^2.13.1",
     "eslint-config-google": "^0.6.0"
+  },
+  "dependencies": {
+    "body-parser": "^1.15.2",
+    "express": "^4.14.0",
+    "lodash": "^4.13.1",
+    "mongoose": "^4.5.1",
+    "mysql": "^2.11.1",
+    "redis": "^2.6.2"
   }
 }
