@@ -1,6 +1,6 @@
 {
   "name": "airborne-engine",
-  "version": "0.2.3",
+  "version": "0.2.4",
   "description": "Airborne mappers for Airborne Framework",
   "main": "index.js",
   "scripts": {
@@ -8,7 +8,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+ssh://git@bitbucket.org/aerial-dev/airborn-base.git"
+    "url": "git+ssh://git@bitbucket.org/aerial-dev/airborn-engine.git"
   },
   "keywords": [
     "ariborne",
