@@ -1,7 +1,7 @@
 {
   "name": "airborne-engine",
-  "version": "0.2.4",
-  "description": "Airborne mappers for Airborne Framework",
+  "version": "0.2.5",
+  "description": "Airborne RESTful API framework",
   "main": "index.js",
   "scripts": {
     "start": "nodemon index.js"
