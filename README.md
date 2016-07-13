@@ -1,5 +1,4 @@
 # Airborne API framework
-It is really cool!
 
 ## Config
 You can provide your own config that will replace default
@@ -47,6 +46,19 @@ db: {
   myRedis: { // Name of the connection
     host: '127.0.0.1',        // by default
     port: 6379,               // by default
+    username: 'root',         // by default no user
+    password: 'myPassword1'   // by default - using password: NO
+  }
+}
+```
+
+### MongoDB
+```
+db: {
+  ...
+  myMongo: { // Name of the connection
+    host: '127.0.0.1',        // by default
+    port: 27017,              // by default
     username: 'root',         // by default no user
     password: 'myPassword1'   // by default - using password: NO
   }
