@@ -32,6 +32,7 @@ GET /messages/1/?limit=100 // MessagesController.get(id, params)
 ```
 ## Controllers
 Engine will search for controllers in controllers folder or you can create modules. In that case you have to place in module folder.
+More about [Controllers](./docs/Controllers.md)
 
 ### App controllers
 ```
