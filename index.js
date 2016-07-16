@@ -127,6 +127,7 @@ class Airborne {
         }
 
         this.authData = authData;
+        this.di.set('authData', authData);
         this.dispatch();
       })
       .catch(authData => {
