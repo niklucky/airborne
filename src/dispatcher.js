@@ -7,7 +7,8 @@ const Router = require('./router.js');
 class Dispatcher {
 
   constructor(di, request, response) {
-    this.di = di;
+    this.di = new DI().merge(di);
+
 
     this.router = Router.process(request, di.get('routes'));
     console.log("Router: ", this.router);
@@ -17,16 +18,6 @@ class Dispatcher {
     this.controller = null;
     this.method = null;
     this.params = undefined;
-    this.path = '';
-  }
-
-  init() {
-    this.routes = this.di.get('routes');
-    this.request = this.di.get('request');
-
-    this.urlSegments = this.parseUrl(this.request.url);
-
-    return this.checkRouteAPI();
   }
 
   dispatch(modules, controllers) {
@@ -57,56 +48,11 @@ class Dispatcher {
   }
 
 
-
-  checkRouteAPI() {
-    this.currentRoute = this.getRouteByUrl();
-    if (this.checkAllowedMethods(this.currentRoute)) {
-      if (this.urlSegments[0] !== undefined) {
-        if( this.urlSegments.length > 1){
-          this.module = (this.currentRoute.module) ?
-            this.currentRoute.module :
-            this.prepareModuleName(this.urlSegments[0]);
-
-          this.urlSegments.splice(0, 1);
-        }
-      }
-      if (this.urlSegments[0] === undefined) {
-        this.urlSegments[0] = this.DEFAULT_CONTROLLER_NAME;
-      }
-
-      this.controller = (this.currentRoute.controller) ?
-        this.currentRoute.controller :
-        this.prepareControllerName(this.urlSegments[0]);
-
-      this.urlSegments.splice(0, 1);
-
-      this.method = (this.currentRoute.method) ?
-        this.currentRoute.method :
-        this.prepareMethodName(
-          this.getControllerMethodByRequestMethod(this.request)
-        );
-
-      this.params = this.getParamsByUrl();
-    }
-    return this;
-  }
-
   getControllerMethodByRequestMethod(request) {
     if (this.CONTROLLER_METHODS[request.method]) {
       return this.CONTROLLER_METHODS[request.method];
     }
     return this.DEFAULT_CONTROLLER_METHOD;
-  }
-
-  getRouteByUrl() {
-    var route = this.routes[this.path];
-
-    if (route === undefined) {
-      return {
-        methods: null
-      }
-    }
-    return route;
   }
 
   getParamsByUrl() {

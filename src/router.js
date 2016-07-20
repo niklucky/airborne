@@ -17,7 +17,8 @@ class Router {
     const path = this.getPathFromUrl(url);
     const segments = this.getSegmentsFromPath(path);
     const route = this.getRouteByPath(path, routes)
-    //const module = this.getModule()
+    const module = this.getModule()
+    
     console.log(route);
   }
 
