@@ -1,60 +1,39 @@
 'use strict';
-
-const BaseController = require('./lib/base.controller');
-const BaseService = require('./lib/base.service');
-const BaseMapper = require('./lib/base.mapper');
-const BaseModel = require('./lib/base.model');
-
-const HATEOASDecorator = require('./lib/hateoas.decorator');
-
-const HTTPMapper = require('./lib/http.mapper');
-const MySQLMapper = require('./lib/mysql.mapper');
-const MySQLQueryBuilder = require('./lib/mysql.query.builder');
-const RedisMapper = require('./lib/redis.mapper');
-
-const Validator = require('./lib/validator');
-
+const lib = require('./lib');
 
 const express = require('express');
 const bodyParser = require('body-parser');
-const config = require('./lib/config.js');
 
-const DbAdapter = require('./lib/db.adapter');
+const Config = require('./src/config.js');
+const DI = require('./src/di.js');
+const Dispatcher = require('./src/dispatcher.js');
+const DbAdapter = require('./src/db.adapter.js');
 
-const DI = require('./lib/di.js');
-const Responder = require('./lib/responder.js');
-const Dispatcher = require('./lib/dispatcher.js');
+let _instances = [];
 
 class Airborne {
   constructor(userConfig) {
-    this.config = this.mergeConfig(config, userConfig);
     this.di = new DI();
-    this.response = new Responder(this.config);
-
-    this.di.set('routes', {});
+    this.config = new Config(userConfig).get();
     this.di.set('config', this.config);
-    this.di.set('response', this.response);
 
-    if (this.config.db) {
-      this.db = new DbAdapter(this.config.db);
-      this.di.set('db', this.db);
+    if (this.di.get('config').db) {
+      this.registerDatabase(this.di.get('config').db);
     }
-    this.dispatcher = new Dispatcher(this.di);
   }
 
   registerServices(services) {
-    this.services = services;
     this.di.set('services', services);
     return this;
   }
 
   registerControllers(controllers) {
-    this.controllers = controllers;
+    this.di.set('controllers', controllers);
     return this;
   }
 
   registerModules(modules) {
-    this.modules = modules;
+    this.di.set('modules', modules);
     return this;
   }
 
@@ -62,10 +41,17 @@ class Airborne {
     this.di.set('routes', routes);
     return this;
   }
+
   registerValidator(validator){
     this.di.set('Validator', validator);
     return this;
   }
+
+  registerDatabase(dbConfig){
+    this.di.set('db', new DbAdapter(dbConfig));
+    return this;
+  }
+
   start() {
     this.express = express();
 
@@ -83,11 +69,7 @@ class Airborne {
         return;
       }
 
-      this.di.set('request', request);
-
-      this.response.setServerResponse(response);
-
-      this.handle();
+      this.handle(request, response);
     });
 
     router.use((err, req, res, next) => {
@@ -107,12 +89,19 @@ class Airborne {
       })
   }
 
-  handle() {
+  handle(request, response) {
+    this.setInstance(
+      new Dispatcher(this.di, request, response)
+    )
     let routerResult = this.dispatcher.init();
     if (routerResult.currentRoute.auth) {
       return this.initAuth();
     }
     return this.dispatch();
+  }
+
+  setInstance(dispatcher){
+    _instances.push(dispatcher);
   }
 
   initAuth() {
@@ -155,28 +144,7 @@ class Airborne {
   send(data) {
     this.response.send(data);
   }
-
-  mergeConfig(config, userConfig) {
-    for (var i in userConfig) {
-      if (userConfig.hasOwnProperty(i)) {
-        config[i] = userConfig[i];
-      }
-    }
-    return config;
-  }
-
 }
+lib.Airborne = Airborne;
 
-module.exports = {
-  Airborne,
-  BaseController,
-  BaseService,
-  BaseMapper,
-  BaseModel,
-  HATEOASDecorator,
-  HTTPMapper,
-  MySQLMapper,
-  MySQLQueryBuilder,
-  RedisMapper,
-  Validator
-};
+module.exports = lib;

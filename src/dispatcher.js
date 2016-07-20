@@ -2,22 +2,16 @@
 
 const _ = require('lodash');
 
+const Router = require('./router.js');
+
 class Dispatcher {
 
-  constructor(di) {
-    this.DEFAULT_CONTROLLER_NAME = 'index';
-    this.DEFAULT_CONTROLLER_METHOD = 'load';
-    this.CONTROLLER_METHODS = {
-      GET: 'load',
-      POST: 'create',
-      PUT: 'update',
-      PATCH: 'update',
-      DELETE: 'remove'
-    };
-
+  constructor(di, request, response) {
     this.di = di;
 
-    this.request = {};
+    this.router = Router.process(request, di.get('routes'));
+    console.log("Router: ", this.router);
+    this.request = request;
     this.config = di.get('config');
     this.module = null;
     this.controller = null;
@@ -62,21 +56,7 @@ class Dispatcher {
     });
   }
 
-  parseUrl(url) {
-    this.url = url;
-    this.path = this.request.originalUrl.split('?').shift();
 
-    var seg = this.path.split('/');
-    var segments = [];
-    for (var i in seg) {
-      if (seg.hasOwnProperty(i)) {
-        if (seg[i] !== '') {
-          segments.push(seg[i]);
-        }
-      }
-    }
-    return segments;
-  }
 
   checkRouteAPI() {
     this.currentRoute = this.getRouteByUrl();

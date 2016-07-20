@@ -1,31 +1,31 @@
 const https = require('http');
 
 class Authorization {
-  constructor (di) {
+  constructor(di) {
     this.di = di;
   }
 
-  init () {
+  init() {
     let token = this.isTokenProvided();
 
     return new Promise((resolve, reject) => {
-      https.get('http://192.168.99.100:443/authorize/token/?token=' + token, (res) => {
+      https.get('http://192.168.99.100:443/token/?token=' + token, res => {
         // console.log('statusCode: ', res.statusCode);
         // console.log('headers: ', res.headers);
-        res.on('data', (d) => {
+        res.on('data', d => {
           try {
-            resolve(JSON.parse(d.toString()).data);
+            resolve(JSON.parse(d.toString()));
           } catch (e) {
             reject(Error('Auth server response error'));
           }
         });
-      }).on('error', (e) => {
+      }).on('error', e => {
         reject(Error('Auth server error', e));
       });
     });
   }
 
-  isTokenProvided () {
+  isTokenProvided() {
     if (!this.di.get('request').query.token) {
       throw Error('Token is not provided');
     }

@@ -1,13 +1,6 @@
-class IndexController {
-  constructor (di) {
-    this.di = di;
-  }
+const {BaseController} = require('./../../index.js');
 
-  load (params) {
-    return {
-      a: 1
-    }
-  }
+class IndexController extends BaseController {
 }
 
 module.exports = IndexController;

@@ -3,6 +3,10 @@ class DI {
     this.di = {};
   }
 
+  merge(di){
+    
+  }
+
   set (diName, diValue) {
     this.di[diName] = diValue;
     return this;
