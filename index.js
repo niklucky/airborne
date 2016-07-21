@@ -18,36 +18,36 @@ class Airborne {
     this.di.set('config', this.config);
 
     if (this.di.get('config').db) {
-      this.registerDatabase(this.di.get('config').db);
+      this.database(this.di.get('config').db);
     }
   }
 
-  registerServices(services) {
+  services(services) {
     this.di.set('services', services);
     return this;
   }
 
-  registerControllers(controllers) {
+  controllers(controllers) {
     this.di.set('controllers', controllers);
     return this;
   }
 
-  registerModules(modules) {
+  modules(modules) {
     this.di.set('modules', modules);
     return this;
   }
 
-  registerRoutes(routes) {
+  routes(routes) {
     this.di.set('routes', routes);
     return this;
   }
 
-  registerValidator(validator){
+  validator(validator){
     this.di.set('Validator', validator);
     return this;
   }
 
-  registerDatabase(dbConfig){
+  database(dbConfig){
     this.di.set('db', new DbAdapter(dbConfig));
     return this;
   }
@@ -74,7 +74,7 @@ class Airborne {
 
     router.use((err, req, res, next) => {
       console.log('Error catched: ', err);
-      this.response.sendError(err);
+      res.send("Error");
     });
 
     this.express.use('/', router);
@@ -93,56 +93,10 @@ class Airborne {
     this.setInstance(
       new Dispatcher(this.di, request, response)
     )
-    let routerResult = this.dispatcher.init();
-    if (routerResult.currentRoute.auth) {
-      return this.initAuth();
-    }
-    return this.dispatch();
   }
 
   setInstance(dispatcher){
     _instances.push(dispatcher);
-  }
-
-  initAuth() {
-    var AuthLibrary = this.di.get('services').Authorization;
-    if (AuthLibrary === undefined) {
-      throw Error('Auth library not initialized');
-    }
-    new AuthLibrary(this.di).init()
-      .then(authData => {
-        if (!authData.status) {
-          throw Error('Not authorized');
-        }
-
-        this.authData = authData;
-        this.di.set('authData', authData);
-        this.dispatch();
-      })
-      .catch(authData => {
-        this.response.sendError(authData);
-      });
-  }
-
-  dispatch() {
-    var result = this.dispatcher.dispatch(this.modules, this.controllers);
-
-    if (result) {
-      if (result.then) {
-        result.then(data => {
-          this.send(data)
-        })
-          .catch(data => {
-            this.response.sendError(data)
-          });
-        return true;
-      }
-    }
-    return this.send(result)
-  }
-
-  send(data) {
-    this.response.send(data);
   }
 }
 lib.Airborne = Airborne;

@@ -34,6 +34,10 @@ class Responder {
     this.send(message);
   }
 
+  send404(){
+    this.sendError({ message: "Route not found"}, 404);
+  }
+
   send (data) {
     this.setData(data);
     this.serverResponse.status(this.get().statusCode);

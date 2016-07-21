@@ -1,4 +1,5 @@
 'use strict';
+const _ = require('lodash');
 
 const DEFAULT_CONTROLLER_NAME = 'index';
 const DEFAULT_CONTROLLER_METHOD = 'load';
@@ -10,24 +11,55 @@ const CONTROLLER_METHODS = {
   DELETE: 'remove'
 };
 
+let _tmpSegments = [];
+
 class Router {
 
-  process(request, routes){
-    const url = request.url;
-    const path = this.getPathFromUrl(url);
-    const segments = this.getSegmentsFromPath(path);
-    const route = this.getRouteByPath(path, routes)
-    const module = this.getModule()
-    
-    console.log(route);
+  constructor(di){
+    this.route = null;
+    this.module = null;
+    this.controller = null;
+    this.method = null;
+    this.view = 'json';
+    this.url = '';
+    this.segments = [];
+    this.path = '';
+    this.params = undefined;
+
+    this.setUrl(di.get('request').url)
+        .setPathFromUrl()
+        .setSegmentsFromPath()
+        .setRoute(di.get('routes'));
+
+    if(this.checkAllowedMethods()){
+      this.setModule(di.get('modules'))
+          .setController(di.get('controllers'))
+          .setMethod(di.get('request').method)
+          .setParams();
+      }
   }
 
-  getPathFromUrl(url){
-    return url.split('?').shift();
+  setUrl(url){
+    if(url.indexOf('.json') !== -1){
+      this.view = 'json';
+      url = url.replace('.json', '');
+    }
+    if(url.indexOf('.xml') !== -1){
+      this.view = 'xml';
+      url = url.replace('.xml', '');
+    }
+
+    this.url = url;
+    return this;
   }
 
-  getSegmentsFromPath(path) {
-    var seg = path.split('/');
+  setPathFromUrl(){
+    this.path = this.url.split('?').shift();
+    return this;
+  }
+
+  setSegmentsFromPath() {
+    var seg = this.path.split('/');
     var segments = [];
 
     for (var i in seg) {
@@ -37,45 +69,148 @@ class Router {
         }
       }
     }
-    return segments;
+    this.segments = segments;
+    _tmpSegments = segments.map(segment => (segment));
+    return this;
   }
 
-  getRouteByPath(path, routes){
-    return routes[path];
-  }
+  setRoute(routes){
+    if(_tmpSegments.length === 0 && routes['/'] !== undefined){
+      this.route = routes['/'];
+      return this;
+    }
 
-  checkRouteAPI() {
-    this.currentRoute = this.getRouteByUrl();
-    if (this.checkAllowedMethods(this.currentRoute)) {
-      if (this.urlSegments[0] !== undefined) {
-        if( this.urlSegments.length > 1){
-          this.module = (this.currentRoute.module) ?
-            this.currentRoute.module :
-            this.prepareModuleName(this.urlSegments[0]);
-
-          this.urlSegments.splice(0, 1);
+    let routesArray = [];
+    let namedParams = [];
+    for( let routePath in routes){
+      let r = routePath.split('/');
+      for( let i in r){
+        if(r[i] == ''){
+          continue;
         }
+        if( routesArray[routePath] === undefined){
+          routesArray[routePath] = [];
+        }
+        routesArray[routePath].push(r[i]);
       }
-      if (this.urlSegments[0] === undefined) {
-        this.urlSegments[0] = this.DEFAULT_CONTROLLER_NAME;
+    }
+    for( let routePath in routesArray){
+      for(let i in routesArray[routePath]){
+        let routeSegment = routesArray[routePath][i];
+        if(routeSegment.indexOf(':') !== -1){
+          namedParams.push(routeSegment.replace(':', '') );
+          continue;
+        }
+        if(_tmpSegments[i] !== routeSegment){
+          break;
+        }
+        this.route = routes[routePath];
       }
-
-      this.controller = (this.currentRoute.controller) ?
-        this.currentRoute.controller :
-        this.prepareControllerName(this.urlSegments[0]);
-
-      this.urlSegments.splice(0, 1);
-
-      this.method = (this.currentRoute.method) ?
-        this.currentRoute.method :
-        this.prepareMethodName(
-          this.getControllerMethodByRequestMethod(this.request)
-        );
-
-      this.params = this.getParamsByUrl();
+      if(this.route !== undefined){
+        this.route.namedParams = namedParams;
+        return this;
+      }
     }
     return this;
   }
+
+  checkAllowedMethods() {
+    if(this.route === undefined){
+      return true;
+    }
+    if (!this.route.methods) {
+      return true;
+    }
+    return (this.route.methods.indexOf(this.request.method) !== -1);
+  }
+
+  setModule(modules){
+    if(this.route !== undefined && this.route.module){
+      this.module = this.route.module;
+      return this;
+    }
+
+    if(_tmpSegments.length < 2){
+      return this;
+    }
+
+    let moduleName = this.prepareModuleName(_tmpSegments[0]);
+    if(typeof modules[moduleName] === 'function'){
+      this.module = modules[moduleName];
+      _tmpSegments.splice(0, 1);
+    }
+    return this;
+  }
+
+  setController(){
+    if(this.route !== undefined && this.route.controller){
+      this.controller = this.route.controller;
+      return this;
+    }
+
+    this.controller = DEFAULT_CONTROLLER_NAME
+    if(_tmpSegments.length > 0){
+      this.controller = this.prepareControllerName(_tmpSegments[0]);
+      _tmpSegments.splice(0, 1);
+    }
+    return this;
+  }
+
+  setMethod(requestMethod){
+    if(this.route !== undefined && this.route.method){
+      this.method = this.route.method;
+      return this;
+    }
+
+    this.method = this.getControllerMethodByRequestMethod(requestMethod);
+    return this;
+  }
+
+  setParams(){
+    let namedParams = [];
+    if(this.route !== undefined && this.route.namedParams){
+      namedParams = this.route.namedParams;
+    }
+    if(_tmpSegments.length > 0){
+      this.params = {};
+      for( let i in _tmpSegments){
+        let key = (namedParams[i]) ? namedParams[i] : i;
+        this.params[key] = _tmpSegments[i];
+      }
+    }
+    return this;
+  }
+
+
+  getControllerMethodByRequestMethod(method) {
+    if (CONTROLLER_METHODS[method]) {
+      return CONTROLLER_METHODS[method];
+    }
+    return DEFAULT_CONTROLLER_METHOD;
+  }
+
+  prepareModuleName(moduleName) {
+    return this.transformDashToCamelCase(moduleName);
+  }
+
+  prepareControllerName(controllerName) {
+    return this.transformDashToCamelCase(controllerName) + 'Controller';
+  }
+
+  prepareMethodName(methodName) {
+    return methodName;
+  }
+
+  transformDashToCamelCase(string) {
+    let str = string.split('-');
+
+    for (var i in str) {
+      if (str.hasOwnProperty(i)) {
+        str[i] = _.capitalize(str[i]);
+      }
+    }
+    return str.join('');
+  }
 }
 
-module.exports = new Router();
+module.exports = Router;

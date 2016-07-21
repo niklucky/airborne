@@ -1,92 +1,99 @@
 'use strict';
 
-const _ = require('lodash');
-
 const Router = require('./router.js');
+const Responder = require('./responder.js');
+const DI = require('./di.js');
 
 class Dispatcher {
 
   constructor(di, request, response) {
     this.di = new DI().merge(di);
 
+    this.di.set('request', request);
+    this.di.set('response', response);
 
-    this.router = Router.process(request, di.get('routes'));
-    console.log("Router: ", this.router);
-    this.request = request;
-    this.config = di.get('config');
-    this.module = null;
-    this.controller = null;
-    this.method = null;
-    this.params = undefined;
+    this.responder = new Responder(this.di.get('config'));
+    this.responder.setServerResponse(this.di.get('response'));
+
+    this.router = new Router(this.di);
+
+    this.init();
   }
 
-  dispatch(modules, controllers) {
+  init() {
+    if (this.router.route.auth) {
+      return this.initAuth();
+    }
+    return this.dispatch();
+  }
+
+  initAuth() {
+    var AuthLibrary = this.di.get('services').Authorization;
+    if (AuthLibrary === undefined) {
+      throw Error('Auth library not initialized');
+    }
+    new AuthLibrary(this.di).init()
+      .then(authData => {
+        if (!authData.status) {
+          throw Error('Not authorized');
+        }
+
+        this.authData = authData;
+        this.di.set('authData', authData);
+        this.dispatch();
+      })
+      .catch(authData => {
+        this.responder.sendError(authData);
+      });
+  }
+
+  dispatch() {
+    var result = this.start();
+
+    if (result) {
+      if (typeof result.then === 'function') {
+        result.then(data => {
+          this.send(data)
+        })
+          .catch(data => {
+            this.responder.sendError(data)
+          });
+        return true;
+      }
+    }
+    return this.send(result)
+  }
+
+  send(data) {
+    this.responder.send(data);
+  }
+
+  start() {
+    const modules = this.di.get('modules');
+    const controllers = this.di.get('controllers');
+
     try {
-      if (this.module) {
-        this.updateDi();
+      if (this.router.module) {
+        let module = new this.router.module();
 
-        let module = new modules[this.module]();
-
-        let Ctrl = module.controllers[this.controller];
+        let Ctrl = module.controllers[this.router.controller];
+        if(typeof Ctrl !== 'function'){
+          return this.responder.send404();
+        }
         let controller = new Ctrl(this.di);
 
-        return controller.validate(this.method, this.params);
+        return controller.validate(this.router.method, this.router.params);
       }
       var ctrl;
-      ctrl = new controllers[this.controller](this.di);
-      return ctrl.validate(this.method, this.params);
-    } catch (e) {
-      throw new Error(e)
-    }
-  }
-
-  updateDi() {
-    this.di.set('route', {
-      current: this.url,
-      path: this.request.originalUrl.split('?').shift()
-    });
-  }
-
-
-  getControllerMethodByRequestMethod(request) {
-    if (this.CONTROLLER_METHODS[request.method]) {
-      return this.CONTROLLER_METHODS[request.method];
-    }
-    return this.DEFAULT_CONTROLLER_METHOD;
-  }
-
-  getParamsByUrl() {
-    return this.urlSegments;
-  }
-
-  checkAllowedMethods(currentRoute) {
-    if (!currentRoute.methods) {
-      return true;
-    }
-    return (currentRoute.methods.indexOf(this.request.method) !== -1);
-  }
-
-  prepareModuleName(moduleName) {
-    return this.transformDashToCamelCase(moduleName);
-  }
-
-  prepareControllerName(controllerName) {
-    return this.transformDashToCamelCase(controllerName) + 'Controller';
-  }
-
-  prepareMethodName(methodName) {
-    return methodName;
-  }
-
-  transformDashToCamelCase(string) {
-    let str = string.split('-');
-
-    for (var i in str) {
-      if (str.hasOwnProperty(i)) {
-        str[i] = _.capitalize(str[i]);
+      if(typeof controllers[this.router.controller] !== 'function'){
+        return this.responder.send404();
       }
+      ctrl = new controllers[this.router.controller](this.di);
+      return ctrl.validate(this.router.method, this.router.params);
+    } catch (e) {
+      console.log('Dispatcher error', e);
+      this.responder.sendError(e);
     }
-    return str.join('');
   }
 }
 

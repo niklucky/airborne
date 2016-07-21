@@ -3,7 +3,7 @@ module.exports = {
     auth: true,
     allowedMethods: ['GET']
   },
-  '/auth/basic-token': {
+  '/auth/test/:id': {
     auth: false
   },
   '/mailman/messages': {

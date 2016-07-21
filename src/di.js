@@ -3,8 +3,11 @@ class DI {
     this.di = {};
   }
 
-  merge(di){
-    
+  merge(DI){
+    for( let name in DI.di){
+      this.set(name, DI.di[name]);
+    }
+    return this;
   }
 
   set (diName, diValue) {
