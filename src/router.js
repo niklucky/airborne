@@ -159,6 +159,7 @@ class Router {
   setMethod(requestMethod){
     if(this.route !== undefined && this.route.method){
       this.method = this.route.method;
+      _tmpSegments.splice(0, 1);
       return this;
     }
 

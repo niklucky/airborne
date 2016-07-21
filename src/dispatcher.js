@@ -15,6 +15,8 @@ class Dispatcher {
     this.responder = new Responder(this.di.get('config'));
     this.responder.setServerResponse(this.di.get('response'));
 
+    this.di.set('responder', this.responder);
+
     this.router = new Router(this.di);
 
     this.init();
