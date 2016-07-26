@@ -23,7 +23,7 @@ class Dispatcher {
   }
 
   init() {
-    if (this.router.route.auth) {
+    if (this.router.route !== null && this.router.route.auth) {
       return this.initAuth();
     }
     return this.dispatch();
@@ -75,6 +75,7 @@ class Dispatcher {
     const controllers = this.di.get('controllers');
 
     try {
+
       if (this.router.module) {
         let module = new this.router.module();
 
@@ -91,6 +92,7 @@ class Dispatcher {
         return this.responder.send404();
       }
       ctrl = new controllers[this.router.controller](this.di);
+
       return ctrl.validate(this.router.method, this.router.params);
     } catch (e) {
       console.log('Dispatcher error', e);

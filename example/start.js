@@ -8,13 +8,11 @@ const controllers = require('./controllers');
 const modules = require('./config/modules');
 const services = require('./config/services');
 
-const validator = new Engine.Validator();
-
 var app = new Engine.Airborne(config);
 app.routes(routes)
     .services(services)
     .modules(modules)
     .controllers(controllers)
-    .validator(validator);
-    
+    .validator(Engine.Validator);
+
 app.start();

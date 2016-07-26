@@ -115,7 +115,7 @@ class Router {
   }
 
   checkAllowedMethods() {
-    if(this.route === undefined){
+    if(this.route === undefined || this.route === null){
       return true;
     }
     if (!this.route.methods) {
@@ -125,7 +125,7 @@ class Router {
   }
 
   setModule(modules){
-    if(this.route !== undefined && this.route.module){
+    if( (this.route !== undefined && this.route !== null) && this.route.module){
       this.module = this.route.module;
       return this;
     }
@@ -143,7 +143,7 @@ class Router {
   }
 
   setController(){
-    if(this.route !== undefined && this.route.controller){
+    if((this.route !== undefined && this.route !== null)  && this.route.controller){
       this.controller = this.route.controller;
       return this;
     }
@@ -157,7 +157,7 @@ class Router {
   }
 
   setMethod(requestMethod){
-    if(this.route !== undefined && this.route.method){
+    if((this.route !== undefined && this.route !== null)  && this.route.method){
       this.method = this.route.method;
       _tmpSegments.splice(0, 1);
       return this;
@@ -169,7 +169,7 @@ class Router {
 
   setParams(){
     let namedParams = [];
-    if(this.route !== undefined && this.route.namedParams){
+    if((this.route !== undefined && this.route !== null)  && this.route.namedParams){
       namedParams = this.route.namedParams;
     }
     if(_tmpSegments.length > 0){

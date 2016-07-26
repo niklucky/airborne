@@ -1,6 +1,6 @@
 {
   "name": "airborne-engine",
-  "version": "0.3.3",
+  "version": "0.4.1",
   "description": "Airborne RESTful API framework",
   "main": "index.js",
   "scripts": {
