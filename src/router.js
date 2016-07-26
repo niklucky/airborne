@@ -106,7 +106,7 @@ class Router {
         }
         this.route = routes[routePath];
       }
-      if(this.route !== undefined){
+      if(this.route !== undefined && this.route !== null){
         this.route.namedParams = namedParams;
         return this;
       }
