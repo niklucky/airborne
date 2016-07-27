@@ -31,7 +31,7 @@
   "license": "MIT",
   "homepage": "https://github.com/niklucky/airborne#readme",
   "devDependencies": {
-    "babel": "^6.5.2",
+    "babel-cli": "^6.11.4",
     "babel-core": "^6.11.4",
     "babel-eslint": "^6.1.2",
     "babel-preset-es2015": "^6.9.0",
