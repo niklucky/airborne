@@ -1,4 +1,5 @@
-"use strict";
+/* globals Promise */
+'use strict';
 const BaseMapper = require('./base.mapper');
 const BaseModel = require('./base.model');
 

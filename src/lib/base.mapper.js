@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 const BaseModel = require('./base.model');
 
 class BaseMapper {
@@ -8,27 +8,28 @@ class BaseMapper {
   }
 
   load(params) {
-    return this.nullObject();
+    return this.nullObject(params);
   }
 
   get(params) {
-    return this.nullObject();
+    return this.nullObject(params);
   }
 
   create(payload) {
-    return this.nullObject();
+    return this.nullObject(payload);
   }
 
   update(params, data) {
-    return this.nullObject();
+    return this.nullObject(params, data);
   }
 
   search(params) {
-    return this.nullObject();
+    return this.nullObject(params);
   }
 
-  nullObject(){
-    return {};
+  nullObject(params){
+    params = {};
+    return params;
   }
 
   buildCollection(collection){

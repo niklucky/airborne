@@ -71,7 +71,6 @@ class Dispatcher {
   }
 
   start() {
-    const modules = this.di.get('modules');
     const controllers = this.di.get('controllers');
 
     try {

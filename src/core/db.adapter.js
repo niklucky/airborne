@@ -1,3 +1,5 @@
+'use strict';
+
 class DbAdapter {
   constructor(dbConfig) {
     this.dbConfig = dbConfig;
@@ -40,7 +42,7 @@ class DbAdapter {
   }
 
   initMySQL(name, connection) {
-    var mysql = require("mysql");
+    var mysql = require('mysql');
 
     if (!connection.user) {
       connection.user = 'root';
@@ -60,10 +62,13 @@ class DbAdapter {
       database: connection.database
     });
     conn.connect( err => {
-      console.log("MySQL connected");
+      if( err !== null){
+        console.log('MySQL connected with errors: ', err);
+      }
+      console.log('MySQL connected with no errors');
     });
     conn.on('error', err => {
-      console.log("Connection down. Reconnecting...", err);
+      console.log('Connection down. Reconnecting...', err);
       setTimeout(() => {
         this.initMySQL(name, connection);
       }, 1000);

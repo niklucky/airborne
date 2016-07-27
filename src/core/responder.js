@@ -1,3 +1,5 @@
+'use strict';
+
 class Responder {
   constructor (config) {
     this.config = config;
@@ -35,7 +37,7 @@ class Responder {
   }
 
   send404(){
-    this.sendError({ message: "Route not found"}, 404);
+    this.sendError({ message: 'Route not found'}, 404);
   }
 
   send (data) {

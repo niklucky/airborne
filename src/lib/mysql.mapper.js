@@ -1,3 +1,4 @@
+/* globals Promise */
 'use strict';
 const BaseMapper = require('./base.mapper');
 const MySQLQueryBuilder = require('mysql-qb');
@@ -11,7 +12,7 @@ class MySQLMapper extends BaseMapper {
   }
 
   get(params){
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve) => {
       this.load(params).then(collection => {
         resolve(collection[0]);
       });
@@ -28,7 +29,7 @@ class MySQLMapper extends BaseMapper {
           .build();
         this.db.query(query, (error, rows, fields) => {
           if (error) {
-            return reject(error);
+            return reject(error, fields);
           }
           resolve(this.buildCollection(rows));
         });

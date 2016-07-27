@@ -1,3 +1,4 @@
+/* globals Promise */
 'use strict';
 const BaseMapper = require('./base.mapper');
 const BaseModel = require('./base.model');
@@ -55,7 +56,7 @@ class HTTPMapper extends BaseMapper {
             if (response.statusCode > 199 && response.statusCode < 301) {
               resolve(new this.Model(result));
             }
-            reject({ message: "Remote server error", stack: result });
+            reject({ message: 'Remote server error', stack: result });
           } catch(e) {
             reject(e);
           }

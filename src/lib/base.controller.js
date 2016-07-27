@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 const BaseService = require('./base.service');
 
 class BaseController {
@@ -17,7 +17,7 @@ class BaseController {
       const validator = new this.validator(this.rules[method], this.options[method]);
       const result = validator.validate(requestData);
       if(result.result === false){
-        return this.di.get('responder').sendError({message: "Validation error", stack: result.errors }, 401);
+        return this.di.get('responder').sendError({message: 'Validation error', stack: result.errors }, 401);
       }
       return this[method](result.validated.params, result.validated.payload);
     }
@@ -41,9 +41,9 @@ class BaseController {
     }
     let body = this.di.get('request').body;
     if(Object.keys(body).length > 0){
-      for (var i in body) {
-        if( body.hasOwnProperty(i)){
-          payload[i] = body[i];
+      for (var n in body) {
+        if( body.hasOwnProperty(n)){
+          payload[n] = body[n];
         }
       }
     }
