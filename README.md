@@ -1,10 +1,35 @@
-# Airborne API framework
+# Airborne API
+[![Build Status](https://travis-ci.org/niklucky/airborne.svg?branch=master)](https://travis-ci.org/niklucky/airborne)
+[![npm version](https://img.shields.io/npm/v/airborne.svg?style=flat-square)](https://www.npmjs.com/package/airborne)
 
-> Moved to [Airborne](https://www.npmjs.com/package/airborne)
+> API framework that implements DAO (Data Access Object) model.
 
-This framework built for educational purpose. I'm migrating to ES6 and have decided to write my own RESTful API framework.
+## Why do I need it?
+Actually you don't. Really. I build this framework strictly in educational purpose and now I'm trying to use it on my projects.
+It's updated almost every day. Young and unstable. It's even not 1.x!
+Every day I write tests and add new features.
+After testing a lot of frameworks on NodeJS for my needs (all of them are using MV) I decided to write my own.
 
-It is not covered by Unit tests yet but WIP.
+I advise you to use some of the mature frameworks (HAPI, Meteor etc).
+
+> If you decided to poke this stuff you can drop me a line
+
+## NodeJS support
+
+Framework is written on ES6 and with help of babel compiled to ES5.
+So it supports node >= 4.1.2.
+
+
+## Contents
+* [Quick start](./docs/Quick-start.md) (soon)
+* [Usage examples](./docs/Usage.md) (soon)
+* [Architecture](./docs/Architecture.md) (soon)
+* [Controllers & validation](./docs/Architecture.md) (soon)
+* [Services](./docs/Services.md) (soon)
+* [Mappers & Models (schemas)](./docs/Mappers.md) (soon)
+* [Views (xml & json)](./docs/Views.md) (soon)
+* [Working with Databases (MySQL, Redis, MongoDD)](./docs/Databases.md) (soon)
+* [Working with HTTP](./docs/HTTP.md) (soon)
 
 ## How it works
 It uses DAO architecture and DI for its carcass.
