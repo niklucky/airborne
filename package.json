@@ -1,5 +1,5 @@
 {
-  "name": "airborne-engine",
+  "name": "airborne",
   "version": "0.5.3",
   "description": "Airborne RESTful API framework",
   "main": "index.js",
