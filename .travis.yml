@@ -12,6 +12,7 @@ cache:
   - node_modules # NPM packages
 before_script:
   - npm install -g mocha
+  - npm install -g babel-cli
   - npm run build
 install:
   - npm install
