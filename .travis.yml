@@ -11,7 +11,7 @@ cache:
   directories:
   - node_modules # NPM packages
 before_script:
-# - npm install -g mocha
+  - npm install -g mocha
   - npm run build
 install:
   - npm install
