@@ -1,4 +1,7 @@
 # Airborne API framework
+
+> Moved to [Airborne](https://www.npmjs.com/package/airborne)
+
 This framework built for educational purpose. I'm migrating to ES6 and have decided to write my own RESTful API framework.
 
 It is not covered by Unit tests yet but WIP.

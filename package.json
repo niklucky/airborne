@@ -1,6 +1,6 @@
 {
   "name": "airborne-engine",
-  "version": "0.5.2",
+  "version": "0.5.3",
   "description": "Airborne RESTful API framework",
   "main": "index.js",
   "scripts": {
@@ -10,15 +10,26 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+ssh://git@bitbucket.org/aerial-dev/airborn-engine.git"
+    "url": "git+ssh://git@github.com:niklucky/airborne.git"
   },
   "keywords": [
     "ariborne",
-    "mappers"
+    "engine",
+    "framework",
+    "api",
+    "dao",
+    "mapper",
+    "controller",
+    "service",
+    "model",
+    "schema",
+    "mysql",
+    "redis",
+    "database"
   ],
   "author": "Nikita Zhuravlev",
   "license": "MIT",
-  "homepage": "https://bitbucket.org/aerial-dev/airborn-base#readme",
+  "homepage": "https://github.com/niklucky/airborne#readme",
   "devDependencies": {
     "babel": "^6.5.2",
     "babel-core": "^6.11.4",
@@ -27,7 +38,9 @@
     "babel-preset-es2015": "^6.9.0",
     "babel-preset-stage-0": "^6.5.0",
     "babel-register": "^6.11.6",
-    "eslint": "^2.13.1"
+    "chai": "^3.5.0",
+    "eslint": "^2.13.1",
+    "mocha": "^2.5.3"
   },
   "dependencies": {
     "body-parser": "^1.15.2",
