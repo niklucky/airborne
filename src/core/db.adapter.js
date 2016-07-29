@@ -61,18 +61,17 @@ class DbAdapter {
       password: connection.password,
       database: connection.database
     });
-    conn.connect( err => {
-      if( err !== null){
-        console.log('MySQL connected with errors: ', err);
-      }
-      console.log('MySQL connected with no errors');
-    });
-    conn.on('error', err => {
-      console.log('Connection down. Reconnecting...', err);
+    conn.connect();
+    conn.on('error', (err) => {
+      console.error('Connection down. Reconnecting...', err);
       setTimeout(() => {
         this.initMySQL(name, connection);
       }, 1000);
     });
+    conn.on('connect', () => {
+      console.info('Connected');
+    });
+
     this.connections[name] = conn;
   }
 }

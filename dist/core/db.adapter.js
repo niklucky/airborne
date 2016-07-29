@@ -75,18 +75,17 @@ var DbAdapter = function () {
         password: connection.password,
         database: connection.database
       });
-      conn.connect(function (err) {
-        if (err !== null) {
-          console.log('MySQL connected with errors: ', err);
-        }
-        console.log('MySQL connected with no errors');
-      });
+      conn.connect();
       conn.on('error', function (err) {
-        console.log('Connection down. Reconnecting...', err);
+        console.error('Connection down. Reconnecting...', err);
         setTimeout(function () {
           _this.initMySQL(name, connection);
         }, 1000);
       });
+      conn.on('connect', function () {
+        console.info('Connected');
+      });
+
       this.connections[name] = conn;
     }
   }]);
