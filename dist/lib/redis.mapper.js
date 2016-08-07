@@ -123,7 +123,10 @@ var RedisMapper = function (_BaseMapper) {
           if (error) {
             return reject({ error: error, replies: replies });
           }
-          return resolve(key);
+          if (replies !== null) {
+            replies.key = key;
+          }
+          return resolve(replies);
         });
         if (expired > 0) {
           _this3.db.expire(redisKey, expired);
