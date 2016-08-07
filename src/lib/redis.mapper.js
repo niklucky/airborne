@@ -89,7 +89,10 @@ class RedisMapper extends BaseMapper {
         if(error) {
           return reject({ error: error, replies: replies });
         }
-        return resolve(key);
+        if(replies !== null){
+          replies.key = key;
+        }
+        return resolve(replies);
       });
       if (expired > 0) {
         this.db.expire(redisKey, expired);
