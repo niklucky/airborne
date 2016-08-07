@@ -43,13 +43,22 @@ class MySQLMapper extends BaseMapper {
       try {
         const model = new this.Model(params);
         const data = (model.get) ? model.get() : model ;
-
+        for( var i in data ){
+          if(typeof data[i] === 'string'){
+            data[i] = data[i].replace(/'/g, "\\'");
+          }
+        }
         let query = this.queryBuilder.insert(this.dbTable, data).build();
         this.db.query(query, (error, result) => {
           if(error){
             return reject(error);
           }
           data.id = result.insertId;
+          for( var i in data ){
+            if(typeof data[i] === 'string'){
+              data[i] = data[i].replace(/\'/g, "'");
+            }
+          }
           resolve(data);
         });
       }catch(e){
