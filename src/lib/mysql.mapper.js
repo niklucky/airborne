@@ -45,7 +45,7 @@ class MySQLMapper extends BaseMapper {
         const data = (model.get) ? model.get() : model ;
         for( var i in data ){
           if(typeof data[i] === 'string'){
-            data[i] = data[i].replace(/'/g, "\\'");
+            data[i] = data[i].replace(/'/g, "\\'"); // eslint-disable-line
           }
         }
         let query = this.queryBuilder.insert(this.dbTable, data).build();
@@ -56,7 +56,7 @@ class MySQLMapper extends BaseMapper {
           data.id = result.insertId;
           for( var i in data ){
             if(typeof data[i] === 'string'){
-              data[i] = data[i].replace(/\'/g, "'");
+              data[i] = data[i].replace(/\'/g, "'"); // eslint-disable-line
             }
           }
           resolve(data);

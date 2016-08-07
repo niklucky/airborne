@@ -63,16 +63,27 @@ var MySQLMapper = function (_BaseMapper) {
 
       return new Promise(function (resolve, reject) {
         try {
+          var i;
+
           (function () {
             var model = new _this4.Model(params);
             var data = model.get ? model.get() : model;
-
+            for (i in data) {
+              if (typeof data[i] === 'string') {
+                data[i] = data[i].replace(/'/g, "\\'"); // eslint-disable-line
+              }
+            }
             var query = _this4.queryBuilder.insert(_this4.dbTable, data).build();
             _this4.db.query(query, function (error, result) {
               if (error) {
                 return reject(error);
               }
               data.id = result.insertId;
+              for (var i in data) {
+                if (typeof data[i] === 'string') {
+                  data[i] = data[i].replace(/\'/g, "'"); // eslint-disable-line
+                }
+              }
               resolve(data);
             });
           })();
