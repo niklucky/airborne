@@ -92,6 +92,32 @@ var MySQLMapper = function (_BaseMapper) {
         }
       });
     }
+  }, {
+    key: 'update',
+    value: function update(params, data) {
+      var _this5 = this;
+
+      return new Promise(function (resolve, reject) {
+        try {
+          var model = new _this5.Model(data);
+          data = model.get ? model.get() : model;
+          for (var i in data) {
+            if (data[i] === undefined) {
+              delete data[i];
+            }
+          }
+          var query = _this5.queryBuilder.update(_this5.dbTable, data).where(params).build();
+          _this5.db.query(query, function (error, result) {
+            if (error) {
+              return reject(error);
+            }
+            resolve(result);
+          });
+        } catch (e) {
+          reject(e);
+        }
+      });
+    }
   }]);
 
   return MySQLMapper;

@@ -66,6 +66,29 @@ class MySQLMapper extends BaseMapper {
       }
     });
   }
+
+  update(params, data){
+    return new Promise((resolve, reject) => {
+      try {
+        const model = new this.Model(data);
+        data = (model.get) ? model.get() : model ;
+        for( var i in data ){
+          if(data[i] === undefined ){
+            delete data[i];
+          }
+        }
+        let query = this.queryBuilder.update(this.dbTable, data).where(params).build();
+        this.db.query(query, (error, result) => {
+          if(error){
+            return reject(error);
+          }
+          resolve(result);
+        });
+      }catch(e){
+        reject(e);
+      }
+    });
+  }
 }
 
 module.exports = MySQLMapper;
