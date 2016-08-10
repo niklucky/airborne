@@ -1,6 +1,6 @@
 {
   "name": "airborne",
-  "version": "0.5.12",
+  "version": "0.5.13",
   "description": "Airborne RESTful API framework",
   "main": "index.js",
   "scripts": {

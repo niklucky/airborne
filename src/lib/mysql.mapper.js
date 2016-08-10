@@ -90,7 +90,7 @@ class MySQLMapper extends BaseMapper {
     });
   }
 
-  del(params, data){
+  del(params){
     return new Promise((resolve, reject) => {
       try {
         let query = this.queryBuilder.delete(this.dbTable).where(params).build();

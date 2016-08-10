@@ -87,6 +87,16 @@ var BaseController = function () {
     value: function search(params) {
       return this.service.search(params);
     }
+  }, {
+    key: 'status',
+    value: function status(params) {
+      return this.service.status(params);
+    }
+  }, {
+    key: 'del',
+    value: function del(params) {
+      return this.service.del(params);
+    }
   }]);
 
   return BaseController;

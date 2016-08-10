@@ -50,9 +50,14 @@ var HTTPMapper = function (_BaseMapper) {
       return this.request('PUT', params, putData);
     }
   }, {
-    key: 'remove',
-    value: function remove(params) {
+    key: 'del',
+    value: function del(params) {
       return this.request('DELETE', params);
+    }
+  }, {
+    key: 'status',
+    value: function status(params) {
+      return this.request('HEAD', params);
     }
   }, {
     key: 'request',

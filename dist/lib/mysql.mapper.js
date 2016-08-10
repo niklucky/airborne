@@ -118,6 +118,25 @@ var MySQLMapper = function (_BaseMapper) {
         }
       });
     }
+  }, {
+    key: 'del',
+    value: function del(params) {
+      var _this6 = this;
+
+      return new Promise(function (resolve, reject) {
+        try {
+          var query = _this6.queryBuilder.delete(_this6.dbTable).where(params).build();
+          _this6.db.query(query, function (error, result) {
+            if (error) {
+              return reject(error);
+            }
+            resolve(result);
+          });
+        } catch (e) {
+          reject(e);
+        }
+      });
+    }
   }]);
 
   return MySQLMapper;

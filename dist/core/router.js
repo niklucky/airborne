@@ -13,7 +13,8 @@ var CONTROLLER_METHODS = {
   POST: 'create',
   PUT: 'update',
   PATCH: 'update',
-  DELETE: 'remove'
+  DELETE: 'del',
+  HEAD: 'status'
 };
 
 var _tmpSegments = [];

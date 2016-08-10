@@ -40,6 +40,16 @@ var BaseMapper = function () {
       return this.nullObject(params);
     }
   }, {
+    key: 'status',
+    value: function status(params) {
+      return this.nullObject(params);
+    }
+  }, {
+    key: 'del',
+    value: function del(params) {
+      return this.nullObject(params);
+    }
+  }, {
     key: 'nullObject',
     value: function nullObject(params) {
       params = {};

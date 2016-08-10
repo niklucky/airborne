@@ -39,6 +39,16 @@ var BaseService = function () {
     value: function search(params) {
       return this.mapper.search(params);
     }
+  }, {
+    key: 'status',
+    value: function status(params) {
+      return this.mapper.get(params);
+    }
+  }, {
+    key: 'del',
+    value: function del(params) {
+      return this.mapper.del(params);
+    }
   }]);
 
   return BaseService;

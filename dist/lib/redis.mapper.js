@@ -72,8 +72,8 @@ var RedisMapper = function (_BaseMapper) {
       return this._setter('expire', this._getKey(key), _expire);
     }
   }, {
-    key: 'remove',
-    value: function remove(key) {
+    key: 'del',
+    value: function del(key) {
       return this._getter('del', this._getKey(key));
     }
   }, {
