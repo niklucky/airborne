@@ -27,6 +27,14 @@ class BaseMapper {
     return this.nullObject(params);
   }
 
+  status(params) {
+    return this.nullObject(params);
+  }
+
+  del(params) {
+    return this.nullObject(params);
+  }
+
   nullObject(params){
     params = {};
     return params;

@@ -27,6 +27,14 @@ class BaseService {
   search(params) {
     return this.mapper.search(params);
   }
+
+  status(params) {
+    return this.mapper.get(params);
+  }
+
+  del(params) {
+    return this.mapper.del(params);
+  }
 }
 
 module.exports = BaseService;

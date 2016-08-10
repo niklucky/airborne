@@ -28,8 +28,12 @@ class HTTPMapper extends BaseMapper {
     return this.request('PUT', params, putData);
   }
 
-  remove(params) {
+  del(params) {
     return this.request('DELETE', params);
+  }
+
+  status(params) {
+    return this.request('HEAD', params);
   }
 
   request(method, params, postData) {

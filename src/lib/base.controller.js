@@ -72,6 +72,15 @@ class BaseController {
   search(params) {
     return this.service.search(params);
   }
+
+  status(params){
+    return this.service.status(params);
+  }
+
+  del(params){
+    return this.service.del(params);
+  }
+
 }
 
 module.exports = BaseController;
