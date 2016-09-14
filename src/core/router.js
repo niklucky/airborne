@@ -115,22 +115,21 @@ class Router {
 
       if(routeSegment.indexOf(':') !== -1){
         let paramName = routeSegment.replace(':', '');
-        let paramValue = _tmpSegments[index];
+        let paramValue = segment;
         _tmpSegments.splice(index, 1);
         namedParams[paramName] = paramValue;
         index++;
         continue;
       }
-      if(routeSegment !== _tmpSegments[index]) {
+      if(routeSegment !== segment) {
         next = true;
         found = false;
         continue;
       }
       found = true;
-      routesArray[index] = _tmpSegments[index];
+      routesArray[index] = segment;
       index++;
     }
-    console.log('found', found);
     if(found){
       this.route = routeObject;
       this.route.namedParams = namedParams;

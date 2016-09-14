@@ -123,22 +123,21 @@ var Router = function () {
 
         if (routeSegment.indexOf(':') !== -1) {
           var paramName = routeSegment.replace(':', '');
-          var paramValue = _tmpSegments[index];
+          var paramValue = segment;
           _tmpSegments.splice(index, 1);
           namedParams[paramName] = paramValue;
           index++;
           continue;
         }
-        if (routeSegment !== _tmpSegments[index]) {
+        if (routeSegment !== segment) {
           next = true;
           found = false;
           continue;
         }
         found = true;
-        routesArray[index] = _tmpSegments[index];
+        routesArray[index] = segment;
         index++;
       }
-      console.log('found', found);
       if (found) {
         this.route = routeObject;
         this.route.namedParams = namedParams;
