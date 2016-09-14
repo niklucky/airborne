@@ -123,7 +123,7 @@ var RedisMapper = function (_BaseMapper) {
           if (error) {
             return reject({ error: error, replies: replies });
           }
-          if (replies !== null) {
+          if ((typeof replies === 'undefined' ? 'undefined' : _typeof(replies)) === 'object' && replies !== null) {
             replies.key = key;
           }
           return resolve(replies);

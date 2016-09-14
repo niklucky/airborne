@@ -37,7 +37,7 @@ class Dispatcher {
     new AuthLibrary(this.di).init()
       .then(authData => {
         if (!authData.status) {
-          throw Error('Not authorized');
+          this.responder.sendError('Not authorized', 401);
         }
 
         this.authData = authData;
@@ -45,7 +45,7 @@ class Dispatcher {
         this.dispatch();
       })
       .catch(authData => {
-        this.responder.sendError(authData);
+        this.responder.sendError(authData, 401);
       });
   }
 
@@ -74,7 +74,7 @@ class Dispatcher {
     const controllers = this.di.get('controllers');
 
     try {
-
+      console.log('Dispatcher start: ', this.router);
       if (this.router.module) {
         let module = new this.router.module();
 

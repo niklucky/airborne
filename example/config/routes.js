@@ -1,10 +1,16 @@
 module.exports = {
   '/': {
-    auth: true,
     allowedMethods: ['GET']
   },
-  '/auth/test/:id': {
-    auth: false
+  '/auth': {
+    auth: false,
+    module: 'Auth'
+  },
+  '/auth/forgot-password/:id': {
+    method: 'forgotPassword'
+  },
+  '/auth/login': {
+    method: 'login'
   },
   '/mailman/messages': {
     auth: true

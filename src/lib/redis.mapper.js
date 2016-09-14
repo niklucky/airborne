@@ -47,7 +47,7 @@ class RedisMapper extends BaseMapper {
   expire(key, expire){
     return this._setter('expire', this._getKey(key), expire);
   }
-  
+
   del(key){
     return this._getter('del', this._getKey(key));
   }
@@ -90,7 +90,7 @@ class RedisMapper extends BaseMapper {
         if(error) {
           return reject({ error: error, replies: replies });
         }
-        if(replies !== null){
+        if (typeof replies === 'object' && replies !== null) {
           replies.key = key;
         }
         return resolve(replies);

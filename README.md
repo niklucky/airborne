@@ -23,7 +23,8 @@ So it supports node >= 4.1.2.
 ## Contents
 * [Quick start](./docs/Quick-start.md) (soon)
 * [Usage examples](./docs/Usage.md) (soon)
-* [Architecture](./docs/Architecture.md) (soon)
+* [Architecture](https://github.com/niklucky/airborne/blob/master/docs/Architecture.md) (soon)
+* [Routing](https://github.com/niklucky/airborne/blob/master/docs/Routing.md)
 * [Controllers & validation](./docs/Architecture.md) (soon)
 * [Services](./docs/Services.md) (soon)
 * [Mappers & Models (schemas)](./docs/Mappers.md) (soon)

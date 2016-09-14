@@ -46,14 +46,14 @@ var Dispatcher = function () {
       }
       new AuthLibrary(this.di).init().then(function (authData) {
         if (!authData.status) {
-          throw Error('Not authorized');
+          _this.responder.sendError('Not authorized', 401);
         }
 
         _this.authData = authData;
         _this.di.set('authData', authData);
         _this.dispatch();
       }).catch(function (authData) {
-        _this.responder.sendError(authData);
+        _this.responder.sendError(authData, 401);
       });
     }
   }, {
@@ -86,7 +86,7 @@ var Dispatcher = function () {
       var controllers = this.di.get('controllers');
 
       try {
-
+        console.log('Dispatcher start: ', this.router);
         if (this.router.module) {
           var _module = new this.router.module();
 

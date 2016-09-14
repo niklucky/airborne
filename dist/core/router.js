@@ -6,7 +6,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 var _ = require('lodash');
 
-var DEFAULT_CONTROLLER_NAME = 'index';
+var DEFAULT_CONTROLLER_NAME = 'IndexController';
 var DEFAULT_CONTROLLER_METHOD = 'load';
 var CONTROLLER_METHODS = {
   GET: 'load',
@@ -25,7 +25,7 @@ var Router = function () {
 
     this.route = null;
     this.module = null;
-    this.controller = null;
+    this.controller = DEFAULT_CONTROLLER_NAME;
     this.method = null;
     this.view = 'json';
     this.url = '';
@@ -35,7 +35,7 @@ var Router = function () {
 
     this.setUrl(di.get('request').url).setPathFromUrl().setSegmentsFromPath().setRoute(di.get('routes'));
 
-    if (this.checkAllowedMethods()) {
+    if (this.isMethodAllowed()) {
       this.setModule(di.get('modules')).setController(di.get('controllers')).setMethod(di.get('request').method).setParams();
     }
   }
@@ -87,44 +87,69 @@ var Router = function () {
         this.route = routes['/'];
         return this;
       }
-
-      var routesArray = [];
-      var namedParams = [];
-      for (var routePath in routes) {
-        var r = routePath.split('/');
-        for (var i in r) {
-          if (r[i] == '') {
-            continue;
-          }
-          if (routesArray[routePath] === undefined) {
-            routesArray[routePath] = [];
-          }
-          routesArray[routePath].push(r[i]);
-        }
-      }
-      for (var _routePath in routesArray) {
-        for (var _i in routesArray[_routePath]) {
-          var routeSegment = routesArray[_routePath][_i];
-          if (routeSegment.indexOf(':') !== -1) {
-            namedParams.push(routeSegment.replace(':', ''));
-            continue;
-          }
-          if (_tmpSegments[_i] !== routeSegment) {
-            break;
-          }
-          this.route = routes[_routePath];
-        }
-        if (this.route !== undefined && this.route !== null) {
-          this.route.namedParams = namedParams;
-          return this;
+      for (var route in routes) {
+        var is = this.checkRoute(route, routes[route]);
+        if (!is) {
+          continue;
         }
       }
       return this;
     }
   }, {
-    key: 'checkAllowedMethods',
-    value: function checkAllowedMethods() {
-      if (this.route === undefined || this.route === null) {
+    key: 'checkRoute',
+    value: function checkRoute(route, routeObject) {
+
+      if (route.indexOf('/') === 0) {
+        route = route.replace('/', '');
+      }
+      var _routeSegments = route.split('/');
+      var index = 0;
+      var next = false;
+      var found = false;
+      var routesArray = [];
+      var namedParams = {};
+
+      if (_tmpSegments.length > _routeSegments.length) {
+        return false;
+      }
+
+      for (var i in _tmpSegments) {
+        var segment = _tmpSegments[i];
+        var routeSegment = _routeSegments[index];
+
+        if (next === true) {
+          continue;
+        }
+
+        if (routeSegment.indexOf(':') !== -1) {
+          var paramName = routeSegment.replace(':', '');
+          var paramValue = _tmpSegments[index];
+          _tmpSegments.splice(index, 1);
+          namedParams[paramName] = paramValue;
+          index++;
+          continue;
+        }
+        if (routeSegment !== _tmpSegments[index]) {
+          next = true;
+          found = false;
+          continue;
+        }
+        found = true;
+        routesArray[index] = _tmpSegments[index];
+        index++;
+      }
+      console.log('found', found);
+      if (found) {
+        this.route = routeObject;
+        this.route.namedParams = namedParams;
+        this.params = namedParams;
+      }
+      return found;
+    }
+  }, {
+    key: 'isMethodAllowed',
+    value: function isMethodAllowed() {
+      if (this.route === null) {
         return true;
       }
       if (!this.route.methods) {
@@ -135,17 +160,22 @@ var Router = function () {
   }, {
     key: 'setModule',
     value: function setModule(modules) {
-      if (this.route !== undefined && this.route !== null && this.route.module) {
-        this.module = this.route.module;
-        return this;
-      }
-
       if (_tmpSegments.length < 2) {
         return this;
       }
+      var moduleName = null;
 
-      var moduleName = this.prepareModuleName(_tmpSegments[0]);
-      if (typeof modules[moduleName] === 'function') {
+      if (this.route !== null) {
+        if (this.route.module) {
+          moduleName = this.route.module;
+        } else {
+          if (this.route.method === undefined) {
+            moduleName = this.prepareModuleName(_tmpSegments[0]);
+          }
+        }
+      }
+
+      if (moduleName !== null && typeof modules[moduleName] === 'function') {
         this.module = modules[moduleName];
         _tmpSegments.splice(0, 1);
       }
@@ -154,12 +184,11 @@ var Router = function () {
   }, {
     key: 'setController',
     value: function setController() {
-      if (this.route !== undefined && this.route !== null && this.route.controller) {
-        this.controller = this.route.controller;
+      if (this.route !== null && this.route.controller) {
+        this.controller = this.prepareControllerName(this.route.controller);
         return this;
       }
 
-      this.controller = DEFAULT_CONTROLLER_NAME;
       if (_tmpSegments.length > 0) {
         this.controller = this.prepareControllerName(_tmpSegments[0]);
         _tmpSegments.splice(0, 1);
@@ -182,7 +211,7 @@ var Router = function () {
     key: 'setParams',
     value: function setParams() {
       var namedParams = [];
-      if (this.route !== undefined && this.route !== null && this.route.namedParams) {
+      if (this.route !== null && this.route.namedParams) {
         namedParams = this.route.namedParams;
       }
       if (_tmpSegments.length > 0) {

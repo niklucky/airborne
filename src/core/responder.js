@@ -29,7 +29,7 @@ class Responder {
 
   sendError (error, statusCode = 500) {
     this.statusCode = statusCode;
-    var message = { error: error.message };
+    var message = (typeof error === 'string') ? { error: error } : { error: error.message };
     if (this.config.debug === true) {
       message.stackTrace = error.stack;
     }

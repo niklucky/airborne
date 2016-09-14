@@ -26,7 +26,7 @@ var BaseController = function () {
         var validator = new this.validator(this.rules[method], this.options[method]);
         var result = validator.validate(requestData);
         if (result.result === false) {
-          return this.di.get('responder').sendError({ message: 'Validation error', stack: result.errors }, 401);
+          return this.di.get('responder').sendError({ message: 'Validation error', stack: result.errors }, 400);
         }
         return this[method](result.validated.params, result.validated.payload);
       }

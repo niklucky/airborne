@@ -41,7 +41,7 @@ var Responder = function () {
       var statusCode = arguments.length <= 1 || arguments[1] === undefined ? 500 : arguments[1];
 
       this.statusCode = statusCode;
-      var message = { error: error.message };
+      var message = typeof error === 'string' ? { error: error } : { error: error.message };
       if (this.config.debug === true) {
         message.stackTrace = error.stack;
       }
