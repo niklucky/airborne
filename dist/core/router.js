@@ -98,7 +98,6 @@ var Router = function () {
   }, {
     key: 'checkRoute',
     value: function checkRoute(route, routeObject) {
-
       if (route.indexOf('/') === 0) {
         route = route.replace('/', '');
       }
@@ -134,9 +133,11 @@ var Router = function () {
           found = false;
           continue;
         }
-        found = true;
         routesArray[index] = segment;
         index++;
+        if (index === _routeSegments.length) {
+          found = true;
+        }
       }
       if (found) {
         this.route = routeObject;

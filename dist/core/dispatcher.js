@@ -14,6 +14,8 @@ var Dispatcher = function () {
 
     this.di = new DI().merge(di);
 
+    this.debug = this.di.get('config').debug;
+
     this.di.set('request', request);
     this.di.set('response', response);
 
@@ -86,7 +88,9 @@ var Dispatcher = function () {
       var controllers = this.di.get('controllers');
 
       try {
-        console.log('Dispatcher start: ', this.router);
+        if (this.debug) {
+          console.log('Dispatcher start: ', this.router);
+        }
         if (this.router.module) {
           var _module = new this.router.module();
 

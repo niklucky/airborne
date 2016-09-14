@@ -9,6 +9,8 @@ class Dispatcher {
   constructor(di, request, response) {
     this.di = new DI().merge(di);
 
+    this.debug = this.di.get('config').debug;
+
     this.di.set('request', request);
     this.di.set('response', response);
 
@@ -74,7 +76,9 @@ class Dispatcher {
     const controllers = this.di.get('controllers');
 
     try {
-      console.log('Dispatcher start: ', this.router);
+      if(this.debug){
+        console.log('Dispatcher start: ', this.router);
+      }
       if (this.router.module) {
         let module = new this.router.module();
 

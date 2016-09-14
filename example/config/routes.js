@@ -6,7 +6,7 @@ module.exports = {
     auth: false,
     module: 'Auth'
   },
-  '/auth/forgot-password/:id': {
+  '/auth/forgot-password': {
     method: 'forgotPassword'
   },
   '/auth/login': {

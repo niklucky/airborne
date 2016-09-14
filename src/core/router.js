@@ -90,7 +90,6 @@ class Router {
   }
 
   checkRoute(route, routeObject){
-
     if(route.indexOf('/') === 0){
       route = route.replace('/', '');
     }
@@ -126,9 +125,12 @@ class Router {
         found = false;
         continue;
       }
-      found = true;
       routesArray[index] = segment;
       index++;
+      if(index === _routeSegments.length){
+        found = true;
+      }
+
     }
     if(found){
       this.route = routeObject;
