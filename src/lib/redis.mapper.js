@@ -60,6 +60,7 @@ class RedisMapper extends BaseMapper {
   }
   _generateKey(model) { // eslint-disable-line class-methods-use-this
     const crypto = require('crypto');
+
     const uuid = new Date();
     const secret = 'secret';
     const key = (model.id) ? model.id : model.toString() + uuid.toISOString();

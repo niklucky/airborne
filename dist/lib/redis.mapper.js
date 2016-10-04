@@ -91,6 +91,7 @@ var RedisMapper = function (_BaseMapper) {
     value: function _generateKey(model) {
       // eslint-disable-line class-methods-use-this
       var crypto = require('crypto');
+
       var uuid = new Date();
       var secret = 'secret';
       var key = model.id ? model.id : model.toString() + uuid.toISOString();

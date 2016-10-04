@@ -26,11 +26,13 @@ class DbAdapter {
   }
   initRedis(name, connection) {
     const redis = require('redis'); // eslint-disable-line global-require
+
     this.connections[name] = redis.createClient(connection);
   }
 
   initMongoDb(name, connection) {
     const mongoose = require('mongodb'); // eslint-disable-line global-require
+
     let userPassword = '';
 
     if (connection.user) {
@@ -43,6 +45,7 @@ class DbAdapter {
 
   initMySQL(name, connectionConfig) {
     const mysql = require('mysql'); // eslint-disable-line global-require
+
     const connection = connectionConfig;
 
     if (!connection.user) {

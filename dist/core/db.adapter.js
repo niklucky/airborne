@@ -36,12 +36,14 @@ var DbAdapter = function () {
     key: 'initRedis',
     value: function initRedis(name, connection) {
       var redis = require('redis'); // eslint-disable-line global-require
+
       this.connections[name] = redis.createClient(connection);
     }
   }, {
     key: 'initMongoDb',
     value: function initMongoDb(name, connection) {
       var mongoose = require('mongodb'); // eslint-disable-line global-require
+
       var userPassword = '';
 
       if (connection.user) {
@@ -57,6 +59,7 @@ var DbAdapter = function () {
       var _this = this;
 
       var mysql = require('mysql'); // eslint-disable-line global-require
+
       var connection = connectionConfig;
 
       if (!connection.user) {
