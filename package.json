@@ -1,16 +1,19 @@
 {
   "name": "airborne",
-  "version": "0.5.16",
+  "version": "0.0.0-semantically-released",
   "description": "Airborne RESTful API framework",
-  "main": "index.js",
+  "main": "dist/index.js",
   "scripts": {
+    "commit": "git-cz",
+    "test": "",
     "lint": "eslint src",
     "start": "eslint src && babel -w src -d dist",
-    "build": "eslint src && babel src -d dist"
+    "build": "eslint src && babel src -d dist",
+    "semantic-release": "semantic-release pre && npm publish && semantic-release post"
   },
   "repository": {
     "type": "git",
-    "url": "git+ssh://git@github.com:niklucky/airborne.git"
+    "url": "https://github.com/niklucky/airborne.git"
   },
   "keywords": [
     "ariborne",
@@ -27,6 +30,12 @@
     "redis",
     "database"
   ],
+  "files": [
+    "dist",
+    "docs",
+    "examples",
+    "README.md"
+  ],
   "author": "Nikita Zhuravlev",
   "license": "MIT",
   "homepage": "https://github.com/niklucky/airborne#readme",
@@ -38,14 +47,16 @@
     "babel-preset-stage-0": "^6.5.0",
     "babel-register": "^6.11.6",
     "chai": "^3.5.0",
+    "commitizen": "^2.8.6",
+    "cz-conventional-changelog": "^1.2.0",
     "eslint": "^2.13.1",
-    "mocha": "^2.5.3"
+    "mocha": "^2.5.3",
+    "semantic-release": "^4.3.5"
   },
   "dependencies": {
     "body-parser": "^1.15.2",
     "express": "^4.14.0",
     "lodash": "^4.13.1",
-    "mongoose": "^4.5.1",
     "mysql": "^2.11.1",
     "mysql-qb": "^0.6.2",
     "redis": "^2.6.2",
@@ -53,5 +64,8 @@
   },
   "engines": {
     "node": ">=4.1.2 =<6.3"
+  },
+  "czConfig": {
+    "path": "node_modules/cz-conventional-changelog"
   }
 }

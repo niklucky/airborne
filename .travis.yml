@@ -1,22 +1,29 @@
-language: node_js
 sudo: false
+language: node_js
+cache:
+  directories:
+    - node_modules
+notifications:
+  email: false
 node_js:
-  - "6"
-  - "4.4"
+  - '4'
+  - iojs-v3
+  - iojs-v2
+  - iojs-v1
+  - '0.12'
+  - '0.10'
+before_install:
+  - npm i -g npm@^2.0.0
+before_script:
+  - npm prune
+script:
+  - npm run test
+  - npm run build
+after_success:
+  - 'curl -Lo travis_after_all.py https://git.io/travis_after_all'
+  - python travis_after_all.py
+  - export $(cat .to_export_back) &> /dev/null
+  - npm run semantic-release
 branches:
   only:
-  - master
-cache:
-  bundler: true
-  directories:
-  - node_modules # NPM packages
-before_script:
-  - npm install -g mocha
-  - npm install -g babel-cli
-  - npm run build
-install:
-  - npm install
-deploy:
-  provider: npm
-  email: "iam@niklucky.com"
-  api_key: "7eabae90-995a-4d36-ba60-a1fb05697e11"
+    - master

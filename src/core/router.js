@@ -35,8 +35,7 @@ class Router {
     if(this.isMethodAllowed()){
       this.setModule(di.get('modules'))
           .setController(di.get('controllers'))
-          .setMethod(di.get('request').method)
-          .setParams();
+          .setMethod(di.get('request').method);
       }
   }
 
@@ -90,49 +89,51 @@ class Router {
   }
 
   checkRoute(route, routeObject){
-    if(route.indexOf('/') === 0){
+    if (route.indexOf('/') === 0) {
       route = route.replace('/', '');
     }
-    let _routeSegments = route.split('/');
-    let index = 0;
-    let next = false;
-    let found = false;
-    let routesArray = [];
-    let namedParams = {};
+    var _routeSegments = route.split('/');
+    const _segments = [..._tmpSegments];
+    var index = 0;
+    var next = false;
+    var found = false;
+    var routesArray = [];
+    var namedParams = {};
 
-    if(_tmpSegments.length > _routeSegments.length){
+    if (_tmpSegments.length > _routeSegments.length) {
       return false;
     }
 
-    for( let i in _tmpSegments){
-      const segment = _tmpSegments[i];
-      const routeSegment = _routeSegments[index];
-
-      if(next === true){
+    for (var i in _segments) {
+      var segment = _segments[i];
+      var routeSegment = _routeSegments[index];
+      if (next === true) {
         continue;
       }
 
-      if(routeSegment.indexOf(':') !== -1){
-        let paramName = routeSegment.replace(':', '');
-        let paramValue = segment;
+      if (routeSegment.indexOf(':') !== -1) {
+        var paramName = routeSegment.replace(':', '');
+        var paramValue = segment;
         _tmpSegments.splice(index, 1);
         namedParams[paramName] = paramValue;
         index++;
+        if (index === _routeSegments.length) {
+          found = true;
+        }
         continue;
       }
-      if(routeSegment !== segment) {
+      if (routeSegment !== segment) {
         next = true;
         found = false;
         continue;
       }
       routesArray[index] = segment;
       index++;
-      if(index === _routeSegments.length){
+      if (index === _routeSegments.length) {
         found = true;
       }
-
     }
-    if(found){
+    if (found) {
       this.route = routeObject;
       this.route.namedParams = namedParams;
       this.params = namedParams;
