@@ -1,4 +1,4 @@
-'use strict';
+
 
 class DbAdapter {
   constructor(dbConfig) {
@@ -8,41 +8,42 @@ class DbAdapter {
   }
 
   init() {
-    for (let dbConnectionName in this.dbConfig) {
-      if (this.dbConfig.hasOwnProperty(dbConnectionName)) {
-        let dbCredits = this.dbConfig[dbConnectionName];
+    const configArray = Object.keys(this.dbConfig);
+    for (let i = 0; i < configArray.length; i += 1) {
+      const dbConnectionName = configArray[i];
+      const dbCredits = this.dbConfig[dbConnectionName];
 
-        if (dbCredits.driver === 'redis') {
-          this.initRedis(dbConnectionName, dbCredits);
-        }
-        if (dbCredits.driver === 'mongodb') {
-          this.initMongoDb(dbConnectionName, dbCredits);
-        }
-        if (dbCredits.driver === 'mysql') {
-          this.initMySQL(dbConnectionName, dbCredits);
-        }
+      if (dbCredits.driver === 'redis') {
+        this.initRedis(dbConnectionName, dbCredits);
+      }
+      if (dbCredits.driver === 'mongodb') {
+        this.initMongoDb(dbConnectionName, dbCredits);
+      }
+      if (dbCredits.driver === 'mysql') {
+        this.initMySQL(dbConnectionName, dbCredits);
       }
     }
   }
   initRedis(name, connection) {
-    var redis = require('redis');
+    const redis = require('redis'); // eslint-disable-line global-require
     this.connections[name] = redis.createClient(connection);
   }
 
   initMongoDb(name, connection) {
-    var mongoose = require('mongoose');
-    var userPassword = '';
+    const mongoose = require('mongodb'); // eslint-disable-line global-require
+    let userPassword = '';
 
     if (connection.user) {
-      userPassword = connection.user + ':' + connection.pwd + '@';
+      userPassword = `${connection.user}:${connection.pwd}@`;
     }
 
-    let connectionString = 'mongodb://' + userPassword + connection.host + '/' + connection.database;
+    const connectionString = `mongodb://${userPassword}${connection.host}/${connection.database}`;
     this.connections[name] = mongoose.connect(connectionString);
   }
 
-  initMySQL(name, connection) {
-    var mysql = require('mysql');
+  initMySQL(name, connectionConfig) {
+    const mysql = require('mysql'); // eslint-disable-line global-require
+    const connection = connectionConfig;
 
     if (!connection.user) {
       connection.user = 'root';
@@ -54,22 +55,22 @@ class DbAdapter {
       connection.port = 3306;
     }
 
-    let conn = mysql.createConnection({
+    const conn = mysql.createConnection({
       host: connection.host,
       port: connection.port,
       user: connection.user,
       password: connection.password,
-      database: connection.database
+      database: connection.database,
     });
     conn.connect();
     conn.on('error', (err) => {
-      console.error('Connection down. Reconnecting...', err);
+      console.log('Connection down. Reconnecting...', err);
       setTimeout(() => {
         this.initMySQL(name, connection);
       }, 1000);
     });
     conn.on('connect', () => {
-      console.info('Connected');
+      console.log('Connected');
     });
 
     this.connections[name] = conn;

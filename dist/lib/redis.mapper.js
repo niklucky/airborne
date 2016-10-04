@@ -1,4 +1,3 @@
-/* globals Promise */
 'use strict';
 
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
@@ -11,6 +10,7 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
+/* globals Promise */
 var BaseMapper = require('./base.mapper');
 var BaseModel = require('./base.model');
 
@@ -31,9 +31,10 @@ var RedisMapper = function (_BaseMapper) {
 
   _createClass(RedisMapper, [{
     key: 'create',
-    value: function create(params) {
+    value: function create(requestParams, payload) {
+      var params = payload;
       var object = new this.Model(params).get();
-      if (params.key == undefined) {
+      if (params.key === undefined) {
         params.key = this._generateKey(object);
       }
 
@@ -79,6 +80,7 @@ var RedisMapper = function (_BaseMapper) {
   }, {
     key: '_getKey',
     value: function _getKey(key) {
+      // eslint-disable-line class-methods-use-this
       if ((typeof key === 'undefined' ? 'undefined' : _typeof(key)) === 'object') {
         return key.key;
       }
@@ -87,6 +89,7 @@ var RedisMapper = function (_BaseMapper) {
   }, {
     key: '_generateKey',
     value: function _generateKey(model) {
+      // eslint-disable-line class-methods-use-this
       var crypto = require('crypto');
       var uuid = new Date();
       var secret = 'secret';
@@ -101,7 +104,7 @@ var RedisMapper = function (_BaseMapper) {
       var redisKey = this.prefix + ':' + key;
       return new Promise(function (resolve, reject) {
         _this2.db[command](redisKey, value, function (error, replies) {
-          if (replies == 'OK') {
+          if (replies === 'OK') {
             return resolve(key);
           }
           return reject({ error: error, replies: replies });
@@ -118,15 +121,16 @@ var RedisMapper = function (_BaseMapper) {
 
       var redisKey = this.prefix + ':' + key;
       return new Promise(function (resolve, reject) {
-        //console.log("Command: ", command, redisKey);
+        // console.log("Command: ", command, redisKey);
         _this3.db[command](redisKey, function (error, replies) {
           if (error) {
             return reject({ error: error, replies: replies });
           }
+          var data = replies;
           if ((typeof replies === 'undefined' ? 'undefined' : _typeof(replies)) === 'object' && replies !== null) {
-            replies.key = key;
+            data.key = key;
           }
-          return resolve(replies);
+          return resolve(data);
         });
         if (expired > 0) {
           _this3.db.expire(redisKey, expired);

@@ -1,5 +1,13 @@
-'use strict';
-const _ = require('lodash');
+import { capitalize } from 'lodash';
+
+function dashToCamelCase(string) {
+  const str = string.split('-');
+
+  for (const i of str) {
+    str[i] = capitalize(str[i]);
+  }
+  return str.join('');
+}
 
 const DEFAULT_CONTROLLER_NAME = 'IndexController';
 const DEFAULT_CONTROLLER_METHOD = 'load';
@@ -9,14 +17,14 @@ const CONTROLLER_METHODS = {
   PUT: 'update',
   PATCH: 'update',
   DELETE: 'del',
-  HEAD: 'status'
+  HEAD: 'status',
 };
 
 let _tmpSegments = [];
 
 class Router {
 
-  constructor(di){
+  constructor(di) {
     this.route = null;
     this.module = null;
     this.controller = DEFAULT_CONTROLLER_NAME;
@@ -32,19 +40,20 @@ class Router {
         .setSegmentsFromPath()
         .setRoute(di.get('routes'));
 
-    if(this.isMethodAllowed()){
+    if (this.isMethodAllowed()) {
       this.setModule(di.get('modules'))
           .setController(di.get('controllers'))
           .setMethod(di.get('request').method);
-      }
+    }
   }
 
-  setUrl(url){
-    if(url.indexOf('.json') !== -1){
+  setUrl(requestUrl) {
+    let url = requestUrl;
+    if (url.indexOf('.json') !== -1) {
       this.view = 'json';
       url = url.replace('.json', '');
     }
-    if(url.indexOf('.xml') !== -1){
+    if (url.indexOf('.xml') !== -1) {
       this.view = 'xml';
       url = url.replace('.xml', '');
     }
@@ -53,20 +62,18 @@ class Router {
     return this;
   }
 
-  setPathFromUrl(){
+  setPathFromUrl() {
     this.path = this.url.split('?').shift();
     return this;
   }
 
   setSegmentsFromPath() {
-    var seg = this.path.split('/');
-    var segments = [];
+    const seg = this.path.split('/');
+    const segments = [];
 
-    for (var i in seg) {
-      if (seg.hasOwnProperty(i)) {
-        if (seg[i] !== '') {
-          segments.push(seg[i]);
-        }
+    for (const i of seg) {
+      if (seg[i] !== '') {
+        segments.push(seg[i]);
       }
     }
     this.segments = segments;
@@ -74,61 +81,62 @@ class Router {
     return this;
   }
 
-  setRoute(routes){
-    if(_tmpSegments.length === 0 && routes['/'] !== undefined){
+  setRoute(routes) {
+    if (_tmpSegments.length === 0 && routes['/'] !== undefined) {
       this.route = routes['/'];
       return this;
     }
-    for( let route in routes){
-      const is = this.checkRoute(route, routes[route]);
-      if(!is){
-        continue;
+    for (const index of Object.keys(routes)) {
+      const route = Object.keys(routes)[index];
+      if (this.checkRoute(route, routes[route])) {
+        break;
       }
     }
     return this;
   }
 
-  checkRoute(route, routeObject){
+  checkRoute(routeName, routeObject) {
+    let route = routeName;
     if (route.indexOf('/') === 0) {
       route = route.replace('/', '');
     }
-    var _routeSegments = route.split('/');
+    const _routeSegments = route.split('/');
     const _segments = [..._tmpSegments];
-    var index = 0;
-    var next = false;
-    var found = false;
-    var routesArray = [];
-    var namedParams = {};
+    let index = 0;
+    let next = false;
+    let found = false;
+    const routesArray = [];
+    const namedParams = {};
 
     if (_tmpSegments.length > _routeSegments.length) {
       return false;
     }
 
-    for (var i in _segments) {
-      var segment = _segments[i];
-      var routeSegment = _routeSegments[index];
+    for (const i of _segments) {
+      const segment = _segments[i];
+      const routeSegment = _routeSegments[index];
       if (next === true) {
-        continue;
+        continue; // eslint-disable-line no-continue
       }
 
       if (routeSegment.indexOf(':') !== -1) {
-        var paramName = routeSegment.replace(':', '');
-        var paramValue = segment;
+        const paramName = routeSegment.replace(':', '');
+        const paramValue = segment;
         _tmpSegments.splice(index, 1);
         namedParams[paramName] = paramValue;
-        index++;
+        index += 1;
         if (index === _routeSegments.length) {
           found = true;
         }
-        continue;
+        continue; // eslint-disable-line no-continue
       }
       if (routeSegment !== segment) {
         next = true;
         found = false;
-        continue;
+        continue; // eslint-disable-line no-continue
       }
       routesArray[index] = segment;
-      index++;
+      index += 1;
       if (index === _routeSegments.length) {
         found = true;
       }
@@ -142,7 +150,7 @@ class Router {
   }
 
   isMethodAllowed() {
-    if(this.route === null){
+    if (this.route === null) {
       return true;
     }
     if (!this.route.methods) {
@@ -151,96 +159,73 @@ class Router {
     return (this.route.methods.indexOf(this.request.method) !== -1);
   }
 
-  setModule(modules){
-    if(_tmpSegments.length < 2){
+  setModule(modules) {
+    if (_tmpSegments.length < 2) {
       return this;
     }
     let moduleName = null;
 
-    if(this.route !== null){
-      if( this.route.module){
+    if (this.route !== null) {
+      if (this.route.module) {
         moduleName = this.route.module;
-      }else{
-        if(this.route.method === undefined){
-          moduleName = this.prepareModuleName(_tmpSegments[0]);
-        }
+      } else if (this.route.method === undefined) {
+        moduleName = this.prepareModuleName(_tmpSegments[0]);
       }
     }
 
-    if(moduleName !== null && typeof modules[moduleName] === 'function'){
+    if (moduleName !== null && typeof modules[moduleName] === 'function') {
       this.module = modules[moduleName];
       _tmpSegments.splice(0, 1);
     }
     return this;
   }
 
-  setController(){
-    if((this.route !== null)  && this.route.controller){
-      this.controller = this.prepareControllerName(this.route.controller);
+  setController() {
+    if ((this.route !== null) && this.route.controller) {
+      this.prepareControllerName(this.route.controller);
       return this;
     }
 
-    if(_tmpSegments.length > 0){
-      this.controller = this.prepareControllerName(_tmpSegments[0]);
+    if (_tmpSegments.length > 0) {
+      this.prepareControllerName(_tmpSegments[0]);
       _tmpSegments.splice(0, 1);
     }
     return this;
   }
 
-  setMethod(requestMethod){
-    if((this.route !== undefined && this.route !== null)  && this.route.method){
+  setMethod(requestMethod) {
+    if ((this.route !== undefined && this.route !== null) && this.route.method) {
       this.method = this.route.method;
       _tmpSegments.splice(0, 1);
       return this;
     }
 
-    this.method = this.getControllerMethodByRequestMethod(requestMethod);
+    this.method = (CONTROLLER_METHODS[requestMethod] || DEFAULT_CONTROLLER_METHOD);
     return this;
   }
 
-  setParams(){
+  setParams() {
     let namedParams = [];
-    if((this.route !== null)  && this.route.namedParams){
+    if ((this.route !== null) && this.route.namedParams) {
       namedParams = this.route.namedParams;
     }
-    if(_tmpSegments.length > 0){
+    if (_tmpSegments.length > 0) {
       this.params = {};
-      for( let i in _tmpSegments){
-        let key = (namedParams[i]) ? namedParams[i] : i;
+      for (const i of _tmpSegments) {
+        const key = (namedParams[i]) ? namedParams[i] : i;
         this.params[key] = _tmpSegments[i];
       }
     }
     return this;
   }
 
-  getControllerMethodByRequestMethod(method) {
-    if (CONTROLLER_METHODS[method]) {
-      return CONTROLLER_METHODS[method];
-    }
-    return DEFAULT_CONTROLLER_METHOD;
-  }
-
-  prepareModuleName(moduleName) {
-    return this.transformDashToCamelCase(moduleName);
+  prepareModuleName(moduleName) { // eslint-disable-line class-methods-use-this
+    return dashToCamelCase(moduleName);
   }
 
   prepareControllerName(controllerName) {
-    return this.transformDashToCamelCase(controllerName) + 'Controller';
-  }
-
-  prepareMethodName(methodName) {
-    return methodName;
-  }
-
-  transformDashToCamelCase(string) {
-    let str = string.split('-');
-
-    for (var i in str) {
-      if (str.hasOwnProperty(i)) {
-        str[i] = _.capitalize(str[i]);
-      }
-    }
-    return str.join('');
+    this.controller = `${dashToCamelCase(controllerName)}Controller`;
+    return this.controller;
   }
 }
 

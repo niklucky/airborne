@@ -1,8 +1,6 @@
-'use strict';
+import BaseMapper from './base.mapper';
 
-const BaseMapper = require('./base.mapper');
 class BaseService {
-
   constructor(di) {
     this.di = di;
     this.mapper = new BaseMapper(di);
@@ -16,12 +14,12 @@ class BaseService {
     return this.mapper.get(params);
   }
 
-  create(payload) {
-    return this.mapper.create(payload);
+  create(params, payload) {
+    return this.mapper.create(params, payload);
   }
 
-  update(params, data) {
-    return this.mapper.update(params, data);
+  update(params, payload) {
+    return this.mapper.update(params, payload);
   }
 
   search(params) {

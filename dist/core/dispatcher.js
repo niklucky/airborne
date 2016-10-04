@@ -1,5 +1,9 @@
 'use strict';
 
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -92,9 +96,10 @@ var Dispatcher = function () {
           console.log('Dispatcher start: ', this.router);
         }
         if (this.router.module) {
-          var _module = new this.router.module();
+          var Module = this.router.module;
+          var module = new Module();
 
-          var Ctrl = _module.controllers[this.router.controller];
+          var Ctrl = module.controllers[this.router.controller];
           if (typeof Ctrl !== 'function') {
             return this.responder.send404();
           }
@@ -102,16 +107,15 @@ var Dispatcher = function () {
 
           return controller.validate(this.router.method, this.router.params);
         }
-        var ctrl;
         if (typeof controllers[this.router.controller] !== 'function') {
           return this.responder.send404();
         }
-        ctrl = new controllers[this.router.controller](this.di);
+        var ctrl = new controllers[this.router.controller](this.di);
 
         return ctrl.validate(this.router.method, this.router.params);
       } catch (e) {
         console.log('Dispatcher error', e);
-        this.responder.sendError(e);
+        return this.responder.sendError(e);
       }
     }
   }]);
@@ -119,4 +123,4 @@ var Dispatcher = function () {
   return Dispatcher;
 }();
 
-module.exports = Dispatcher;
+exports.default = Dispatcher;

@@ -1,23 +1,24 @@
 class DI {
-  constructor () {
+  constructor() {
     this.di = {};
   }
 
-  merge(DI){
-    for( let name in DI.di){
-      this.set(name, DI.di[name]);
+  merge(di) {
+    for (const key of Object.keys(di.di)) {
+      const name = Object.keys(di.di)[key];
+      this.set(name, di.di[name]);
     }
     return this;
   }
 
-  set (diName, diValue) {
+  set(diName, diValue) {
     this.di[diName] = diValue;
     return this;
   }
 
-  get (diName) {
+  get(diName) {
     return this.di[diName];
   }
 }
 
-module.exports = DI;
+export default DI;

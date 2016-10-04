@@ -2,28 +2,32 @@
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+var _base = require('./base.service');
 
-var BaseService = require('./base.service');
+var _base2 = _interopRequireDefault(_base);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var BaseController = function () {
   function BaseController(di) {
     _classCallCheck(this, BaseController);
 
     this.di = di;
-    this.service = new BaseService(di);
+    this.service = new _base2.default(di);
     this.rules = {};
     this.options = {};
     this.params = {};
-    this.validator = this.di.get('Validator');
   }
 
   _createClass(BaseController, [{
     key: 'validate',
     value: function validate(method, params) {
       var requestData = this.mergeRequestData(params);
-      if (this.validator) {
-        var validator = new this.validator(this.rules[method], this.options[method]);
+      var Validator = this.di.get('Validator');
+      if (Validator) {
+        var validator = new Validator(this.rules[method], this.options[method]);
         var result = validator.validate(requestData);
         if (result.result === false) {
           return this.di.get('responder').sendError({ message: 'Validation error', stack: result.errors }, 400);
@@ -34,26 +38,63 @@ var BaseController = function () {
     }
   }, {
     key: 'mergeRequestData',
-    value: function mergeRequestData(params) {
+    value: function mergeRequestData(requestParams) {
       var payload = {};
-
-      if (params == undefined) {
-        params = {};
-      }
+      var params = requestParams || {};
 
       var query = this.di.get('request').query;
       if (Object.keys(query).length > 0) {
-        for (var i in query) {
-          if (query.hasOwnProperty(i)) {
-            params[i] = query[i];
+        var _iteratorNormalCompletion = true;
+        var _didIteratorError = false;
+        var _iteratorError = undefined;
+
+        try {
+          for (var _iterator = Object.keys(query)[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+            var i = _step.value;
+
+            var name = Object.keys(query)[i];
+            params[name] = query[name];
+          }
+        } catch (err) {
+          _didIteratorError = true;
+          _iteratorError = err;
+        } finally {
+          try {
+            if (!_iteratorNormalCompletion && _iterator.return) {
+              _iterator.return();
+            }
+          } finally {
+            if (_didIteratorError) {
+              throw _iteratorError;
+            }
           }
         }
       }
       var body = this.di.get('request').body;
       if (Object.keys(body).length > 0) {
-        for (var n in body) {
-          if (body.hasOwnProperty(n)) {
-            payload[n] = body[n];
+        var _iteratorNormalCompletion2 = true;
+        var _didIteratorError2 = false;
+        var _iteratorError2 = undefined;
+
+        try {
+          for (var _iterator2 = Object.keys(body)[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+            var n = _step2.value;
+
+            var _name = Object.keys(body)[n];
+            payload[_name] = body[_name];
+          }
+        } catch (err) {
+          _didIteratorError2 = true;
+          _iteratorError2 = err;
+        } finally {
+          try {
+            if (!_iteratorNormalCompletion2 && _iterator2.return) {
+              _iterator2.return();
+            }
+          } finally {
+            if (_didIteratorError2) {
+              throw _iteratorError2;
+            }
           }
         }
       }

@@ -38,16 +38,23 @@ var Validator = function () {
         params: {},
         payload: {}
       };
-      for (var key in this.rules) {
-        if (this.rules.hasOwnProperty(key)) {
+      var _iteratorNormalCompletion = true;
+      var _didIteratorError = false;
+      var _iteratorError = undefined;
+
+      try {
+        for (var _iterator = Object.keys(this.rules)[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+          var i = _step.value;
+
+          var key = Object.keys(this.rules)[i];
           var rule = this.rules[key];
 
-          if (this.data.params[key] == undefined && this.data.payload[key] == undefined) {
+          if (this.data.params[key] === undefined && this.data.payload[key] === undefined) {
             if (rule.required) {
               this.setResult(false);
               this.setError(key, undefined, 'presented');
             }
-            continue;
+            continue; // eslint-disable-line no-continue
           }
           var mode = 'params';
 
@@ -55,17 +62,31 @@ var Validator = function () {
             mode = 'payload';
           }
 
-          if (rule.type == 'number') {
+          if (rule.type === 'number') {
             this.validated[mode][key] = this.validateNumber(key, this.data[mode][key]);
           }
-          if (rule.type == 'string') {
+          if (rule.type === 'string') {
             this.validated[mode][key] = this.validateString(key, this.data[mode][key]);
           }
-          if (rule.type == 'array') {
+          if (rule.type === 'array') {
             this.validated[mode][key] = this.validateArray(key, this.data[mode][key]);
           }
         }
+      } catch (err) {
+        _didIteratorError = true;
+        _iteratorError = err;
+      } finally {
+        try {
+          if (!_iteratorNormalCompletion && _iterator.return) {
+            _iterator.return();
+          }
+        } finally {
+          if (_didIteratorError) {
+            throw _iteratorError;
+          }
+        }
       }
+
       return {
         result: this.result,
         validated: this.result ? this.validated : null,
@@ -74,8 +95,8 @@ var Validator = function () {
     }
   }, {
     key: 'validateNumber',
-    value: function validateNumber(key, value) {
-      value = parseInt(value);
+    value: function validateNumber(key, inputValue) {
+      var value = parseInt(inputValue, 10);
 
       if (typeof value === 'number') {
         this.setResult(true);
@@ -86,14 +107,15 @@ var Validator = function () {
     }
   }, {
     key: 'validateString',
-    value: function validateString(key, value) {
+    value: function validateString(key, inputValue) {
+      var value = inputValue;
       if (typeof value === 'string') {
         value = sanitizer.sanitize(value);
         this.setResult(true);
         return value;
       }
-      this.setResult(false);
       this.setError(key, value, 'string');
+      return this.setResult(false);
     }
   }, {
     key: 'validateArray',
@@ -102,8 +124,8 @@ var Validator = function () {
         this.setResult(true);
         return value;
       }
-      this.setResult(false);
       this.setError(key, value, 'array');
+      return this.setResult(false);
     }
   }, {
     key: 'setResult',

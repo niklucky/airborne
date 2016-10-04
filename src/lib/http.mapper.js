@@ -1,5 +1,7 @@
 /* globals Promise */
-'use strict';
+
+
+
 const BaseMapper = require('./base.mapper');
 const BaseModel = require('./base.model');
 const HTTP = require('http');
@@ -37,39 +39,39 @@ class HTTPMapper extends BaseMapper {
   }
 
   request(method, params, postData) {
-    let data = QueryString.stringify(postData);
-    let options = {
+    const data = QueryString.stringify(postData);
+    const options = {
       hostname: this.host,
       port: this.port,
       path: this.path + this.prepareGetParams(params),
-      method: method,
+      method,
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
         'Content-Length': Buffer.byteLength(data),
-        'Token': this.di.get('config').serverKey
-      }
+        Token: this.di.get('config').serverKey,
+      },
     };
     return new Promise((resolve, reject) => {
-      let request = HTTP.request(options, response => {
-        //console.log(`STATUS: ${response.statusCode}`);
-        //console.log(`HEADERS: ${JSON.stringify(response.headers)}`);
+      const request = HTTP.request(options, (response) => {
+        // console.log(`STATUS: ${response.statusCode}`);
+        // console.log(`HEADERS: ${JSON.stringify(response.headers)}`);
         response.setEncoding('utf8');
-        response.on('data', chunk => {
+        response.on('data', (chunk) => {
           try {
-            let result = JSON.parse(chunk);
+            const result = JSON.parse(chunk);
             if (response.statusCode > 199 && response.statusCode < 301) {
               resolve(new this.Model(result));
             }
             reject({ message: 'Remote server error', stack: result });
-          } catch(e) {
+          } catch (e) {
             reject(e);
           }
         });
         response.on('end', () => {
           // console.log('No more data in response.')
-        })
+        });
       });
-      request.on('error', e => {
+      request.on('error', (e) => {
         reject(Error(e));
       });
 
@@ -81,14 +83,13 @@ class HTTPMapper extends BaseMapper {
     });
   }
 
-  prepareGetParams(params) {
-    let query = [];
-    for (var i in params) {
-      if (params.hasOwnProperty(i)) {
-        query.push(i + '=' + params[i]);
-      }
+  prepareGetParams(params) { // eslint-disable-line class-methods-use-this
+    const query = [];
+    for (const i of Object.keys(params)) {
+      const name = Object.keys(params)[i];
+      query.push(`${name}=${params[name]}`);
     }
-    return '?' + query.join('&')
+    return `?${query.join('&')}`;
   }
 }
 

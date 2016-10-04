@@ -2,9 +2,42 @@
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
+var _lodash = require('lodash');
+
+function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
+
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-var _ = require('lodash');
+function dashToCamelCase(string) {
+  var str = string.split('-');
+
+  var _iteratorNormalCompletion = true;
+  var _didIteratorError = false;
+  var _iteratorError = undefined;
+
+  try {
+    for (var _iterator = str[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+      var i = _step.value;
+
+      str[i] = (0, _lodash.capitalize)(str[i]);
+    }
+  } catch (err) {
+    _didIteratorError = true;
+    _iteratorError = err;
+  } finally {
+    try {
+      if (!_iteratorNormalCompletion && _iterator.return) {
+        _iterator.return();
+      }
+    } finally {
+      if (_didIteratorError) {
+        throw _iteratorError;
+      }
+    }
+  }
+
+  return str.join('');
+}
 
 var DEFAULT_CONTROLLER_NAME = 'IndexController';
 var DEFAULT_CONTROLLER_METHOD = 'load';
@@ -36,13 +69,14 @@ var Router = function () {
     this.setUrl(di.get('request').url).setPathFromUrl().setSegmentsFromPath().setRoute(di.get('routes'));
 
     if (this.isMethodAllowed()) {
-      this.setModule(di.get('modules')).setController(di.get('controllers')).setMethod(di.get('request').method).setParams();
+      this.setModule(di.get('modules')).setController(di.get('controllers')).setMethod(di.get('request').method);
     }
   }
 
   _createClass(Router, [{
     key: 'setUrl',
-    value: function setUrl(url) {
+    value: function setUrl(requestUrl) {
+      var url = requestUrl;
       if (url.indexOf('.json') !== -1) {
         this.view = 'json';
         url = url.replace('.json', '');
@@ -67,13 +101,33 @@ var Router = function () {
       var seg = this.path.split('/');
       var segments = [];
 
-      for (var i in seg) {
-        if (seg.hasOwnProperty(i)) {
+      var _iteratorNormalCompletion2 = true;
+      var _didIteratorError2 = false;
+      var _iteratorError2 = undefined;
+
+      try {
+        for (var _iterator2 = seg[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+          var i = _step2.value;
+
           if (seg[i] !== '') {
             segments.push(seg[i]);
           }
         }
+      } catch (err) {
+        _didIteratorError2 = true;
+        _iteratorError2 = err;
+      } finally {
+        try {
+          if (!_iteratorNormalCompletion2 && _iterator2.return) {
+            _iterator2.return();
+          }
+        } finally {
+          if (_didIteratorError2) {
+            throw _iteratorError2;
+          }
+        }
       }
+
       this.segments = segments;
       _tmpSegments = segments.map(function (segment) {
         return segment;
@@ -87,21 +141,45 @@ var Router = function () {
         this.route = routes['/'];
         return this;
       }
-      for (var route in routes) {
-        var is = this.checkRoute(route, routes[route]);
-        if (!is) {
-          continue;
+      var _iteratorNormalCompletion3 = true;
+      var _didIteratorError3 = false;
+      var _iteratorError3 = undefined;
+
+      try {
+        for (var _iterator3 = Object.keys(routes)[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
+          var index = _step3.value;
+
+          var route = Object.keys(routes)[index];
+          if (this.checkRoute(route, routes[route])) {
+            break;
+          }
+        }
+      } catch (err) {
+        _didIteratorError3 = true;
+        _iteratorError3 = err;
+      } finally {
+        try {
+          if (!_iteratorNormalCompletion3 && _iterator3.return) {
+            _iterator3.return();
+          }
+        } finally {
+          if (_didIteratorError3) {
+            throw _iteratorError3;
+          }
         }
       }
+
       return this;
     }
   }, {
     key: 'checkRoute',
-    value: function checkRoute(route, routeObject) {
+    value: function checkRoute(routeName, routeObject) {
+      var route = routeName;
       if (route.indexOf('/') === 0) {
         route = route.replace('/', '');
       }
       var _routeSegments = route.split('/');
+      var _segments = [].concat(_toConsumableArray(_tmpSegments));
       var index = 0;
       var next = false;
       var found = false;
@@ -112,33 +190,57 @@ var Router = function () {
         return false;
       }
 
-      for (var i in _tmpSegments) {
-        var segment = _tmpSegments[i];
-        var routeSegment = _routeSegments[index];
+      var _iteratorNormalCompletion4 = true;
+      var _didIteratorError4 = false;
+      var _iteratorError4 = undefined;
 
-        if (next === true) {
-          continue;
-        }
+      try {
+        for (var _iterator4 = _segments[Symbol.iterator](), _step4; !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
+          var i = _step4.value;
 
-        if (routeSegment.indexOf(':') !== -1) {
-          var paramName = routeSegment.replace(':', '');
-          var paramValue = segment;
-          _tmpSegments.splice(index, 1);
-          namedParams[paramName] = paramValue;
-          index++;
-          continue;
+          var segment = _segments[i];
+          var routeSegment = _routeSegments[index];
+          if (next === true) {
+            continue; // eslint-disable-line no-continue
+          }
+
+          if (routeSegment.indexOf(':') !== -1) {
+            var paramName = routeSegment.replace(':', '');
+            var paramValue = segment;
+            _tmpSegments.splice(index, 1);
+            namedParams[paramName] = paramValue;
+            index += 1;
+            if (index === _routeSegments.length) {
+              found = true;
+            }
+            continue; // eslint-disable-line no-continue
+          }
+          if (routeSegment !== segment) {
+            next = true;
+            found = false;
+            continue; // eslint-disable-line no-continue
+          }
+          routesArray[index] = segment;
+          index += 1;
+          if (index === _routeSegments.length) {
+            found = true;
+          }
         }
-        if (routeSegment !== segment) {
-          next = true;
-          found = false;
-          continue;
-        }
-        routesArray[index] = segment;
-        index++;
-        if (index === _routeSegments.length) {
-          found = true;
+      } catch (err) {
+        _didIteratorError4 = true;
+        _iteratorError4 = err;
+      } finally {
+        try {
+          if (!_iteratorNormalCompletion4 && _iterator4.return) {
+            _iterator4.return();
+          }
+        } finally {
+          if (_didIteratorError4) {
+            throw _iteratorError4;
+          }
         }
       }
+
       if (found) {
         this.route = routeObject;
         this.route.namedParams = namedParams;
@@ -168,10 +270,8 @@ var Router = function () {
       if (this.route !== null) {
         if (this.route.module) {
           moduleName = this.route.module;
-        } else {
-          if (this.route.method === undefined) {
-            moduleName = this.prepareModuleName(_tmpSegments[0]);
-          }
+        } else if (this.route.method === undefined) {
+          moduleName = this.prepareModuleName(_tmpSegments[0]);
         }
       }
 
@@ -185,12 +285,12 @@ var Router = function () {
     key: 'setController',
     value: function setController() {
       if (this.route !== null && this.route.controller) {
-        this.controller = this.prepareControllerName(this.route.controller);
+        this.prepareControllerName(this.route.controller);
         return this;
       }
 
       if (_tmpSegments.length > 0) {
-        this.controller = this.prepareControllerName(_tmpSegments[0]);
+        this.prepareControllerName(_tmpSegments[0]);
         _tmpSegments.splice(0, 1);
       }
       return this;
@@ -204,7 +304,7 @@ var Router = function () {
         return this;
       }
 
-      this.method = this.getControllerMethodByRequestMethod(requestMethod);
+      this.method = CONTROLLER_METHODS[requestMethod] || DEFAULT_CONTROLLER_METHOD;
       return this;
     }
   }, {
@@ -216,47 +316,45 @@ var Router = function () {
       }
       if (_tmpSegments.length > 0) {
         this.params = {};
-        for (var i in _tmpSegments) {
-          var key = namedParams[i] ? namedParams[i] : i;
-          this.params[key] = _tmpSegments[i];
+        var _iteratorNormalCompletion5 = true;
+        var _didIteratorError5 = false;
+        var _iteratorError5 = undefined;
+
+        try {
+          for (var _iterator5 = _tmpSegments[Symbol.iterator](), _step5; !(_iteratorNormalCompletion5 = (_step5 = _iterator5.next()).done); _iteratorNormalCompletion5 = true) {
+            var i = _step5.value;
+
+            var key = namedParams[i] ? namedParams[i] : i;
+            this.params[key] = _tmpSegments[i];
+          }
+        } catch (err) {
+          _didIteratorError5 = true;
+          _iteratorError5 = err;
+        } finally {
+          try {
+            if (!_iteratorNormalCompletion5 && _iterator5.return) {
+              _iterator5.return();
+            }
+          } finally {
+            if (_didIteratorError5) {
+              throw _iteratorError5;
+            }
+          }
         }
       }
       return this;
     }
   }, {
-    key: 'getControllerMethodByRequestMethod',
-    value: function getControllerMethodByRequestMethod(method) {
-      if (CONTROLLER_METHODS[method]) {
-        return CONTROLLER_METHODS[method];
-      }
-      return DEFAULT_CONTROLLER_METHOD;
-    }
-  }, {
     key: 'prepareModuleName',
     value: function prepareModuleName(moduleName) {
-      return this.transformDashToCamelCase(moduleName);
+      // eslint-disable-line class-methods-use-this
+      return dashToCamelCase(moduleName);
     }
   }, {
     key: 'prepareControllerName',
     value: function prepareControllerName(controllerName) {
-      return this.transformDashToCamelCase(controllerName) + 'Controller';
-    }
-  }, {
-    key: 'prepareMethodName',
-    value: function prepareMethodName(methodName) {
-      return methodName;
-    }
-  }, {
-    key: 'transformDashToCamelCase',
-    value: function transformDashToCamelCase(string) {
-      var str = string.split('-');
-
-      for (var i in str) {
-        if (str.hasOwnProperty(i)) {
-          str[i] = _.capitalize(str[i]);
-        }
-      }
-      return str.join('');
+      this.controller = dashToCamelCase(controllerName) + 'Controller';
+      return this.controller;
     }
   }]);
 

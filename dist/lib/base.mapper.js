@@ -26,7 +26,7 @@ var BaseMapper = function () {
     }
   }, {
     key: 'create',
-    value: function create(payload) {
+    value: function create(params, payload) {
       return this.nullObject(payload);
     }
   }, {
@@ -51,17 +51,39 @@ var BaseMapper = function () {
     }
   }, {
     key: 'nullObject',
-    value: function nullObject(params) {
-      params = {};
-      return params;
+    value: function nullObject() {
+      // eslint-disable-line class-methods-use-this
+      return {};
     }
   }, {
     key: 'buildCollection',
     value: function buildCollection(collection) {
-      var builtCollection = {};
-      for (var i in collection) {
-        builtCollection[i] = this.build(collection[i]);
+      var builtCollection = [];
+      var _iteratorNormalCompletion = true;
+      var _didIteratorError = false;
+      var _iteratorError = undefined;
+
+      try {
+        for (var _iterator = collection[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+          var i = _step.value;
+
+          builtCollection.push(this.build(collection[i]));
+        }
+      } catch (err) {
+        _didIteratorError = true;
+        _iteratorError = err;
+      } finally {
+        try {
+          if (!_iteratorNormalCompletion && _iterator.return) {
+            _iterator.return();
+          }
+        } finally {
+          if (_didIteratorError) {
+            throw _iteratorError;
+          }
+        }
       }
+
       return builtCollection;
     }
   }, {

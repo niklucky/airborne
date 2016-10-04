@@ -1,5 +1,3 @@
-'use strict';
-
 const Router = require('./router.js');
 const Responder = require('./responder.js');
 const DI = require('./di.js');
@@ -32,12 +30,12 @@ class Dispatcher {
   }
 
   initAuth() {
-    var AuthLibrary = this.di.get('services').Authorization;
+    const AuthLibrary = this.di.get('services').Authorization;
     if (AuthLibrary === undefined) {
       throw Error('Auth library not initialized');
     }
     new AuthLibrary(this.di).init()
-      .then(authData => {
+      .then((authData) => {
         if (!authData.status) {
           this.responder.sendError('Not authorized', 401);
         }
@@ -46,26 +44,26 @@ class Dispatcher {
         this.di.set('authData', authData);
         this.dispatch();
       })
-      .catch(authData => {
+      .catch((authData) => {
         this.responder.sendError(authData, 401);
       });
   }
 
   dispatch() {
-    var result = this.start();
+    const result = this.start();
 
     if (result) {
       if (typeof result.then === 'function') {
-        result.then(data => {
-          this.send(data)
+        result.then((data) => {
+          this.send(data);
         })
-          .catch(data => {
-            this.responder.sendError(data)
+          .catch((data) => {
+            this.responder.sendError(data);
           });
         return true;
       }
     }
-    return this.send(result)
+    return this.send(result);
   }
 
   send(data) {
@@ -76,32 +74,32 @@ class Dispatcher {
     const controllers = this.di.get('controllers');
 
     try {
-      if(this.debug){
+      if (this.debug) {
         console.log('Dispatcher start: ', this.router);
       }
       if (this.router.module) {
-        let module = new this.router.module();
+        const Module = this.router.module;
+        const module = new Module();
 
-        let Ctrl = module.controllers[this.router.controller];
-        if(typeof Ctrl !== 'function'){
+        const Ctrl = module.controllers[this.router.controller];
+        if (typeof Ctrl !== 'function') {
           return this.responder.send404();
         }
-        let controller = new Ctrl(this.di);
+        const controller = new Ctrl(this.di);
 
         return controller.validate(this.router.method, this.router.params);
       }
-      var ctrl;
-      if(typeof controllers[this.router.controller] !== 'function'){
+      if (typeof controllers[this.router.controller] !== 'function') {
         return this.responder.send404();
       }
-      ctrl = new controllers[this.router.controller](this.di);
+      const ctrl = new controllers[this.router.controller](this.di);
 
       return ctrl.validate(this.router.method, this.router.params);
     } catch (e) {
       console.log('Dispatcher error', e);
-      this.responder.sendError(e);
+      return this.responder.sendError(e);
     }
   }
 }
 
-module.exports = Dispatcher;
+export default Dispatcher;

@@ -22,5 +22,5 @@ module.exports = {
   MySQLMapper,
   MySQLQueryBuilder,
   RedisMapper,
-  Validator
+  Validator,
 };

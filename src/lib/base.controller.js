@@ -1,5 +1,4 @@
-'use strict';
-const BaseService = require('./base.service');
+import BaseService from './base.service';
 
 class BaseController {
   constructor(di) {
@@ -8,48 +7,43 @@ class BaseController {
     this.rules = {};
     this.options = {};
     this.params = {};
-    this.validator = this.di.get('Validator');
   }
 
-  validate(method, params){
-    let requestData = this.mergeRequestData(params);
-    if (this.validator) {
-      const validator = new this.validator(this.rules[method], this.options[method]);
+  validate(method, params) {
+    const requestData = this.mergeRequestData(params);
+    const Validator = this.di.get('Validator');
+    if (Validator) {
+      const validator = new Validator(this.rules[method], this.options[method]);
       const result = validator.validate(requestData);
-      if(result.result === false){
-        return this.di.get('responder').sendError({message: 'Validation error', stack: result.errors }, 400);
+      if (result.result === false) {
+        return this.di.get('responder').sendError({ message: 'Validation error', stack: result.errors }, 400);
       }
       return this[method](result.validated.params, result.validated.payload);
     }
     return this[method](requestData.data);
   }
 
-  mergeRequestData(params){
-    var payload = {};
+  mergeRequestData(requestParams) {
+    const payload = {};
+    const params = (requestParams || {});
 
-    if(params == undefined){
-      params = {};
-    }
-
-    let query = this.di.get('request').query;
-    if(Object.keys(query).length > 0){
-      for (var i in query) {
-        if( query.hasOwnProperty(i)){
-          params[i] = query[i];
-        }
+    const query = this.di.get('request').query;
+    if (Object.keys(query).length > 0) {
+      for (const i of Object.keys(query)) {
+        const name = Object.keys(query)[i];
+        params[name] = query[name];
       }
     }
-    let body = this.di.get('request').body;
-    if(Object.keys(body).length > 0){
-      for (var n in body) {
-        if( body.hasOwnProperty(n)){
-          payload[n] = body[n];
-        }
+    const body = this.di.get('request').body;
+    if (Object.keys(body).length > 0) {
+      for (const n of Object.keys(body)) {
+        const name = Object.keys(body)[n];
+        payload[name] = body[name];
       }
     }
     return {
       params,
-      payload
+      payload,
     };
   }
 
@@ -73,11 +67,11 @@ class BaseController {
     return this.service.search(params);
   }
 
-  status(params){
+  status(params) {
     return this.service.status(params);
   }
 
-  del(params){
+  del(params) {
     return this.service.del(params);
   }
 

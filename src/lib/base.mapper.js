@@ -1,4 +1,5 @@
-'use strict';
+
+
 const BaseModel = require('./base.model');
 
 class BaseMapper {
@@ -15,7 +16,7 @@ class BaseMapper {
     return this.nullObject(params);
   }
 
-  create(payload) {
+  create(params, payload) {
     return this.nullObject(payload);
   }
 
@@ -35,15 +36,16 @@ class BaseMapper {
     return this.nullObject(params);
   }
 
-  nullObject(params){
-    params = {};
-    return params;
+  nullObject() { // eslint-disable-line class-methods-use-this
+    return {};
   }
 
-  buildCollection(collection){
-    let builtCollection = {};
-    for(let i in collection){
-      builtCollection[i] = this.build(collection[i]);
+  buildCollection(collection) {
+    const builtCollection = [];
+    for (const i of collection) {
+      builtCollection.push(
+        this.build(collection[i])
+      );
     }
     return builtCollection;
   }
