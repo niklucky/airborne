@@ -119,9 +119,8 @@ var HTTPMapper = function (_BaseMapper) {
 
       try {
         for (var _iterator = Object.keys(params)[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-          var i = _step.value;
+          var name = _step.value;
 
-          var name = Object.keys(params)[i];
           query.push(name + '=' + params[name]);
         }
       } catch (err) {

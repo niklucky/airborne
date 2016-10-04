@@ -6,29 +6,38 @@ Object.defineProperty(exports, "__esModule", {
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+var _di = require('./di');
 
-var Router = require('./router.js');
-var Responder = require('./responder.js');
-var DI = require('./di.js');
+var _di2 = _interopRequireDefault(_di);
+
+var _responder = require('./responder');
+
+var _responder2 = _interopRequireDefault(_responder);
+
+var _router = require('./router');
+
+var _router2 = _interopRequireDefault(_router);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var Dispatcher = function () {
   function Dispatcher(di, request, response) {
     _classCallCheck(this, Dispatcher);
 
-    this.di = new DI().merge(di);
-
+    this.di = new _di2.default().merge(di);
     this.debug = this.di.get('config').debug;
 
     this.di.set('request', request);
     this.di.set('response', response);
 
-    this.responder = new Responder(this.di.get('config'));
+    this.responder = new _responder2.default(this.di.get('config'));
     this.responder.setServerResponse(this.di.get('response'));
 
     this.di.set('responder', this.responder);
 
-    this.router = new Router(this.di);
+    this.router = new _router2.default(this.di.get('request'), this.di.get('routes'), this.di.get('modules'), this.di.get('controllers'));
 
     this.init();
   }

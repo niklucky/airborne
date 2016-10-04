@@ -25,7 +25,7 @@ var BaseController = function () {
     key: 'validate',
     value: function validate(method, params) {
       var requestData = this.mergeRequestData(params);
-      var Validator = this.di.get('Validator');
+      var Validator = this.di.get('validator');
       if (Validator) {
         var validator = new Validator(this.rules[method], this.options[method]);
         var result = validator.validate(requestData);
@@ -50,9 +50,8 @@ var BaseController = function () {
 
         try {
           for (var _iterator = Object.keys(query)[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-            var i = _step.value;
+            var name = _step.value;
 
-            var name = Object.keys(query)[i];
             params[name] = query[name];
           }
         } catch (err) {
@@ -78,9 +77,8 @@ var BaseController = function () {
 
         try {
           for (var _iterator2 = Object.keys(body)[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
-            var n = _step2.value;
+            var _name = _step2.value;
 
-            var _name = Object.keys(body)[n];
             payload[_name] = body[_name];
           }
         } catch (err) {
@@ -116,7 +114,7 @@ var BaseController = function () {
   }, {
     key: 'create',
     value: function create(params, payload) {
-      return this.service.create(payload);
+      return this.service.create(params, payload);
     }
   }, {
     key: 'update',

@@ -85,8 +85,7 @@ class HTTPMapper extends BaseMapper {
 
   prepareGetParams(params) { // eslint-disable-line class-methods-use-this
     const query = [];
-    for (const i of Object.keys(params)) {
-      const name = Object.keys(params)[i];
+    for (const name of Object.keys(params)) {
       query.push(`${name}=${params[name]}`);
     }
     return `?${query.join('&')}`;

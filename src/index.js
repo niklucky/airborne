@@ -1,19 +1,20 @@
-
+import DI from './core/di';
+import Validator from './core/validator';
+import Dispatcher from './core/dispatcher';
 
 const lib = require('./lib');
-
 const express = require('express');
 const bodyParser = require('body-parser');
 
 const defaultConfig = require('./core/config.js');
-const DI = require('./core/di.js');
-const Dispatcher = require('./core/dispatcher.js');
 const DbAdapter = require('./core/db.adapter.js');
-
-const _instances = [];
 
 class Airborne {
   constructor(config) {
+    if (typeof config !== 'object') {
+      throw new Error('Fatal: Engine error: config is not an object. Failed to start');
+    }
+    this.instances = [];
     this.di = new DI();
     this.config = Object.assign({}, defaultConfig, config);
     this.di.set('config', this.config);
@@ -44,7 +45,9 @@ class Airborne {
   }
 
   validator(validator) {
-    this.di.set('Validator', validator);
+    if (validator === true) {
+      this.di.set('validator', Validator);
+    }
     return this;
   }
 
@@ -91,15 +94,21 @@ class Airborne {
   }
 
   handle(request, response) {
+    if (typeof request !== 'object') {
+      throw new Error('[Fatal] Application handle: request is not an object');
+    }
+    if (typeof response !== 'object') {
+      throw new Error('[Fatal] Application handle: response is not an object');
+    }
     this.setInstance(
       new Dispatcher(this.di, request, response)
     );
   }
 
   setInstance(dispatcher) { // eslint-disable-line class-methods-use-this
-    _instances.push(dispatcher);
+    this.instances.push(dispatcher);
   }
 }
-lib.Airborne = Airborne;
+lib.Engine = Airborne;
 
-module.exports = lib;
+export default lib;

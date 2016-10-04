@@ -1,12 +1,12 @@
-const Router = require('./router.js');
-const Responder = require('./responder.js');
-const DI = require('./di.js');
+import DI from './di';
+import Responder from './responder';
+
+import Router from './router';
 
 class Dispatcher {
 
   constructor(di, request, response) {
     this.di = new DI().merge(di);
-
     this.debug = this.di.get('config').debug;
 
     this.di.set('request', request);
@@ -17,7 +17,12 @@ class Dispatcher {
 
     this.di.set('responder', this.responder);
 
-    this.router = new Router(this.di);
+    this.router = new Router(
+      this.di.get('request'),
+      this.di.get('routes'),
+      this.di.get('modules'),
+      this.di.get('controllers')
+    );
 
     this.init();
   }

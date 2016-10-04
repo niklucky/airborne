@@ -4,10 +4,7 @@ class DI {
   }
 
   merge(di) {
-    for (const key of Object.keys(di.di)) {
-      const name = Object.keys(di.di)[key];
-      this.set(name, di.di[name]);
-    }
+    this.di = Object.assign({}, this.di, di.di);
     return this;
   }
 

@@ -51,10 +51,13 @@ class Responder {
   }
 
   prepareHeaderLinks(links) {
+    if (!links) {
+      return '';
+    }
     this.headerLinks = [];
-    for (const i of links) {
+    for (const link of links) {
       this.headerLinks.push(
-        `<${links[i].schema}>; rel="${links[i].rel}"`
+        `<${link.schema}>; rel="${link.rel}"`
       );
     }
     return this.headerLinks.join(',');

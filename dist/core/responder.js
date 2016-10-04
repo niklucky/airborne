@@ -71,6 +71,9 @@ var Responder = function () {
   }, {
     key: 'prepareHeaderLinks',
     value: function prepareHeaderLinks(links) {
+      if (!links) {
+        return '';
+      }
       this.headerLinks = [];
       var _iteratorNormalCompletion = true;
       var _didIteratorError = false;
@@ -78,9 +81,9 @@ var Responder = function () {
 
       try {
         for (var _iterator = links[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-          var i = _step.value;
+          var link = _step.value;
 
-          this.headerLinks.push('<' + links[i].schema + '>; rel="' + links[i].rel + '"');
+          this.headerLinks.push('<' + link.schema + '>; rel="' + link.rel + '"');
         }
       } catch (err) {
         _didIteratorError = true;

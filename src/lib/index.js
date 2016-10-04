@@ -10,8 +10,6 @@ const MySQLMapper = require('./mysql.mapper');
 const MySQLQueryBuilder = require('mysql-qb');
 const RedisMapper = require('./redis.mapper');
 
-const Validator = require('./validator');
-
 module.exports = {
   BaseController,
   BaseService,
@@ -21,6 +19,5 @@ module.exports = {
   HTTPMapper,
   MySQLMapper,
   MySQLQueryBuilder,
-  RedisMapper,
-  Validator,
+  RedisMapper
 };

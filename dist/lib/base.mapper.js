@@ -65,9 +65,9 @@ var BaseMapper = function () {
 
       try {
         for (var _iterator = collection[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-          var i = _step.value;
+          var item = _step.value;
 
-          builtCollection.push(this.build(collection[i]));
+          builtCollection.push(this.build(item));
         }
       } catch (err) {
         _didIteratorError = true;

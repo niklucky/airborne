@@ -11,7 +11,7 @@ class BaseController {
 
   validate(method, params) {
     const requestData = this.mergeRequestData(params);
-    const Validator = this.di.get('Validator');
+    const Validator = this.di.get('validator');
     if (Validator) {
       const validator = new Validator(this.rules[method], this.options[method]);
       const result = validator.validate(requestData);
@@ -29,15 +29,13 @@ class BaseController {
 
     const query = this.di.get('request').query;
     if (Object.keys(query).length > 0) {
-      for (const i of Object.keys(query)) {
-        const name = Object.keys(query)[i];
+      for (const name of Object.keys(query)) {
         params[name] = query[name];
       }
     }
     const body = this.di.get('request').body;
     if (Object.keys(body).length > 0) {
-      for (const n of Object.keys(body)) {
-        const name = Object.keys(body)[n];
+      for (const name of Object.keys(body)) {
         payload[name] = body[name];
       }
     }
@@ -56,7 +54,7 @@ class BaseController {
   }
 
   create(params, payload) {
-    return this.service.create(payload);
+    return this.service.create(params, payload);
   }
 
   update(params, payload) {

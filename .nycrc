@@ -1,0 +1,11 @@
+{
+  "lines": 36,
+  "statements": 38,
+  "functions": 25,
+  "branches": 30,
+  "reporter": [
+    "html",
+    "lcov",
+    "text-summary"
+  ]
+}

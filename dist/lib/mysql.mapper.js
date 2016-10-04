@@ -47,7 +47,11 @@ var MySQLMapper = function (_BaseMapper) {
 
       return new Promise(function (resolve, reject) {
         try {
-          var query = _this3.queryBuilder.select('*').from(_this3.dbTable).where(params).build();
+          _this3.queryBuilder.select('*').from(_this3.dbTable);
+          if (params !== undefined) {
+            _this3.queryBuilder.where(params);
+          }
+          var query = _this3.queryBuilder.build();
           return _this3.db.query(query, function (error, rows, fields) {
             if (error) {
               reject(error, fields);
@@ -61,19 +65,20 @@ var MySQLMapper = function (_BaseMapper) {
     }
   }, {
     key: 'create',
-    value: function create(params) {
+    value: function create(params, payload) {
       var _this4 = this;
 
       return new Promise(function (resolve, reject) {
         try {
           var _ret = function () {
-            var model = new _this4.Model(params);
+            var model = new _this4.Model(payload);
             var data = model.get ? model.get() : model;
             for (var i in data) {
               if (typeof data[i] === 'string') {
                 data[i] = data[i].replace(/'/g, "\\'"); // eslint-disable-line
               }
             }
+            console.log('data', data);
             var query = _this4.queryBuilder.insert(_this4.dbTable, data).build();
             return {
               v: _this4.db.query(query, function (error, result) {

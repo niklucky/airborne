@@ -1,12 +1,10 @@
 import { capitalize } from 'lodash';
 
 function dashToCamelCase(string) {
-  const str = string.split('-');
-
-  for (const i of str) {
-    str[i] = capitalize(str[i]);
-  }
-  return str.join('');
+  return string
+    .split('-')
+    .map(item => capitalize(item))
+    .join('');
 }
 
 const DEFAULT_CONTROLLER_NAME = 'IndexController';
@@ -24,7 +22,13 @@ let _tmpSegments = [];
 
 class Router {
 
-  constructor(di) {
+  constructor(request, routes, modules, controllers) {
+    if (typeof request !== 'object') {
+      throw new Error('Router error: request is not an object');
+    }
+    if (typeof controllers !== 'object') {
+      throw new Error('Router error: should be at least 1 controller');
+    }
     this.route = null;
     this.module = null;
     this.controller = DEFAULT_CONTROLLER_NAME;
@@ -35,15 +39,15 @@ class Router {
     this.path = '';
     this.params = undefined;
 
-    this.setUrl(di.get('request').url)
+    this.setUrl(request.url)
         .setPathFromUrl()
         .setSegmentsFromPath()
-        .setRoute(di.get('routes'));
+        .setRoute(routes);
 
     if (this.isMethodAllowed()) {
-      this.setModule(di.get('modules'))
-          .setController(di.get('controllers'))
-          .setMethod(di.get('request').method);
+      this.setModule(modules)
+          .setController(controllers)
+          .setMethod(request.method);
     }
   }
 
@@ -69,25 +73,21 @@ class Router {
 
   setSegmentsFromPath() {
     const seg = this.path.split('/');
-    const segments = [];
-
-    for (const i of seg) {
-      if (seg[i] !== '') {
-        segments.push(seg[i]);
-      }
-    }
-    this.segments = segments;
-    _tmpSegments = segments.map(segment => (segment));
+    this.segments = seg.filter(item => item !== '');
+    _tmpSegments = [...this.segments];
     return this;
   }
 
   setRoute(routes) {
+    if (typeof routes !== 'object') {
+      return this;
+    }
     if (_tmpSegments.length === 0 && routes['/'] !== undefined) {
       this.route = routes['/'];
       return this;
     }
-    for (const index of Object.keys(routes)) {
-      const route = Object.keys(routes)[index];
+
+    for (const route of Object.keys(routes)) {
       if (this.checkRoute(route, routes[route])) {
         break;
       }
@@ -112,8 +112,7 @@ class Router {
       return false;
     }
 
-    for (const i of _segments) {
-      const segment = _segments[i];
+    for (const segment of _segments) {
       const routeSegment = _routeSegments[index];
       if (next === true) {
         continue; // eslint-disable-line no-continue
@@ -224,9 +223,13 @@ class Router {
   }
 
   prepareControllerName(controllerName) {
-    this.controller = `${dashToCamelCase(controllerName)}Controller`;
+    if (controllerName === undefined) {
+      this.controller = DEFAULT_CONTROLLER_NAME;
+    } else {
+      this.controller = `${dashToCamelCase(controllerName)}Controller`;
+    }
     return this.controller;
   }
 }
 
-module.exports = Router;
+export default Router;

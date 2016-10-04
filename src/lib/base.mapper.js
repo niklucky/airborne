@@ -42,9 +42,9 @@ class BaseMapper {
 
   buildCollection(collection) {
     const builtCollection = [];
-    for (const i of collection) {
+    for (const item of collection) {
       builtCollection.push(
-        this.build(collection[i])
+        this.build(item)
       );
     }
     return builtCollection;

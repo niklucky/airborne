@@ -23,11 +23,13 @@ class MySQLMapper extends BaseMapper {
   load(params) {
     return new Promise((resolve, reject) => {
       try {
-        const query = this.queryBuilder
+        this.queryBuilder
           .select('*')
-          .from(this.dbTable)
-          .where(params)
-          .build();
+          .from(this.dbTable);
+        if (params !== undefined) {
+          this.queryBuilder.where(params);
+        }
+        const query = this.queryBuilder.build();
         return this.db.query(query, (error, rows, fields) => {
           if (error) {
             reject(error, fields);
@@ -39,16 +41,17 @@ class MySQLMapper extends BaseMapper {
       }
     });
   }
-  create(params) {
+  create(params, payload) {
     return new Promise((resolve, reject) => {
       try {
-        const model = new this.Model(params);
+        const model = new this.Model(payload);
         const data = (model.get) ? model.get() : model;
         for (const i in data) {
           if (typeof data[i] === 'string') {
             data[i] = data[i].replace(/'/g, "\\'"); // eslint-disable-line
           }
         }
+        console.log('data', data);
         const query = this.queryBuilder.insert(this.dbTable, data).build();
         return this.db.query(query, (error, result) => {
           if (error) {
