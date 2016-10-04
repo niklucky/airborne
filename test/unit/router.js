@@ -37,4 +37,24 @@ describe('Router', () => {
       assert.equal(router.controller, 'DictionaryController');
     });
   });
+  describe('Methods', () => {
+    it('setUrl - /test', () => {
+      const router = new Router(request.index, routes, {}, {});
+      router.setUrl('/test');
+      assert.equal(router.view, 'json');
+      assert.equal(router.url, '/test');
+    });
+    it('setUrl - /test.json', () => {
+      const router = new Router(request.dictionary, routes, {}, {});
+      router.setUrl('/test.json');
+      assert.equal(router.view, 'json');
+      assert.equal(router.url, '/test');
+    });
+    it('setUrl - /test.xml', () => {
+      const router = new Router(request.dictionary, routes, {}, {});
+      router.setUrl('/test.xml');
+      assert.equal(router.view, 'xml');
+      assert.equal(router.url, '/test');
+    });
+  });
 });
