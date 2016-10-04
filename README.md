@@ -1,6 +1,7 @@
 # Airborne API
 [![Build Status](https://travis-ci.org/niklucky/airborne.svg?branch=master)](https://travis-ci.org/niklucky/airborne)
 [![npm version](https://img.shields.io/npm/v/airborne.svg?style=flat-square)](https://www.npmjs.com/package/airborne)
+[![Codecov](https://img.shields.io/codecov/c/github/niklucky/airborne.svg?maxAge=2592000?style=flat-square)](https://codecov.io/gh/niklucky/airborne)
 
 > API framework that implements DAO (Data Access Object) model.
 
