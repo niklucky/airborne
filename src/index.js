@@ -67,6 +67,7 @@ class Airborne {
     this.express.use(bodyParser.json());
     this.express.use(bodyParser.urlencoded({ extended: true }));
 
+    /* istanbul ignore next */
     router.use((request, response) => {
       if (request.url.indexOf('favicon') !== -1) {
         response.send();
@@ -76,6 +77,7 @@ class Airborne {
       this.handle(request, response);
     });
 
+    /* istanbul ignore next */
     router.use((err, req, res) => {
       console.log('Error catched: ', err);
       res.send('Error');
