@@ -17,42 +17,48 @@ const CONTROLLER_METHODS = {
   DELETE: 'del',
   HEAD: 'status',
 };
-
-let _tmpSegments = [];
+let _modules = null;
+let _routes = null;
 
 class Router {
 
-  constructor(request, routes, modules, controllers) {
+  constructor(request, routes, modules) {
     if (typeof request !== 'object') {
       throw new Error('Router error: request is not an object');
     }
-    if (typeof controllers !== 'object') {
-      throw new Error('Router error: should be at least 1 controller');
-    }
+    _modules = modules;
+    _routes = routes;
+
     this.route = null;
     this.module = null;
     this.controller = DEFAULT_CONTROLLER_NAME;
     this.method = null;
+    this.requestMethod = request.method;
+    this.requestUrl = request.url;
     this.view = 'json';
     this.url = '';
     this.segments = [];
     this.path = '';
     this.params = undefined;
-
-    this.setUrl(request.url)
-        .setPathFromUrl()
-        .setSegmentsFromPath()
-        .setRoute(routes);
-
-    if (this.isMethodAllowed()) {
-      this.setModule(modules)
-          .setController(controllers)
-          .setMethod(request.method);
-    }
+    this.tmpSegments = [];
   }
 
-  setUrl(requestUrl) {
-    let url = requestUrl;
+  init() {
+    this.setUrl()
+        .setPathFromUrl()
+        .setSegmentsFromPath()
+        .setRoute();
+
+    if (this.isMethodAllowed()) {
+      this.setModule()
+          .setController()
+          .setMethod();
+    }
+    return this;
+  }
+
+  setUrl() {
+    let url = this.requestUrl;
     if (url.indexOf('.json') !== -1) {
       this.view = 'json';
       url = url.replace('.json', '');
@@ -74,78 +80,88 @@ class Router {
   setSegmentsFromPath() {
     const seg = this.path.split('/');
     this.segments = seg.filter(item => item !== '');
-    _tmpSegments = [...this.segments];
+    this.tmpSegments = [...this.segments];
     return this;
   }
 
-  setRoute(routes) {
-    if (typeof routes !== 'object') {
+  setRoute() {
+    if (typeof _routes !== 'object') {
       return this;
     }
-    if (_tmpSegments.length === 0 && routes['/'] !== undefined) {
-      this.route = routes['/'];
+    if (this.tmpSegments.length === 0 && _routes['/'] !== undefined) {
+      this.route = _routes['/'];
       return this;
     }
 
-    for (const route of Object.keys(routes)) {
-      if (this.checkRoute(route, routes[route])) {
+    for (const route of Object.keys(_routes)) {
+      if (this.checkRoute(route)) {
+        this.route = _routes[route];
         break;
       }
     }
     return this;
   }
 
-  checkRoute(routeName, routeObject) {
-    let route = routeName;
+  checkRoute(routeUrl) {
+    let route = routeUrl;
+    let index = 0;
+    let found = true;
+
     if (route.indexOf('/') === 0) {
       route = route.replace('/', '');
     }
-    const _routeSegments = route.split('/');
-    const _segments = [..._tmpSegments];
-    let index = 0;
-    let next = false;
-    let found = false;
-    const routesArray = [];
-    const namedParams = {};
 
-    if (_tmpSegments.length > _routeSegments.length) {
+    const { routeSegments, urlSegments } = this.getNamedParams(
+      route.split('/').filter(item => item !== ''),
+      [...this.tmpSegments]
+    );
+    if (routeSegments.length !== urlSegments.length) {
       return false;
     }
 
-    for (const segment of _segments) {
-      const routeSegment = _routeSegments[index];
-      if (next === true) {
-        continue; // eslint-disable-line no-continue
-      }
-
-      if (routeSegment.indexOf(':') !== -1) {
-        const paramName = routeSegment.replace(':', '');
-        const paramValue = segment;
-        _tmpSegments.splice(index, 1);
-        namedParams[paramName] = paramValue;
-        index += 1;
-        if (index === _routeSegments.length) {
-          found = true;
-        }
-        continue; // eslint-disable-line no-continue
-      }
-      if (routeSegment !== segment) {
-        next = true;
+    for (const segment of routeSegments) {
+      if (segment !== urlSegments[index]) {
         found = false;
-        continue; // eslint-disable-line no-continue
+        break;
       }
-      routesArray[index] = segment;
       index += 1;
-      if (index === _routeSegments.length) {
-        found = true;
-      }
-    }
-    if (found) {
-      this.route = routeObject;
-      this.route.namedParams = namedParams;
-      this.params = namedParams;
     }
     return found;
+  }
+
+  getNamedParams(routeSegments, urlSegments) {
+    const iterator = [...routeSegments];
+    let index = 0;
+    let isRequred = true;
+    for (let segment of iterator) {
+      isRequred = true;
+      if (segment.indexOf(':') !== -1) {
+        if (segment.indexOf('?') !== -1) {
+          segment = segment.replace('?', '');
+          isRequred = false;
+        }
+        const name = segment.replace(':', '');
+        const value = urlSegments[index];
+
+        if (value === undefined && isRequred === false) {
+          routeSegments.splice(index, 1);
+          continue; // eslint-disable-line no-continue
+        } else if (value === undefined && isRequred === true) {
+          break;
+        }
+        if (this.params === undefined) {
+          this.params = {};
+        }
+        this.params[name] = value;
+        routeSegments.splice(index, 1);
+        urlSegments.splice(index, 1);
+      }
+      index += 1;
+    }
+    return {
+      routeSegments,
+      urlSegments
+    };
   }
 
   isMethodAllowed() {
@@ -158,8 +174,8 @@ class Router {
     return (this.route.methods.indexOf(this.request.method) !== -1);
   }
 
-  setModule(modules) {
-    if (_tmpSegments.length < 2) {
+  setModule() {
+    if (this.tmpSegments.length < 2) {
       return this;
     }
     let moduleName = null;
@@ -168,13 +184,13 @@ class Router {
       if (this.route.module) {
         moduleName = this.route.module;
       } else if (this.route.method === undefined) {
-        moduleName = this.prepareModuleName(_tmpSegments[0]);
+        moduleName = this.prepareModuleName(this.tmpSegments[0]);
       }
     }
 
-    if (moduleName !== null && typeof modules[moduleName] === 'function') {
-      this.module = modules[moduleName];
-      _tmpSegments.splice(0, 1);
+    if (moduleName !== null && typeof _modules[moduleName] === 'function') {
+      this.module = _modules[moduleName];
+      this.tmpSegments.splice(0, 1);
     }
     return this;
   }
@@ -185,21 +201,21 @@ class Router {
       return this;
     }
 
-    if (_tmpSegments.length > 0) {
-      this.prepareControllerName(_tmpSegments[0]);
-      _tmpSegments.splice(0, 1);
+    if (this.tmpSegments.length > 0) {
+      this.prepareControllerName(this.tmpSegments[0]);
+      this.tmpSegments.splice(0, 1);
     }
     return this;
   }
 
-  setMethod(requestMethod) {
+  setMethod() {
     if ((this.route !== undefined && this.route !== null) && this.route.method) {
       this.method = this.route.method;
-      _tmpSegments.splice(0, 1);
+      this.tmpSegments.splice(0, 1);
       return this;
     }
 
-    this.method = (CONTROLLER_METHODS[requestMethod] || DEFAULT_CONTROLLER_METHOD);
+    this.method = (CONTROLLER_METHODS[this.requestMethod] || DEFAULT_CONTROLLER_METHOD);
     return this;
   }
 
@@ -208,11 +224,11 @@ class Router {
     if ((this.route !== null) && this.route.namedParams) {
       namedParams = this.route.namedParams;
     }
-    if (_tmpSegments.length > 0) {
+    if (this.tmpSegments.length > 0) {
       this.params = {};
-      for (const i of _tmpSegments) {
+      for (const i of this.tmpSegments) {
         const key = (namedParams[i]) ? namedParams[i] : i;
-        this.params[key] = _tmpSegments[i];
+        this.params[key] = this.tmpSegments[i];
       }
     }
     return this;

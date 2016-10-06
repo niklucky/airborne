@@ -20,9 +20,9 @@ class Dispatcher {
     this.router = new Router(
       this.di.get('request'),
       this.di.get('routes'),
-      this.di.get('modules'),
-      this.di.get('controllers')
+      this.di.get('modules')
     );
+    this.router.init();
 
     this.init();
   }

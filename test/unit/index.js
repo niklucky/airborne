@@ -54,7 +54,7 @@ describe('Airborne application', () => {
     it('No database, simple config', () => {
       expect(app).to.have.property('di');
       expect(app).to.have.property('config');
-      expect(app.config).to.be.an('string');
+      expect(app.config).to.be.an('object');
       expect(app.di).to.be.an.instanceOf(DI);
     });
 
