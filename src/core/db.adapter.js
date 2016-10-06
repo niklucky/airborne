@@ -65,16 +65,16 @@ class DbAdapter {
       password: connection.password,
       database: connection.database,
     });
-    // conn.connect();
-    // conn.on('error', (err) => {
-    //   console.log('Connection down. Reconnecting...', err);
-    //   setTimeout(() => {
-    //     this.initMySQL(name, connection);
-    //   }, 1000);
-    // });
-    // conn.on('connect', () => {
-    //   console.log('Connected');
-    // });
+    conn.connect();
+    conn.on('error', (err) => {
+      console.log('Connection down. Reconnecting...', err);
+      setTimeout(() => {
+        this.initMySQL(name, connection);
+      }, 1000);
+    });
+    conn.on('connect', () => {
+      console.log('Connected');
+    });
 
     this.connections[name] = conn;
   }
