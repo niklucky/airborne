@@ -48,7 +48,6 @@ class Router {
         .setPathFromUrl()
         .setSegmentsFromPath()
         .setRoute();
-
     if (this.isMethodAllowed()) {
       this.setModule()
           .setController()
@@ -171,7 +170,7 @@ class Router {
     if (!this.route.methods) {
       return true;
     }
-    return (this.route.methods.indexOf(this.request.method) !== -1);
+    return (this.route.methods.indexOf(this.requestMethod) !== -1);
   }
 
   setModule() {
@@ -196,7 +195,7 @@ class Router {
   }
 
   setController() {
-    if ((this.route !== null) && this.route.controller) {
+    if (this.route !== null && this.route.controller) {
       this.prepareControllerName(this.route.controller);
       return this;
     }
@@ -209,7 +208,7 @@ class Router {
   }
 
   setMethod() {
-    if ((this.route !== undefined && this.route !== null) && this.route.method) {
+    if (this.route !== null && this.route.method) {
       this.method = this.route.method;
       this.tmpSegments.splice(0, 1);
       return this;
@@ -219,31 +218,15 @@ class Router {
     return this;
   }
 
-  setParams() {
-    let namedParams = [];
-    if ((this.route !== null) && this.route.namedParams) {
-      namedParams = this.route.namedParams;
-    }
-    if (this.tmpSegments.length > 0) {
-      this.params = {};
-      for (const i of this.tmpSegments) {
-        const key = (namedParams[i]) ? namedParams[i] : i;
-        this.params[key] = this.tmpSegments[i];
-      }
-    }
-    return this;
-  }
-
   prepareModuleName(moduleName) { // eslint-disable-line class-methods-use-this
     return dashToCamelCase(moduleName);
   }
 
   prepareControllerName(controllerName) {
-    if (controllerName === undefined) {
-      this.controller = DEFAULT_CONTROLLER_NAME;
-    } else {
-      this.controller = `${dashToCamelCase(controllerName)}Controller`;
-    }
+    this.controller = (controllerName === undefined)
+       ? DEFAULT_CONTROLLER_NAME
+       : `${dashToCamelCase(controllerName)}Controller`;
+
     return this.controller;
   }
 }
