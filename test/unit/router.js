@@ -21,6 +21,9 @@ const routes = {
   },
   '/about': {
     controller: 'Company'
+  },
+  '/auth': {
+    method: 'login'
   }
 };
 const request = {
@@ -296,6 +299,69 @@ describe('Router', () => {
       expect(result).is.an.instanceOf(Router)
       expect(router.controller).is.equal('TestController');
       expect(router.method).is.equal('load');
+    });
+    it('setMethod - route is defined, route method is undefined', () => {
+      const router = new Router(request.test, routes, modules).init();
+      const result = router.setMethod();
+      expect(result).is.an.instanceOf(Router);
+      expect(router.method).is.equal('load');
+    });
+    it('setMethod - route is null', () => {
+      const router = new Router(request.dictionary, routes, modules).init();
+      const result = router.setMethod();
+      expect(result).is.an.instanceOf(Router);
+      expect(router.method).is.equal('load');
+    });
+    it('setMethod - route is defined, request.method is POST', () => {
+      const req = request.test;
+      req.method = 'POST';
+      const router = new Router(req, routes, modules).init();
+      const result = router.setMethod();
+      expect(result).is.an.instanceOf(Router);
+      expect(router.method).is.equal('create');
+    });
+    it('setMethod - route is defined, request.method is PUT', () => {
+      const req = request.test;
+      req.method = 'PUT';
+      const router = new Router(req, routes, modules).init();
+      const result = router.setMethod();
+      expect(result).is.an.instanceOf(Router);
+      expect(router.method).is.equal('update');
+    });
+    it('setMethod - route is defined, request.method is DELETE', () => {
+      const req = request.test;
+      req.method = 'DELETE';
+      const router = new Router(req, routes, modules).init();
+      const result = router.setMethod();
+      expect(result).is.an.instanceOf(Router);
+      expect(router.method).is.equal('del');
+    });
+    it('setMethod - route is defined, request.method is GET', () => {
+      const req = request.test;
+      req.method = 'GET';
+      const router = new Router(req, routes, modules).init();
+      const result = router.setMethod();
+      expect(result).is.an.instanceOf(Router);
+      expect(router.method).is.equal('load');
+    });
+    it('setMethod - route is defined, request.method is HEAD', () => {
+      const req = request.test;
+      req.method = 'HEAD';
+      const router = new Router(req, routes, modules).init();
+      const result = router.setMethod();
+      expect(result).is.an.instanceOf(Router);
+      expect(router.method).is.equal('status');
+    });
+    it('setMethod - route is defined, route.method is defined', () => {
+      const router = new Router({ url: '/auth' }, routes, modules).init();
+      const result = router.setMethod();
+      expect(result).is.an.instanceOf(Router);
+      expect(router.method).is.equal('login');
+    });
+    it('prepareControllerName - controllerName is undefined', () => {
+      const router = new Router({ url: '/auth' }, routes, modules).init();
+      const result = router.prepareControllerName();
+      expect(result).is.equal('IndexController');
     });
   });
 });
