@@ -1,9 +1,6 @@
-const sanitizer = require('sanitizer');
-// import capitalize from 'lodash/capitalize';
+import sanitizer from 'sanitizer';
+import capitalize from 'lodash/capitalize';
 
-String.prototype.capitalize = function() {
-    return this.charAt(0).toUpperCase() + this.slice(1);
-}
 const AVAILABLE_RULES = ['number', 'float', 'string', 'boolean', 'array', 'object'];
 
 class Validator {
@@ -49,7 +46,7 @@ class Validator {
         mode = 'payload';
       }
 
-      const method = 'validate' + rule.type.capitalize();
+      const method = 'validate' + capitalize(rule.type);
       if (AVAILABLE_RULES.indexOf(rule.type) !== -1 && typeof this[method] === 'function') {
         this.validated[mode][key] = this[method](key, this.data[mode][key]);
       }
@@ -86,7 +83,7 @@ class Validator {
   validateBoolean(key, inputValue) {
     let value = inputValue;
     if (typeof value === 'number') {
-      value = (value === 1) ? true : false;
+      value = (value === 1);
     }
     if (typeof value === 'boolean') {
       this.setResult(true);
