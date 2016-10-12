@@ -29,7 +29,7 @@ const validator = {
         name: 'Test',
         price: 10.20,
         isActive: true,
-        options: [1,2],
+        options: [1, 2],
         data: {
           id: 2, name: 'dataObject'
         }
@@ -43,14 +43,14 @@ const validator = {
         isActive: true
       },
       payload: {
-        options: [1,2],
+        options: [1, 2],
         data: {
           id: 2, name: 'dataObject'
         }
       }
-    }
+    }    
   ]
-}
+};
 export default {
   validator
 };

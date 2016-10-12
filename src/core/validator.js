@@ -61,7 +61,7 @@ class Validator {
   validateNumber(key, inputValue) {
     const value = parseInt(inputValue, 10);
 
-    if (typeof value === 'number') {
+    if (typeof value === 'number' && !isNaN(value)) {
       this.setResult(true);
       return value;
     }
@@ -72,7 +72,7 @@ class Validator {
   validateFloat(key, inputValue) {
     const value = parseFloat(inputValue, 10);
 
-    if (typeof value === 'number') {
+    if (typeof value === 'number' && !isNaN(value)) {
       this.setResult(true);
       return value;
     }
@@ -84,6 +84,9 @@ class Validator {
     let value = inputValue;
     if (typeof value === 'number') {
       value = (value === 1);
+    }
+    if (typeof value === 'string') {
+      value = (value === 'true');
     }
     if (typeof value === 'boolean') {
       this.setResult(true);
@@ -114,7 +117,7 @@ class Validator {
   }
 
   validateObject(key, value) {
-    if (typeof value === 'object') {
+    if (value instanceof Object) {
       this.setResult(true);
       return value;
     }

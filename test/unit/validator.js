@@ -1,11 +1,13 @@
-import { expect, assert } from 'chai';
+/* eslint-disable */
+import { expect } from 'chai';
 import Validator from '../../src/core/validator';
-import mocks from '../mocks.js';
+import mocks from '../mocks';
+
 const { rules, data } = mocks.validator;
 
 describe('Validator', () => {
   describe('Constructor', () => {
-    it('constructor — empty params', () => {
+    it('constructor — empty rules', () => {
       const validator = new Validator();
       expect(validator.rules).to.be.undefined;
       expect(validator.errors).to.be.null;
@@ -31,6 +33,13 @@ describe('Validator', () => {
     });
   });
   describe('Validation', () => {
+    it('validate with empty data object', () => {
+      const validator = new Validator(rules.load);
+      const result = validator.validate({});
+      expect(result).is.an('object');
+      expect(result.validated).to.be.null;
+      expect(result.result).to.be.false;
+    });
     it('validate all rules in params', () => {
       const validator = new Validator(rules.load);
       const result = validator.validate(data[0]);
@@ -58,5 +67,181 @@ describe('Validator', () => {
       expect(result.validated.payload.data).is.an('object');
       expect(result.validated.payload.options).is.an('array');
     });
+    it('validateNumber is not a number', () => {
+      const validator = new Validator(rules.load);
+      const result = validator.validateNumber('key', null);
+      expect(result).to.be.false;
+    });
+    it('validateNumber is not a number (string)', () => {
+      const validator = new Validator(rules.load);
+      const result = validator.validateNumber('key', 'abc');
+      expect(result).to.be.false;
+    });
+    it('validateNumber is a number', () => {
+      const validator = new Validator(rules.load);
+      const result = validator.validateNumber('key', 123);
+      expect(result).is.equal(123);
+    });
+    it('validateNumber is a number (from string)', () => {
+      const validator = new Validator(rules.load);
+      const result = validator.validateNumber('key', '123');
+      expect(result).is.equal(123);
+    });
+    it('validateFloat is not a number (null)', () => {
+      const validator = new Validator(rules.load);
+      const result = validator.validateFloat('key', null);
+      expect(result).to.be.false;
+    });
+    it('validateFloat is not a number (string)', () => {
+      const validator = new Validator(rules.load);
+      const result = validator.validateFloat('key', 'abc');
+      expect(result).to.be.false;
+    });
+    it('validateFloat is a number', () => {
+      const validator = new Validator(rules.load);
+      const result = validator.validateFloat('key', 123.456);
+      expect(result).is.equal(123.456);
+    });    
+    it('validateFloat is a number (from string)', () => {
+      const validator = new Validator(rules.load);
+      const result = validator.validateFloat('key', '123.456');
+      expect(result).is.equal(123.456);
+    });
+    it('validateBoolean is not a boolean (null)', () => {
+      const validator = new Validator(rules.load);
+      const result = validator.validateBoolean('key', null);
+      expect(result).to.be.false;
+    });
+    it('validateBoolean is not a boolean (string)', () => {
+      const validator = new Validator(rules.load);
+      const result = validator.validateBoolean('key', 'abc');
+      expect(result).to.be.false;
+    });
+    it('validateBoolean is a boolean', () => {
+      const validator = new Validator(rules.load);
+      const result = validator.validateBoolean('key', true);
+      expect(result).is.equal(true);
+    });    
+    it('validateBoolean is a boolean (from string)', () => {
+      const validator = new Validator(rules.load);
+      const result = validator.validateBoolean('key', 'true');
+      expect(result).is.equal(true);
+    });
+    it('validateBoolean is a boolean (from number == 1)', () => {
+      const validator = new Validator(rules.load);
+      const result = validator.validateBoolean('key', 1);
+      expect(result).is.equal(true);
+    });
+    it('validateBoolean is a boolean (from number != 1)', () => {
+      const validator = new Validator(rules.load);
+      const result = validator.validateBoolean('key', 22);
+      expect(result).is.equal(false);
+      expect(validator.errors).is.equal(null);
+    });
+    it('validateString is not a string (null)', () => {
+      const validator = new Validator(rules.load);
+      const result = validator.validateString('key', null);
+      expect(result).to.be.false;
+    });
+    it('validateString is a string (string)', () => {
+      const validator = new Validator(rules.load);
+      const result = validator.validateString('key', 'abc');
+      expect(result).is.equal('abc');
+    });
+    it('validateArray is a not an array (null)', () => {
+      const validator = new Validator(rules.load);
+      const result = validator.validateArray('key', null);
+      expect(result).is.equal(false);
+    });
+    it('validateArray is a not an array (string)', () => {
+      const validator = new Validator(rules.load);
+      const result = validator.validateArray('key', '[1,2]');
+      expect(result).is.equal(false);
+    });
+    it('validateArray is a not an array (number)', () => {
+      const validator = new Validator(rules.load);
+      const result = validator.validateArray('key', 1);
+      expect(result).is.equal(false);
+    });
+    it('validateArray is an array', () => {
+      const arr = [0, 1];
+      const validator = new Validator(rules.load);
+      const result = validator.validateArray('key', arr);
+      expect(result).is.equal(arr);
+    });
+    it('validateArray is an object', () => {
+      const arr = { id: 1, name: "Test" };
+      const validator = new Validator(rules.load);
+      const result = validator.validateArray('key', arr);
+      expect(result).is.equal(false);
+    });
+    it('validateObject is a not an object (null)', () => {
+      const validator = new Validator(rules.load);
+      const result = validator.validateObject('key', null);
+      expect(result).is.equal(false);
+    });
+    it('validateObject is a not an object (string)', () => {
+      const validator = new Validator(rules.load);
+      const result = validator.validateObject('key', '[1,2]');
+      expect(result).is.equal(false);
+    });
+    it('validateObject is a not an object (number)', () => {
+      const validator = new Validator(rules.load);
+      const result = validator.validateObject('key', 1);
+      expect(result).is.equal(false);
+    });
+    it('validateObject is an object', () => {
+      const arr = [0, 1];
+      const validator = new Validator(rules.load);
+      const result = validator.validateObject('key', arr);
+      expect(result).is.equal(arr);
+    });
+    it('validateObject is an object', () => {
+      const arr = { id: 1, name: "Test" };
+      const validator = new Validator(rules.load);
+      const result = validator.validateObject('key', arr);
+      expect(result).is.equal(arr);
+    });
   });
+  describe('Set result & error', () => {
+    it('setResult(false) with this.result === false', () => {
+      const validator = new Validator(rules.load);
+      validator.result = false;
+      const result = validator.setResult(false);
+      expect(result).to.be.false;
+    });
+    it('setResult(true) with this.result === false', () => {
+      const validator = new Validator(rules.load);
+      validator.result = false;
+      const result = validator.setResult(true);
+      expect(result).to.be.false;
+    });
+    it('setResult(true) with this.result === true', () => {
+      const validator = new Validator(rules.load);
+      validator.result = true;
+      const result = validator.setResult(true);
+      expect(result).to.be.true;
+    });
+    it('setResult(false) with this.result === true', () => {
+      const validator = new Validator(rules.load);
+      validator.result = true;
+      const result = validator.setResult(false);
+      expect(result).to.be.false;
+    });
+
+    it('setError(key, value, type) with this.errors === null', () => {
+      const validator = new Validator(rules.load);
+      validator.setError('key', 1, 'string');
+      expect(validator.errors).is.an('object');
+      expect(validator.errors['key']).is.equal('key value (1) is not string');
+    });
+    it('setError(key, value, type) with this.errors !== null', () => {
+      const validator = new Validator(rules.load);
+      validator.setError('key', 1, 'string');
+      validator.setError('key2', 2, 'string');
+      expect(validator.errors).is.an('object');
+      expect(validator.errors['key']).is.equal('key value (1) is not string');
+    });
+  });  
 });
+/* eslint-enable */
