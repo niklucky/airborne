@@ -1,12 +1,31 @@
 class Responder {
   constructor(config) {
+    if (typeof config !== 'object') {
+      throw new Error('[Fatal] Responder error: config is not an object');
+    }
     this.config = config;
     this.statusCode = 200;
-    this.data = {};
+    this.data = null;
     this.errorId = 0;
     this.errorMessage = null;
     this.response = {};
     this.i = 0;
+    this.serverResponse = null;
+  }
+
+  setServerResponse(response) {
+    this.serverResponse = response;
+    this.checkServerResponse();
+    return this;
+  }
+
+  checkServerResponse() {
+    if (!(this.serverResponse instanceof Object)) {
+      throw new Error('[Fatal] Reponder error: response is not an object');
+    }
+    if (typeof this.serverResponse.status !== 'function' || typeof this.serverResponse.send !== 'function') {
+      throw new Error('[Fatal] Reponder error: response.status() and response.send() are not functions. server response object is invalid');
+    }
   }
 
   setData(data) {
@@ -16,12 +35,11 @@ class Responder {
 
   get() {
     const contentLength = (this.data) ? JSON.stringify(this.data).length : 0;
-    const links = (this.data) ? this.data._links : null;
+    const body = (this.data) ? this.data : '';
     return {
       statusCode: this.statusCode,
-      links: this.prepareHeaderLinks(links),
       contentLength,
-      body: this.data,
+      body,
     };
   }
 
@@ -39,28 +57,12 @@ class Responder {
   }
 
   send(data) {
+    this.checkServerResponse();
     this.setData(data);
     this.serverResponse.status(this.get().statusCode);
     this.serverResponse.send(
       this.get().body
     );
-  }
-
-  setServerResponse(response) {
-    this.serverResponse = response;
-  }
-
-  prepareHeaderLinks(links) {
-    if (!links) {
-      return '';
-    }
-    this.headerLinks = [];
-    for (const link of links) {
-      this.headerLinks.push(
-        `<${link.schema}>; rel="${link.rel}"`
-      );
-    }
-    return this.headerLinks.join(',');
   }
 }
 

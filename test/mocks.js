@@ -48,9 +48,20 @@ const validator = {
           id: 2, name: 'dataObject'
         }
       }
-    }    
+    }
   ]
 };
+const responder = {
+  config: {
+    debug: false
+  },
+  response: {
+    status: () => (true),
+    send: () => (true)
+  }
+};
+
 export default {
-  validator
+  validator,
+  responder
 };

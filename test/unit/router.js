@@ -4,7 +4,7 @@ import Router from '../../src/core/router';
 const modulesEmpty = {};
 const modules = {
   Chat: () => (true)
-}
+};
 const routes = {
   '/': { auth: false },
   '/dictionary/:id': {},
@@ -15,8 +15,8 @@ const routes = {
   '/groups': {
     methods: ['GET', 'POST']
   },
-  '/chat/messages' : {},
-  '/chat/users' : {
+  '/chat/messages': {},
+  '/chat/users': {
     module: 'Chat'
   },
   '/about': {
