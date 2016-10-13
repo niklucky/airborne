@@ -1,3 +1,49 @@
+class Authorization {
+  constructor(di) {
+    this.di = di;
+    this.result = {
+      status: true,
+      user: {
+        id: 1
+      }
+    };
+  }
+  init() {
+    return new Promise((resolve, reject) => {
+      if (this.di.get('reject')) {
+        return reject(null);
+      }
+      if (this.di.get('falseStatus') === '1') {
+        this.result.status = false;
+      }
+      return resolve(this.result);
+    });
+  }
+}
+
+class IndexController {
+  constructor(di) {
+    this.di = di;
+    this.data = {
+      params: {
+        a: 1
+      },
+      payload: {}
+    };
+  }
+  validate() {
+    return this.load(this.data);
+  }
+  load(params) {
+    this.result = params;
+    return this.result;
+  }
+}
+const responseObj = {
+  status: () => (true),
+  send: () => (true)
+};
+
 const validator = {
   rules: {
     load: {
@@ -55,13 +101,36 @@ const responder = {
   config: {
     debug: false
   },
-  response: {
-    status: () => (true),
-    send: () => (true)
-  }
+  response: responseObj
+};
+
+const dispatcher = {
+  config: {
+    debug: true
+  },
+  request: {
+    url: '/'
+  },
+  response: responseObj,
+  emptyControllers: {}
+};
+
+const routes = {
+  '/': {},
+  '/user': { auth: true }
+};
+const services = {
+  Authorization
+};
+const controllers = {
+  IndexController
 };
 
 export default {
-  validator,
-  responder
+  controllers,
+  dispatcher,
+  responder,
+  routes,
+  services,
+  validator
 };

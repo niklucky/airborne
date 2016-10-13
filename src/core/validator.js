@@ -18,6 +18,9 @@ class Validator {
   }
 
   validate(data) {
+    if (typeof this.rules !== 'object') {
+      throw new Error('Fatal: Validator rules are invalid. You either correct rules in controller or disable validation in Engine init');
+    }
     this.data = data;
     if (data.params === undefined) {
       this.data.params = {};

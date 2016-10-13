@@ -4,6 +4,8 @@ import DI from '../../src/core/di';
 import DbAdapter from '../../src/core/db.adapter';
 import Validator from '../../src/core/validator';
 
+import mocks from '../mocks';
+
 const config = {
   host: 'localhost',
   port: 3011,
@@ -38,6 +40,8 @@ const response = {
     // console.log('Response status mock');
   }
 }
+const { controllers } = mocks;
+
 let app;
 
 describe('Airborne application', () => {
@@ -132,7 +136,7 @@ describe('Airborne application', () => {
     });
     it('handle', () => {
       const app = new Airborne.Engine(configDb);
-      app.controllers({});
+      app.controllers(controllers);
       app.handle(request, response);
       expect(app.setInstance).to.be.called;
     });

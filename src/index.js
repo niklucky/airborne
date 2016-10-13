@@ -102,8 +102,10 @@ class Airborne {
     if (typeof response !== 'object') {
       throw new Error('[Fatal] Application handle: response is not an object');
     }
+    const dispatcher = new Dispatcher(this.di, request, response);
+    dispatcher.init();
     this.setInstance(
-      new Dispatcher(this.di, request, response)
+      dispatcher
     );
   }
 

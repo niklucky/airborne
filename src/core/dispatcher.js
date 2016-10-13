@@ -3,9 +3,20 @@ import Responder from './responder';
 
 import Router from './router';
 
+const ERROR_PREFIX = 'Dispatcher error';
+
 class Dispatcher {
 
   constructor(di, request, response) {
+    if (!(di instanceof Object)) {
+      throw new Error('[Fatal] ' + ERROR_PREFIX + ': DI is not an object');
+    }
+    if (!(request instanceof Object)) {
+      throw new Error('[Fatal] ' + ERROR_PREFIX + ': request is not an object');
+    }
+    if (!(response instanceof Object)) {
+      throw new Error('[Fatal] ' + ERROR_PREFIX + ': response is not an object');
+    }
     this.di = new DI().merge(di);
     this.debug = this.di.get('config').debug;
 
@@ -22,12 +33,11 @@ class Dispatcher {
       this.di.get('routes'),
       this.di.get('modules')
     );
-    this.router.init();
-
-    this.init();
   }
 
   init() {
+    this.router.init();
+
     if (this.router.route !== null && this.router.route.auth) {
       return this.initAuth();
     }
@@ -35,11 +45,15 @@ class Dispatcher {
   }
 
   initAuth() {
+    if (this.di.get('services') === undefined) {
+      throw new Error('[Fatal] ' + ERROR_PREFIX + ': services that contains Authorization service are not provided');
+    }
     const AuthLibrary = this.di.get('services').Authorization;
     if (AuthLibrary === undefined) {
-      throw Error('Auth library not initialized');
+      throw Error('[Fatal] Dispatcher error: Auth library not initialized. You need to provide core service or disable authorization for route');
     }
-    new AuthLibrary(this.di).init()
+    const Auth = new AuthLibrary(this.di);
+    return Auth.init()
       .then((authData) => {
         if (!authData.status) {
           this.responder.sendError('Not authorized', 401);
@@ -59,51 +73,52 @@ class Dispatcher {
 
     if (result) {
       if (typeof result.then === 'function') {
-        result.then((data) => {
+        return result.then((data) => {
           this.send(data);
         })
-          .catch((data) => {
-            this.responder.sendError(data);
-          });
-        return true;
+        .catch((data) => {
+          this.responder.sendError(data);
+        });
       }
     }
     return this.send(result);
   }
 
   send(data) {
-    this.responder.send(data);
+    return this.responder.send(data);
   }
 
   start() {
+    if (this.debug) {
+      // console.log('Dispatcher start: ', this.router);
+    }
+
     const controllers = this.di.get('controllers');
 
-    try {
-      if (this.debug) {
-        console.log('Dispatcher start: ', this.router);
-      }
-      if (this.router.module) {
-        const Module = this.router.module;
-        const module = new Module();
+    if (Object.keys(controllers).length === 0) {
+      throw new Error('[Fatal]: Dispathcher error: controllers are not initialized');
+    }
 
-        const Ctrl = module.controllers[this.router.controller];
-        if (typeof Ctrl !== 'function') {
-          return this.responder.send404();
-        }
-        const controller = new Ctrl(this.di);
+    if (this.router.module) {
+      const Module = this.router.module;
+      const module = new Module();
 
-        return controller.validate(this.router.method, this.router.params);
-      }
-      if (typeof controllers[this.router.controller] !== 'function') {
+      const Ctrl = module.controllers[this.router.controller];
+      if (typeof Ctrl !== 'function') {
         return this.responder.send404();
       }
-      const ctrl = new controllers[this.router.controller](this.di);
+      const controller = new Ctrl(this.di);
 
-      return ctrl.validate(this.router.method, this.router.params);
-    } catch (e) {
-      console.log('Dispatcher error', e);
-      return this.responder.sendError(e);
+      return controller.validate(this.router.method, this.router.params);
     }
+
+    const Controller = controllers[this.router.controller];
+    if ((Controller instanceof Object) === false) {
+      this.responder.sendError({ message: 'Route not found', stack: 'Controller is not initialized' }, 404);
+      return false;
+    }
+    const ctrl = new Controller(this.di);
+    return ctrl.validate(this.router.method, this.router.params);
   }
 }
 
