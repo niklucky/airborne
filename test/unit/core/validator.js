@@ -1,7 +1,7 @@
 /* eslint-disable */
 import { expect } from 'chai';
-import Validator from '../../src/core/validator';
-import mocks from '../mocks';
+import Validator from '../../../src/core/validator';
+import mocks from '../../mocks';
 
 const { rules, data } = mocks.validator;
 

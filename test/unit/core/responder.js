@@ -1,7 +1,7 @@
 /* eslint-disable */
 import { expect } from 'chai';
-import Responder from '../../src/core/responder';
-import mocks from '../mocks';
+import Responder from '../../../src/core/responder';
+import mocks from '../../mocks';
 
 const { config, response } = mocks.responder;
 

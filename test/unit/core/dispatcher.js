@@ -1,10 +1,10 @@
 import chai, { expect } from 'chai';
 import chaiAsPromised from 'chai-as-promised';
-import Dispatcher from '../../src/core/dispatcher';
-import DI from '../../src/core/di';
-import Responder from '../../src/core/responder';
-import Router from '../../src/core/router';
-import mocks from '../mocks';
+import Dispatcher from '../../../src/core/dispatcher';
+import DI from '../../../src/core/di';
+import Responder from '../../../src/core/responder';
+import Router from '../../../src/core/router';
+import mocks from '../../mocks';
 
 chai.use(chaiAsPromised);
 

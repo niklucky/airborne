@@ -36,8 +36,8 @@ class BaseMapper {
     return this.nullObject(params);
   }
 
-  nullObject() { // eslint-disable-line class-methods-use-this
-    return {};
+  nullObject(data) { // eslint-disable-line class-methods-use-this
+    return data;
   }
 
   buildCollection(collection) {

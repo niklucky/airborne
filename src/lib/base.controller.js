@@ -2,25 +2,32 @@ import BaseService from './base.service';
 
 class BaseController {
   constructor(di) {
+    if ((di instanceof Object) === false) {
+      throw new Error('[Fatal] BaseController: you need to provide valid DI');
+    }
+    if (di.get('request') === undefined) {
+      throw new Error('[Fatal] BaseController: you need to provide valid request in DI');
+    }
     this.di = di;
     this.service = new BaseService(di);
     this.rules = {};
-    this.options = {};
-    this.params = {};
   }
 
   validate(method, params) {
+    if (typeof method !== 'string') {
+      throw new Error('[Fatal] BaseController.validate(): Controller method is not specified');
+    }
     const requestData = this.mergeRequestData(params);
     const Validator = this.di.get('validator');
     if (Validator) {
-      const validator = new Validator(this.rules[method], this.options[method]);
+      const validator = new Validator(this.rules[method]);
       const result = validator.validate(requestData);
       if (result.result === false) {
         return this.di.get('responder').sendError({ message: 'Validation error', stack: result.errors }, 400);
       }
       return this[method](result.validated.params, result.validated.payload);
     }
-    return this[method](requestData.data);
+    return this[method](requestData.params, requestData.payload);
   }
 
   mergeRequestData(requestParams) {
@@ -28,13 +35,13 @@ class BaseController {
     const params = (requestParams || {});
 
     const query = this.di.get('request').query;
-    if (Object.keys(query).length > 0) {
+    if (query !== undefined && Object.keys(query).length > 0) {
       for (const name of Object.keys(query)) {
         params[name] = query[name];
       }
     }
     const body = this.di.get('request').body;
-    if (Object.keys(body).length > 0) {
+    if (body !== undefined && Object.keys(body).length > 0) {
       for (const name of Object.keys(body)) {
         payload[name] = body[name];
       }

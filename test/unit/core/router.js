@@ -1,5 +1,5 @@
 import { expect, assert } from 'chai';
-import Router from '../../src/core/router';
+import Router from '../../../src/core/router';
 
 const modulesEmpty = {};
 const modules = {
