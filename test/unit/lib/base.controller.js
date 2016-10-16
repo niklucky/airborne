@@ -2,13 +2,22 @@ import { expect } from 'chai';
 import BaseController from '../../../src/lib/base.controller';
 import BaseService from '../../../src/lib/base.service';
 import DI from '../../../src/core/di';
+import Validator from '../../../src/core/validator';
 // import mocks from '../../mocks';
 
 const emptyDi = new DI();
 const di = new DI();
 const params = { id: 1, name: 'Test' };
-const request = { query: { a: 1 } };
 const payload = { b: 2 };
+const query = { a: 1 };
+const request = { query: query };
+
+const rules = {
+  load: {
+    a: { type: 'number' }
+  }
+};
+
 di.set('request', request);
 
 describe('BaseController', () => {
@@ -52,6 +61,24 @@ describe('BaseController', () => {
       const controller = new BaseController(di);
       const result = controller.validate('load', params);
       expect(result).is.an.instanceof(Object);
+    });
+    it('validate() — valid method and non-empty params and non-empty body ', () => {
+      di.set('validator', Validator);
+      di.set('request', { query: { a: 1 }, body: payload });
+      const controller = new BaseController(di);
+      controller.rules = rules;
+      const result = controller.validate('load', params);
+      expect(result).is.an.instanceof(Object);
+    });
+    it('validate() — not valid params regarding to rules ', () => {
+      di.set('validator', Validator);
+      di.set('request', { query: { a: 'Test' }, body: payload });
+      di.set('responder', { sendError: () => (true) });
+      const controller = new BaseController(di);
+      controller.rules = rules;
+      const result = controller.validate('load', params);
+      console.log('result', result);
+      expect(result).is.equal(true);
     });
   });
   describe('Methods', () => {

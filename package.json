@@ -4,7 +4,7 @@
   "main": "dist/index.js",
   "scripts": {
     "commit": "git-cz",
-    "check-coverage": "nyc check-coverage --statements 50 --branches 50 --functions 25 --lines 50",
+    "check-coverage": "nyc check-coverage --statements 60 --branches 60 --functions 30 --lines 60",
     "report-coverage": "cat ./coverage/lcov.info | codecov",
     "test": "mocha test --recursive --compilers js:babel-register",
     "test:watch": "npm t -- -w",
