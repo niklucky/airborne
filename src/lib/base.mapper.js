@@ -1,9 +1,10 @@
-
-
 const BaseModel = require('./base.model');
 
 class BaseMapper {
   constructor(di) {
+    if (di instanceof Object === false) {
+      throw new Error('[Fatal] BaseMapper error: you need to provide valid DI');
+    }
     this.di = di;
     this.Model = BaseModel;
   }
