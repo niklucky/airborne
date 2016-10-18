@@ -1,11 +1,9 @@
 /* globals Promise */
-
-
+const HTTP = require('http');
+const QueryString = require('querystring');
 
 const BaseMapper = require('./base.mapper');
 const BaseModel = require('./base.model');
-const HTTP = require('http');
-const QueryString = require('querystring');
 
 class HTTPMapper extends BaseMapper {
   constructor(di) {
@@ -13,6 +11,8 @@ class HTTPMapper extends BaseMapper {
     this.host = '127.0.0.1';
     this.port = 80;
     this.path = '';
+    this.headers = [];
+    this.provider = HTTP;
     this.Model = BaseModel;
   }
   get(params) {
@@ -47,12 +47,11 @@ class HTTPMapper extends BaseMapper {
       method,
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
-        'Content-Length': Buffer.byteLength(data),
-        Token: this.di.get('config').serverKey,
+        'Content-Length': Buffer.byteLength(data)
       },
     };
     return new Promise((resolve, reject) => {
-      const request = HTTP.request(options, (response) => {
+      const request = this.provider.request(options, (response) => {
         // console.log(`STATUS: ${response.statusCode}`);
         // console.log(`HEADERS: ${JSON.stringify(response.headers)}`);
         response.setEncoding('utf8');
@@ -61,18 +60,19 @@ class HTTPMapper extends BaseMapper {
             const result = JSON.parse(chunk);
             if (response.statusCode > 199 && response.statusCode < 301) {
               resolve(new this.Model(result));
+            } else {
+              reject({ message: 'Remote server error', stack: result });
             }
-            reject({ message: 'Remote server error', stack: result });
           } catch (e) {
             reject(e);
           }
         });
-        response.on('end', () => {
-          // console.log('No more data in response.')
-        });
+        // response.on('end', () => {
+        //   console.log('No more data in response.')
+        // });
       });
-      request.on('error', (e) => {
-        reject(Error(e));
+      request.on('error', (error) => {
+        reject(Error(error));
       });
 
       if (postData) {

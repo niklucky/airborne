@@ -11,6 +11,7 @@ class Responder {
     this.response = {};
     this.i = 0;
     this.serverResponse = null;
+    this.isResponseSent = false;
   }
 
   setServerResponse(response) {
@@ -57,12 +58,15 @@ class Responder {
   }
 
   send(data) {
-    this.checkServerResponse();
-    this.setData(data);
-    this.serverResponse.status(this.get().statusCode);
-    this.serverResponse.send(
-      this.get().body
-    );
+    if (this.isResponseSent === false) {
+      this.checkServerResponse();
+      this.setData(data);
+      this.serverResponse.status(this.get().statusCode);
+      this.serverResponse.send(
+        this.get().body
+      );
+      this.isResponseSent = true;
+    }
   }
 }
 
