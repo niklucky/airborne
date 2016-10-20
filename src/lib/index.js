@@ -3,8 +3,6 @@ const BaseService = require('./base.service');
 const BaseMapper = require('./base.mapper');
 const BaseModel = require('./base.model');
 
-const HATEOASDecorator = require('./hateoas.decorator');
-
 const HTTPMapper = require('./http.mapper');
 const MySQLMapper = require('./mysql.mapper');
 const MySQLQueryBuilder = require('mysql-qb');
@@ -15,7 +13,6 @@ module.exports = {
   BaseService,
   BaseMapper,
   BaseModel,
-  HATEOASDecorator,
   HTTPMapper,
   MySQLMapper,
   MySQLQueryBuilder,

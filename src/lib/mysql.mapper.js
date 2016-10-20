@@ -1,6 +1,3 @@
-/* globals Promise */
-
-
 const BaseMapper = require('./base.mapper');
 const MySQLQueryBuilder = require('mysql-qb');
 
@@ -13,9 +10,14 @@ class MySQLMapper extends BaseMapper {
   }
 
   get(params) {
-    return new Promise((resolve) => {
+    if (params instanceof Object === false) {
+      throw new Error('[Fatal] MySQLMapper: you have to provide params for get()');
+    }
+    return new Promise((resolve, reject) => {
       this.load(params).then((collection) => {
         resolve(collection[0]);
+      }).catch((error) => {
+        reject(error);
       });
     });
   }
@@ -26,6 +28,8 @@ class MySQLMapper extends BaseMapper {
         this.queryBuilder
           .select('*')
           .from(this.dbTable);
+
+        /* istanbul ignore else */
         if (params !== undefined) {
           this.queryBuilder.where(params);
         }
@@ -42,6 +46,9 @@ class MySQLMapper extends BaseMapper {
     });
   }
   create(params, payload) {
+    if (payload instanceof Object === false) {
+      throw new Error('[Fatal] MySQLMapper: you have to provide data for create()');
+    }
     return new Promise((resolve, reject) => {
       try {
         const model = new this.Model(payload);
@@ -51,7 +58,6 @@ class MySQLMapper extends BaseMapper {
             data[i] = data[i].replace(/'/g, "\\'"); // eslint-disable-line
           }
         }
-        console.log('data', data);
         const query = this.queryBuilder.insert(this.dbTable, data).build();
         return this.db.query(query, (error, result) => {
           if (error) {
@@ -72,6 +78,12 @@ class MySQLMapper extends BaseMapper {
   }
 
   update(params, payload) {
+    if (params instanceof Object === false) {
+      throw new Error('[Fatal] MySQLMapper error: you have to provide params for update(). You cannot update whole table.');
+    }
+    if (payload instanceof Object === false) {
+      throw new Error('[Fatal] MySQLMapper error: you have to provide payload for update(). Nothing to update.');
+    }
     return new Promise((resolve, reject) => {
       try {
         const model = new this.Model(payload);
@@ -82,19 +94,22 @@ class MySQLMapper extends BaseMapper {
           }
         }
         const query = this.queryBuilder.update(this.dbTable, data).where(params).build();
-        return this.db.query(query, (error, result) => {
+        return this.db.query(query, (error) => {
           if (error) {
             return reject(error);
           }
-          return resolve(result);
+          return resolve(data);
         });
-      } catch (e) {
-        return reject(e);
+      } catch (error) {
+        return reject(error);
       }
     });
   }
 
   del(params) {
+    if (params instanceof Object === false) {
+      throw new Error('[Fatal] MySQLMapper error: you have to provide params for del(). You cannot delete the whole table.');
+    }
     return new Promise((resolve, reject) => {
       try {
         const query = this.queryBuilder.delete(this.dbTable).where(params).build();
