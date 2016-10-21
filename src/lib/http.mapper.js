@@ -43,7 +43,7 @@ class HTTPMapper extends BaseMapper {
     const options = {
       hostname: this.host,
       port: this.port,
-      path: this.path + this.prepareGetParams(params),
+      path: this.path + '?' + QueryString.stringify(params),
       method,
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
@@ -57,7 +57,10 @@ class HTTPMapper extends BaseMapper {
         response.setEncoding('utf8');
         response.on('data', (chunk) => {
           try {
-            const result = JSON.parse(chunk);
+            let result = chunk;
+            if (response.headers['content-type'].indexOf('json') !== -1) {
+              result = JSON.parse(chunk);
+            }
             if (response.statusCode > 199 && response.statusCode < 301) {
               resolve(new this.Model(result));
             } else {
@@ -81,14 +84,6 @@ class HTTPMapper extends BaseMapper {
       request.end();
       return request;
     });
-  }
-
-  prepareGetParams(params) { // eslint-disable-line class-methods-use-this
-    const query = [];
-    for (const name of Object.keys(params)) {
-      query.push(`${name}=${params[name]}`);
-    }
-    return `?${query.join('&')}`;
   }
 }
 

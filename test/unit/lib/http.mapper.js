@@ -87,11 +87,6 @@ describe('HttpMapper', () => {
       const result = mapper.del(params);
       expect(result).to.be.instanceof(Promise);
     });
-    it('prepareGetParams()', () => {
-      const mapper = new HttpMapper(di);
-      const result = mapper.prepareGetParams(params);
-      expect(result).is.equal('?id=1&name=Test');
-    });
     it('request() with disabled server', () => {
       const mapper = new HttpMapper(di);
       mapper.provider = HTTP;

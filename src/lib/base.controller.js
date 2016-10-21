@@ -25,9 +25,22 @@ class BaseController {
       if (result.result === false) {
         return this.di.get('responder').sendError({ message: 'Validation error', stack: result.errors }, 400);
       }
-      return this[method](result.validated.params, result.validated.payload);
+      requestData.params = result.validated.params;
+      requestData.payload = result.validated.payload;
     }
-    return this[method](requestData.params, requestData.payload);
+    return this.run(method, requestData.params, requestData.payload);
+  }
+
+  run(method, params, payload) {
+    const result = this.beforeAction(method, params, payload);
+    if (result.then !== undefined) {
+      return result.then(() => (this[method](params, payload)));
+    }
+    return this[method](params, payload);
+  }
+
+  beforeAction(method, params, payload) {
+    return this[method](params, payload);
   }
 
   mergeRequestData(requestParams) {

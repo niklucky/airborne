@@ -1,4 +1,3 @@
-"use strict";
 const Airborne = require('../../dist/index.js').default;
 
 const config = require('./config/config');
@@ -8,7 +7,7 @@ const controllers = require('./controllers');
 const modules = require('./config/modules');
 const services = require('./config/services');
 
-var app = new Airborne.Engine(config);
+const app = new Airborne.Engine(config);
 app.routes(routes)
     .services(services)
     .modules(modules)
