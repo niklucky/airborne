@@ -5,7 +5,7 @@ const BaseModel = require('./base.model');
 class RedisMapper extends BaseMapper {
   constructor(di) {
     super(di);
-    this.db = di.db;
+    this.db = null;
     this.Model = BaseModel;
     this.expired = 0;
     this.prefix = '';
@@ -25,6 +25,9 @@ class RedisMapper extends BaseMapper {
   }
 
   get(params) {
+    if (params instanceof Object === false) {
+      throw new Error('[Fatal] RedisMapper error: you have to provide params for get()');
+    }
     const object = new this.Model(params).get();
 
     if (typeof object === 'object') {
