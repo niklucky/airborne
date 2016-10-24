@@ -108,7 +108,8 @@ describe('Responder', () => {
       responder.sendError('Error!', 400);
       expect(responder.data).is.an('object');
       expect(responder.data).has.property('error');
-      expect(responder.data.error).is.equal('Error!');
+      expect(responder.data.error).has.property('message');
+      expect(responder.data.error.message).is.equal('Error!');
       expect(responder.statusCode).is.equal(400);
     });
     it('sendError() — sending error with message as object', () => {
@@ -117,7 +118,8 @@ describe('Responder', () => {
       responder.sendError({ message: 'Error!' }, 400);
       expect(responder.data).is.an('object');
       expect(responder.data).has.property('error');
-      expect(responder.data.error).is.equal('Error!');
+      expect(responder.data.error).has.property('message');
+      expect(responder.data.error.message).is.equal('Error!');
       expect(responder.statusCode).is.equal(400);
     });
     it('sendError() — sending error with message and stackTrace for debug mode', () => {
@@ -127,9 +129,10 @@ describe('Responder', () => {
       responder.sendError({ message: 'Error!', stack: 'Error stacktrace' }, 400);
       expect(responder.data).is.an('object');
       expect(responder.data).has.property('error');
-      expect(responder.data.error).is.equal('Error!');
-      expect(responder.data).has.property('stackTrace');
-      expect(responder.data.stackTrace).is.equal('Error stacktrace');
+      expect(responder.data.error).has.property('message');
+      expect(responder.data.error.message).is.equal('Error!');
+      expect(responder.data.error).has.property('stackTrace');
+      expect(responder.data.error.stackTrace).is.equal('Error stacktrace');
       expect(responder.statusCode).is.equal(400);
     });
   });

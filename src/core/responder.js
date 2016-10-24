@@ -46,9 +46,24 @@ class Responder {
 
   sendError(error, statusCode = 500) {
     this.statusCode = statusCode;
-    const message = (typeof error === 'string') ? { error } : { error: error.message };
+    const message = {
+      error: {
+        message: ''
+      }
+    };
+    if (typeof error === 'string') {
+      message.error.message = error;
+    } else {
+      if (error.code !== undefined) {
+        message.error.code = error.code;
+      }
+      if (error.id !== undefined) {
+        message.error.id = error.id;
+      }
+      message.error.message = error.message;
+    }
     if (this.config.debug === true) {
-      message.stackTrace = error.stack;
+      message.error.stackTrace = error.stack;
     }
     this.send(message);
   }
