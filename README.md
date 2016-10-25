@@ -143,6 +143,3 @@ db: {
   }
 }
 ```
-
-
-Fix debug=false 500 handling

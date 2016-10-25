@@ -1,5 +1,3 @@
-
-
 class DbAdapter {
   constructor(dbConfig) {
     this.dbConfig = dbConfig;

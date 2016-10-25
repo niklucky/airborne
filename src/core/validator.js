@@ -5,7 +5,9 @@ const AVAILABLE_RULES = ['number', 'float', 'string', 'boolean', 'array', 'objec
 const FILE_TYPES = {
   jpg: ['image/jpeg', 'image/jpg'],
   gif: ['image/gif'],
-  png: ['image/png']
+  png: ['image/png'],
+  tiff: ['image/tiff'],
+  xls: ['application/excel']
 };
 
 class Validator {
