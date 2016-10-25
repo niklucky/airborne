@@ -39,8 +39,8 @@ class BaseController {
     return this[method](params, payload);
   }
 
-  beforeAction(method, params, payload) {
-    return this[method](params, payload);
+  beforeAction(method, params, payload) { // eslint-disable-line
+    return true;
   }
 
   mergeRequestData(requestParams) {
