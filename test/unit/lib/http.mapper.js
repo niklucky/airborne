@@ -11,7 +11,23 @@ const response = {
   setEncoding: (encoding) => {
     // console.log('encoding', encoding);
   },
-  statusCode: 200
+  statusCode: 200,
+  headers: {
+    'content-type': 'application/json'
+  }
+};
+const responseXML = {
+  on: (event, callback) => {
+    callback('<response>1</response>');
+    // console.log('event, callback', event, callback);
+  },
+  setEncoding: (encoding) => {
+    // console.log('encoding', encoding);
+  },
+  statusCode: 200,
+  headers: {
+    'content-type': 'application/xml'
+  }
 };
 const responseFail = {
   on: (event, callback) => {
@@ -34,6 +50,12 @@ const HTTPFail = {
   request: (options, callback) => {
     // console.log('options', options, callback);
     callback(responseFail);
+  }
+};
+const HTTPXML = {
+  request: (options, callback) => {
+    // console.log('options', options, callback);
+    callback(responseXML);
   }
 };
 
@@ -112,6 +134,21 @@ describe('HttpMapper', () => {
           expect(error).to.be.instanceof(Error);
         });
     });
+    it('request() with mocked server and response XML', () => {
+      const mapper = new HttpMapper(di);
+      mapper.provider = HTTPXML;
+
+      const result = mapper.request('GET', params);
+
+      result
+        .then((data) => {
+          expect(data).to.be.instanceof(Object);
+        })
+        .catch((error) => {
+          // console.log('error', error);
+          expect(error).to.be.instanceof(Error);
+        });
+    });
     it('request() with mocked fail server', () => {
       const mapper = new HttpMapper(di);
       mapper.provider = HTTPFail;
@@ -123,7 +160,7 @@ describe('HttpMapper', () => {
         })
         .catch((error) => {
           // console.log('error', error);
-          expect(error).to.be.instanceof(Error);
+          expect(error).to.be.instanceof(Error);  
         });
     });
     it('request() with mocked fail server with proper response', () => {
@@ -137,7 +174,7 @@ describe('HttpMapper', () => {
           expect(data).to.be.instanceof(Object);
         })
         .catch((error) => {
-          // console.log('error', error);
+          console.log('error', error);
           expect(error).to.be.instanceof(Error);
         });
     });

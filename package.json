@@ -10,7 +10,7 @@
     "test:watch": "npm t -- -w",
     "cover": "nyc npm t",
     "lint": "eslint src",
-    "start": "eslint src && babel -w src -d dist",
+    "build:watch": "eslint src && babel -w src -d dist",
     "prebuild": "rimraf dist",
     "build": "eslint src && babel src -d dist",
     "semantic-release": "semantic-release pre && npm publish && semantic-release post"

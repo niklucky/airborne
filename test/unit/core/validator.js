@@ -5,13 +5,23 @@ import mocks from '../../mocks';
 
 const { rules, data } = mocks.validator;
 
+const file = {
+  path: '/tmp/111',
+  name: '1.jpg',
+  size: 2000,
+  type: 'image/jpeg'
+};
+const extraRules = {
+  type: 'file',
+  fileTypes: ['jpg'],
+  required: true
+};
+
 describe('Validator', () => {
   describe('Constructor', () => {
     it('constructor — empty rules', () => {
-      const validator = new Validator();
-      expect(validator.rules).to.be.undefined;
-      expect(validator.errors).to.be.null;
-      expect(validator.result).to.be.true;
+      const validator = () => new Validator();
+      expect(validator).to.throw('Validator rules are invalid');
     });
     it('constructor — rules defined, options undefined', () => {
       const validator = new Validator(rules.load);
@@ -20,12 +30,8 @@ describe('Validator', () => {
       expect(validator.errors).to.be.null;
       expect(validator.result).to.be.true;
     });
-    it('setRules — rules are invalid', () => {
-      const validator = new Validator();
-      expect(validator.setRules).to.throw(Error, /Validator rules are invalid/);
-    });
     it('setRules — rules are valid', () => {
-      const validator = new Validator();
+      const validator = new Validator(rules.load);
       const result = validator.setRules(rules.load);
       expect(validator.rules).is.an('object');
       expect(validator.rules.id).is.an('object');
@@ -201,6 +207,27 @@ describe('Validator', () => {
       const validator = new Validator(rules.load);
       const result = validator.validateObject('key', arr);
       expect(result).is.equal(arr);
+    });
+    it('validateFile — empty object', () => {
+      const validator = new Validator(rules.load);
+      const result = validator.validateFile('file', null);
+      expect(result).is.equal(false);
+    });
+    it('validateFile — valid object with no extra rules', () => {
+      const validator = new Validator(rules.load);
+      const result = validator.validateFile('file', file);
+      expect(result).is.equal(file);
+    });
+    it('validateFile — valid object with extra rules (no size)', () => {
+      const validator = new Validator(rules.load);
+      const result = validator.validateFile('file', file, extraRules);
+      expect(result).is.equal(file);
+    });
+    it('validateFile — valid object with extra rules', () => {
+      const validator = new Validator(rules.load);
+      extraRules.size = 2;
+      const result = validator.validateFile('file', file, extraRules);
+      expect(result).is.equal(file);
     });
   });
   describe('Set result & error', () => {

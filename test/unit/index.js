@@ -6,6 +6,15 @@ import Validator from '../../src/core/validator';
 
 import mocks from '../mocks';
 
+class IncomingForm {
+  parse(request, callback) {
+    callback(null, { a: 1 }, { b: 2 });
+  }
+}
+const formidableMock = {
+  IncomingForm: IncomingForm
+};
+
 const config = {
   host: 'localhost',
   port: 3011,
@@ -30,7 +39,8 @@ const routes = {
   '/': { auth: false }
 };
 const request = {
-  url: '/'
+  url: '/',
+  body: { c: 3 }
 };
 const response = {
   send: () => {
@@ -139,6 +149,20 @@ describe('Airborne application', () => {
       app.controllers(controllers);
       app.handle(request, response);
       expect(app.setInstance).to.be.called;
+    });
+
+    it('handleMultipart with not available formidable', () => {
+      const app = new Airborne.Engine(configDb);
+      app.controllers(controllers);
+      const result = app.handleMultipart(request, response);
+      expect(response.send).to.be.called;
+    });
+    it('handleMultipart', () => {
+      const app = new Airborne.Engine(configDb);
+      app.controllers(controllers);
+      app.multipartParser = formidableMock;
+      const result = app.handleMultipart(request, response);
+      expect(response.send).to.be.called;
     });
   });
 });

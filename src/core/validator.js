@@ -1,16 +1,21 @@
 import sanitizer from 'sanitizer';
 import capitalize from 'lodash/capitalize';
 
-const AVAILABLE_RULES = ['number', 'float', 'string', 'boolean', 'array', 'object'];
+const AVAILABLE_RULES = ['number', 'float', 'string', 'boolean', 'array', 'object', 'file'];
+const FILE_TYPES = {
+  jpg: ['image/jpeg', 'image/jpg'],
+  gif: ['image/gif'],
+  png: ['image/png']
+};
 
 class Validator {
   constructor(rules) {
-    this.rules = rules;
+    this.setRules(rules);
     this.errors = null;
     this.result = true;
   }
   setRules(rules) {
-    if (typeof rules !== 'object') {
+    if (rules instanceof Object === false) {
       throw new Error('Fatal: Validator rules are invalid. You either correct rules in controller or disable validation in Engine init');
     }
     this.rules = rules;
@@ -18,9 +23,6 @@ class Validator {
   }
 
   validate(data) {
-    if (typeof this.rules !== 'object') {
-      throw new Error('Fatal: Validator rules are invalid. You either correct rules in controller or disable validation in Engine init');
-    }
     this.data = data;
     if (data.params === undefined) {
       this.data.params = {};
@@ -50,8 +52,9 @@ class Validator {
       }
 
       const method = 'validate' + capitalize(rule.type);
+      /* istanbul ignore else */
       if (AVAILABLE_RULES.indexOf(rule.type) !== -1 && typeof this[method] === 'function') {
-        this.validated[mode][key] = this[method](key, this.data[mode][key]);
+        this.validated[mode][key] = this[method](key, this.data[mode][key], rule);
       }
     }
     return {
@@ -127,7 +130,45 @@ class Validator {
     this.setError(key, value, 'object');
     return this.setResult(false);
   }
+  validateFile(key, inputValue, rule) {
+    /* istanbul ignore else */
+    if (inputValue instanceof Object === true) {
+      /* istanbul ignore else */
+      if (
+        inputValue.name !== undefined &&
+        inputValue.path !== undefined &&
+        inputValue.size !== undefined
+      ) {
+        let typeValid = true;
+        let sizeValid = true;
 
+        if (rule !== undefined) {
+          const size = inputValue.size / 1000000;
+          const ruleSize = (rule.size) ? rule.size : 2;
+          sizeValid = (size <= ruleSize);
+
+          /* istanbul ignore else */
+          if (rule.fileTypes !== undefined) {
+            let types = [];
+            for (const type of rule.fileTypes) {
+              /* istanbul ignore else */
+              if (FILE_TYPES[type] !== undefined) {
+                types = [...types, ...FILE_TYPES[type]];
+              }
+            }
+            typeValid = (types.indexOf(inputValue.type) !== -1);
+          }
+        }
+        /* istanbul ignore else */
+        if (sizeValid && typeValid) {
+          this.setResult(true);
+          return inputValue;
+        }
+      }
+    }
+    this.setError(key, inputValue, 'file object');
+    return this.setResult(false);
+  }
   setResult(result) {
     if (this.result === false && result === true) {
       return false;

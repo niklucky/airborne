@@ -11,6 +11,22 @@ const params = { id: 1, name: 'Test' };
 const payload = { b: 2 };
 const query = { a: 1 };
 const request = { query: query };
+const paramsAndPayload = { id: 1, name: 'Test', a: 'Test' };
+
+class MyController extends BaseController {
+  constructor(_di) {
+    super(_di);
+    this.rules = {};
+  }
+
+  beforeAction(method, _params, _payload) {
+    return new Promise((resolve) => {
+      this.params = _params;
+      this.payload = _payload;
+      resolve(true);
+    });
+  }
+}
 
 const rules = {
   load: {
@@ -42,6 +58,14 @@ describe('BaseController', () => {
       const controller = new BaseController(di);
       const result = () => controller.validate();
       expect(result).to.throw('Controller method is not specified');
+    });
+    it('validate() — valid method and empty params and query', () => {
+      const _di = new DI();
+      _di.set('request', {});
+      const controller = new BaseController(_di);
+      const result = controller.validate('load');
+      expect(result).is.an('object');
+      expect(Object.keys(result).length).is.equal(0);
     });
     it('validate() — valid method and empty params', () => {
       const controller = new BaseController(di);
@@ -79,6 +103,14 @@ describe('BaseController', () => {
       const result = controller.validate('load', params);
       console.log('result', result);
       expect(result).is.equal(true);
+    });
+    it('run() — beforeAction with .then()', () => {
+      const controller = new MyController(di);
+      const result = controller.run('load', params, payload);
+      expect(result).is.instanceof(Promise);
+      result.then((res) => {
+        expect(res).is.equal(paramsAndPayload);
+      });
     });
   });
   describe('Methods', () => {

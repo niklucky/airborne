@@ -122,6 +122,16 @@ describe('Responder', () => {
       expect(responder.data.error.message).is.equal('Error!');
       expect(responder.statusCode).is.equal(400);
     });
+    it('sendError() — sending error with message as object: id', () => {
+      const responder = new Responder(config);
+      responder.setServerResponse(response);
+      responder.sendError({ message: 'Error!', id: 101, code: 102 }, 400);
+      expect(responder.data).is.an('object');
+      expect(responder.data).has.property('error');
+      expect(responder.data.error).has.property('message');
+      expect(responder.data.error.message).is.equal('Error!');
+      expect(responder.statusCode).is.equal(400);
+    });
     it('sendError() — sending error with message and stackTrace for debug mode', () => {
       const responder = new Responder({ debug: true });
       expect(responder.config.debug).is.equal(true);

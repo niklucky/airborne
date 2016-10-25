@@ -5,6 +5,7 @@ import Dispatcher from './core/dispatcher';
 const lib = require('./lib');
 const express = require('express');
 const bodyParser = require('body-parser');
+// const util = require('util');
 
 const defaultConfig = require('./core/config.js');
 const DbAdapter = require('./core/db.adapter.js');
@@ -18,6 +19,7 @@ class Airborne {
     this.di = new DI();
     this.config = Object.assign({}, defaultConfig, config);
     this.di.set('config', this.config);
+    this.multipartParser = null;
 
     if (this.di.get('config').db) {
       this.database(this.di.get('config').db);
@@ -73,8 +75,11 @@ class Airborne {
         response.send();
         return;
       }
-
-      this.handle(request, response);
+      if (request.headers['content-type'].indexOf('multipart/form-data') !== -1) {
+        this.handleMultipart(request, response);
+      } else {
+        this.handle(request, response);
+      }
     });
 
     /* istanbul ignore next */
@@ -85,14 +90,33 @@ class Airborne {
 
     this.express.use('/', router);
 
+    /* istanbul ignore next */
     const server = this.express.listen(
       this.config.port,
       this.config.host,
       () => {
-        console.log(`Server running at ${
-          server.address().address}:${
-          server.address().port}`);
+        console.log(`Server running at ${server.address().address}:${server.address().port}`);
       });
+  }
+
+  handleMultipart(request, response) {
+    try {
+      if (this.multipartParser === null) {
+        require.resolve('formidable');
+        this.multipartParser = require('formidable');
+      }
+      console.log('this.multipartParser', this.multipartParser);
+      const form = new this.multipartParser.IncomingForm();
+      form.parse(request, (err, fields, files) => {
+        const req = request;
+        req.body = this.mergeFilesInFields(request.body, fields, files);
+        this.handle(req, response);
+      });
+    } catch (e) {
+      console.error('formidable module is not found. It is used to parse multipart form-data. Install: npm i --save formidable');
+      console.log('e', e);
+      response.send('Error parsing multipart/form-data');
+    }
   }
 
   handle(request, response) {
@@ -108,7 +132,16 @@ class Airborne {
       dispatcher
     );
   }
-
+  mergeFilesInFields(body, fields, files) { // eslint-disable-line
+    const newBody = body;
+    for (const name in files) { // eslint-disable-line
+      newBody[name] = files[name];
+    }
+    for (const name in fields) { // eslint-disable-line
+      newBody[name] = fields[name];
+    }
+    return newBody;
+  }
   setInstance(dispatcher) { // eslint-disable-line class-methods-use-this
     this.instances.push(dispatcher);
   }
