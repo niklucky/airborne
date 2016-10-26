@@ -75,7 +75,7 @@ class Airborne {
         response.send();
         return;
       }
-      if (request.headers['content-type'].indexOf('multipart/form-data') !== -1) {
+      if (request.headers['content-type'] !== undefined && request.headers['content-type'].indexOf('multipart/form-data') !== -1) {
         this.handleMultipart(request, response);
       } else {
         this.handle(request, response);
@@ -105,7 +105,6 @@ class Airborne {
         require.resolve('formidable');
         this.multipartParser = require('formidable');
       }
-      console.log('this.multipartParser', this.multipartParser);
       const form = new this.multipartParser.IncomingForm();
       form.parse(request, (err, fields, files) => {
         const req = request;
