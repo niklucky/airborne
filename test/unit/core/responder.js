@@ -36,7 +36,11 @@ describe('Responder', () => {
       expect(result).to.be.an('object');
       expect(result.contentLength).is.equal(0);
       expect(result.statusCode).is.equal(200);
-      expect(result.body).is.equal('');
+      expect(result.body).is.an.instanceof(Object);
+      expect(result.body).has.property('version');
+      expect(result.body).has.property('root');
+      expect(result.body).has.property('data');
+      expect(result.body.data).is.equal('');
     });
     it('get() — non empty data', () => {
       const responder = new Responder(config);
@@ -45,8 +49,11 @@ describe('Responder', () => {
       expect(result).to.be.an('object');
       expect(result.contentLength).is.equal(8);
       expect(result.statusCode).is.equal(200);
-      expect(result.body).to.be.an('object');
-      expect(result.body.id).to.be.equal(1);
+      expect(result.body).is.an.instanceof(Object);
+      expect(result.body).has.property('version');
+      expect(result.body).has.property('root');
+      expect(result.body).has.property('data');
+      expect(result.body.data.id).is.equal(1);
     });
     it('setServerResponse() — not valid response object', () => {
       const responder = new Responder(config);

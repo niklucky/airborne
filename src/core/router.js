@@ -132,6 +132,8 @@ class Router {
     const iterator = [...routeSegments];
     let index = 0;
     let isRequred = true;
+    const _segments = [...urlSegments];
+
     for (let segment of iterator) {
       isRequred = true;
       if (segment.indexOf(':') !== -1) {
@@ -140,7 +142,7 @@ class Router {
           isRequred = false;
         }
         const name = segment.replace(':', '');
-        const value = urlSegments[index];
+        const value = _segments[index];
 
         if (value === undefined && isRequred === false) {
           routeSegments.splice(index, 1);

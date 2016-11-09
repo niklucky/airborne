@@ -40,7 +40,7 @@ class Responder {
     return {
       statusCode: this.statusCode,
       contentLength,
-      body,
+      body: this.decorator(body),
     };
   }
 
@@ -82,6 +82,13 @@ class Responder {
       );
       this.isResponseSent = true;
     }
+  }
+  decorator(data) { // eslint-disable-line
+    return {
+      version: '2.0',
+      root: '/',
+      data
+    };
   }
 }
 
