@@ -75,7 +75,7 @@
     "lodash": "^4.13.1",
     "mongodb": "^2.2.10",
     "mysql": "^2.11.1",
-    "mysql-qb": "^0.7.3",
+    "mysql-qb": "^0.x.x",
     "redis": "^2.6.2",
     "sanitizer": "^0.1.3"
   },
