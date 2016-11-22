@@ -55,6 +55,9 @@ class DbAdapter {
     if (!connection.port) {
       connection.port = 3306;
     }
+    if (connection.charset === undefined) {
+      connection.charset = 'utf8';
+    }
 
     const conn = mysql.createConnection({
       host: connection.host,
@@ -62,6 +65,7 @@ class DbAdapter {
       user: connection.user,
       password: connection.password,
       database: connection.database,
+      charset: connection.charset,
     });
     conn.connect();
     conn.on('error', (err) => {
