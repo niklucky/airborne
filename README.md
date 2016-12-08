@@ -3,8 +3,6 @@
 [![npm version](https://img.shields.io/npm/v/airborne.svg?style=flat-square)](https://www.npmjs.com/package/airborne)
 [![Codecov](https://img.shields.io/codecov/c/github/niklucky/airborne.svg?maxAge=2592000?style=flat-square)](https://codecov.io/gh/niklucky/airborne)
 
-> API framework that implements DAO (Data Access Object) model.
-
 ## Why do I need it?
 Actually you don't. Really. I build this framework strictly in educational purpose and now I'm trying to use it on my projects.
 It's updated almost every day. Young and unstable. It's even not 1.x!
