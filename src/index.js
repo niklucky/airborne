@@ -66,8 +66,8 @@ class Airborne {
       mergeParams: true,
     });
 
-    this.express.use(bodyParser.json());
-    this.express.use(bodyParser.urlencoded({ extended: true }));
+    this.express.use(bodyParser.json({ limit: '100mb' }));
+    this.express.use(bodyParser.urlencoded({ extended: true, limit: '100mb', parameterLimit: 1000000 }));
 
     /* istanbul ignore next */
     router.use((request, response) => {
