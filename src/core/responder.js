@@ -37,7 +37,7 @@ class Responder {
     let error = {};
 
     if (typeof errorData === 'string') {
-      error.message = error;
+      error.message = errorData;
     } else {
       error = errorData;
       if (this.config.debug === false) {
