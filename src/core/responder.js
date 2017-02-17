@@ -68,8 +68,8 @@ class Responder {
   }
   decorator(data, error) {
     return {
-      version: this.config.version,
-      root: this.config.host,
+      version: this.config.apiVersion,
+      root: this.config.apiHost,
       data,
       error
     };
