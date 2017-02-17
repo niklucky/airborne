@@ -69,7 +69,7 @@ class Responder {
   decorator(data, error) {
     return {
       version: this.config.apiVersion,
-      root: this.config.apiHost,
+      root: `${this.config.protocol}://${this.config.apiHost}`,
       data,
       error
     };
