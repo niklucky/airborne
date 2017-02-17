@@ -6,10 +6,8 @@ class Responder {
     this.config = config;
     this.statusCode = 200;
     this.data = null;
-    this.errorId = 0;
-    this.errorMessage = null;
+    this.error = null;
     this.response = {};
-    this.i = 0;
     this.serverResponse = null;
     this.isResponseSent = false;
   }
@@ -34,38 +32,20 @@ class Responder {
     return this;
   }
 
-  get() {
-    const contentLength = (this.data) ? JSON.stringify(this.data).length : 0;
-    const body = (this.data) ? this.data : '';
-    return {
-      statusCode: this.statusCode,
-      contentLength,
-      body: this.decorator(body),
-    };
-  }
-
-  sendError(error, statusCode = 500) {
+  sendError(errorData, statusCode = 500) {
     this.statusCode = statusCode;
-    const message = {
-      error: {
-        message: ''
-      }
-    };
-    if (typeof error === 'string') {
-      message.error.message = error;
+    let error = {};
+
+    if (typeof errorData === 'string') {
+      error.message = error;
     } else {
-      if (error.code !== undefined) {
-        message.error.code = error.code;
+      error = errorData;
+      if (this.config.debug === false) {
+        delete error.stackTrace;
       }
-      if (error.id !== undefined) {
-        message.error.id = error.id;
-      }
-      message.error.message = error.message;
     }
-    if (this.config.debug === true) {
-      message.error.stackTrace = error.stack;
-    }
-    this.send(message);
+    this.error = error;
+    this.send(null);
   }
 
   send404() {
@@ -76,18 +56,22 @@ class Responder {
     if (this.isResponseSent === false) {
       this.checkServerResponse();
       this.setData(data);
-      this.serverResponse.status(this.get().statusCode);
+      this.serverResponse.status(this.statusCode);
       this.serverResponse.send(
-        this.get().body
+        this.getData()
       );
       this.isResponseSent = true;
     }
   }
-  decorator(data) { // eslint-disable-line
+  getData() {
+    return this.decorator(this.data, this.error);
+  }
+  decorator(data, error) {
     return {
-      version: '2.0',
-      root: '/',
-      data
+      version: this.config.version,
+      root: this.config.host,
+      data,
+      error
     };
   }
 }
