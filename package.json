@@ -4,7 +4,7 @@
   "main": "dist/index.js",
   "scripts": {
     "commit": "git-cz",
-    "check-coverage": "nyc check-coverage --statements 60 --branches 60 --functions 30 --lines 60",
+    "check-coverage": "nyc check-coverage --statements 80 --branches 80 --functions 80 --lines 80",
     "report-coverage": "cat ./coverage/lcov.info | codecov",
     "test": "mocha test --recursive --compilers js:babel-register",
     "test:watch": "npm t -- -w",
@@ -67,7 +67,7 @@
     "mocha": "^2.5.3",
     "nyc": "^8.3.0",
     "rimraf": "^2.5.4",
-    "semantic-release": "^4.3.5"
+    "semantic-release": "^6.3.2"
   },
   "dependencies": {
     "body-parser": "^1.15.2",
@@ -89,5 +89,6 @@
     "ghooks": {
       "pre-commit": "npm run cover && npm run check-coverage"
     }
-  }
+  },
+  "version": "0.0.0-development"
 }
