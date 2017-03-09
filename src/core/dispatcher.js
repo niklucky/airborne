@@ -57,14 +57,14 @@ class Dispatcher {
       .then((authData) => {
         if (!authData.status) {
           this.responder.sendError('Not authorized', 401);
+        } else {
+          this.authData = authData;
+          this.di.set('authData', authData);
+          this.dispatch();
         }
-
-        this.authData = authData;
-        this.di.set('authData', authData);
-        this.dispatch();
       })
       .catch((authData) => {
-        this.responder.sendError(authData, 401);
+        this.responder.sendError(authData);
       });
   }
 

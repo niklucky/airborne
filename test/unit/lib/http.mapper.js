@@ -74,8 +74,7 @@ describe('HttpMapper', () => {
       expect(mapper.Model).to.be.instanceof(Function);
       expect(mapper.di).to.be.instanceof(DI);
       expect(mapper.host).is.equal('127.0.0.1');
-      expect(mapper.headers).is.an.instanceof(Array);
-      expect(mapper.headers.length).is.equal(0);
+      expect(mapper.headers).is.an.instanceof(Object);
     });
   });
   describe('Methods', () => {

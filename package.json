@@ -1,6 +1,6 @@
 {
   "name": "airborne",
-  "version": "0.11.5",
+  "version": "0.11.6",
   "description": "Airborne RESTful API framework",
   "main": "dist/index.js",
   "scripts": {

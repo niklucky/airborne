@@ -36,7 +36,12 @@ class Responder {
     this.statusCode = statusCode;
     let error = {};
 
-    if (typeof errorData === 'string') {
+    if (errorData instanceof Error === true) {
+      error.message = errorData.message;
+      if (this.config.debug === true) {
+        error.stackTrace = errorData.stack;
+      }
+    } else if (typeof errorData === 'string') {
       error.message = errorData;
     } else {
       error = errorData;
