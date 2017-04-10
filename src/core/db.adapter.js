@@ -58,15 +58,11 @@ class DbAdapter {
     if (connection.charset === undefined) {
       connection.charset = 'utf8';
     }
+    connection.dateStrings = (connection.dateStrings !== undefined)
+      ? connection.dateStrings
+      : false;
 
-    const conn = mysql.createConnection({
-      host: connection.host,
-      port: connection.port,
-      user: connection.user,
-      password: connection.password,
-      database: connection.database,
-      charset: connection.charset,
-    });
+    const conn = mysql.createConnection(connection);
     conn.connect();
     conn.on('error', (err) => {
       console.log('Connection down. Reconnecting...', err);
