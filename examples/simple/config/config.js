@@ -6,11 +6,14 @@ module.exports = {
   debug: true,
   db: {
     mysql: {
-      host: '192.168.99.100',
+      host: '127.0.0.1',
       port: 3306,
-      driver: 'mysql',
+      user: 'root',
       password: '12345',
-      database: 'AirborneTest'
+      database: 'airborne_test',
+      driver: 'mysql',
+      charset: 'utf8mb4',
+      dateStrings: true
     }
   },
   sources: {

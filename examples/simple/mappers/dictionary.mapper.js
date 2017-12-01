@@ -1,4 +1,4 @@
-const { MySQLMapper } = require('../../../dist').default;
+const { MySQLMapper } = require('../../../dist');
 const Dictionary = require('../models/dictionary.js');
 
 class DictionaryMapper extends MySQLMapper {
@@ -8,6 +8,12 @@ class DictionaryMapper extends MySQLMapper {
     this.db = this.di.get('db').connections.mysql;
     this.Model = Dictionary;
   }
+  // create(params, payload) {
+  //   return { params, payload };
+  // }
+  // load(params, payload) {
+  //   return { params, payload };
+  // }
 }
 
 module.exports = DictionaryMapper;

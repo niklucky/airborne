@@ -29,7 +29,7 @@ class DbAdapter {
   }
 
   initMongoDb(name, connection) {
-    const mongoose = require('mongodb'); // eslint-disable-line global-require
+    const mongoose = require('mongoose'); // eslint-disable-line global-require
 
     let userPassword = '';
 
@@ -38,6 +38,7 @@ class DbAdapter {
     }
 
     const connectionString = `mongodb://${userPassword}${connection.host}/${connection.database}`;
+    console.log('connectionString', connectionString);
     this.connections[name] = mongoose.connect(connectionString);
   }
 

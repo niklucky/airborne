@@ -1,8 +1,8 @@
 class Dictionary {
-  constructor(data){
+  constructor(data) {
     this.id = data.id;
-    this.word = data.word;
-    this.translation = data.translation;
+    this.title = data.title;
+    this.description = data.description;
     this.lang = data.lang;
   }
 }

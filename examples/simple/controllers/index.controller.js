@@ -1,4 +1,4 @@
-const { BaseController } = require('../../../dist/index.js').default;
+const { BaseController } = require('../../../dist/index.js');
 
 class IndexController extends BaseController {
   constructor(di) {

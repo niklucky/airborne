@@ -1,6 +1,30 @@
-module.exports = {
-  '/': {
-    allowedMethods: ['GET']
+const UsersController = require('../controllers/dictionary.controller');
+
+const routes = {
+  '/users/': {
+    get: {
+      handler: UsersController,
+      method: 'load'
+    },
+    post: {
+      handler: UsersController,
+      method: 'create'
+    }
   },
-  '/dictionary': {}
+  // '/users': {
+  //   get: {
+  //     handler: UsersController,
+  //     method: 'load'
+  //   },
+  //   post: {
+  //     handler: UsersController,
+  //     method: 'create'
+  //   },
+  // },
+  // '*': {
+  //   handler: UsersController,
+  //   method: 'create'
+  // }
 };
+
+module.exports = routes;

@@ -1,4 +1,4 @@
-const Airborne = require('../../dist/index.js').default;
+const Airborne = require('../../dist/index.js');
 
 const config = require('./config/config');
 const routes = require('./config/routes');

@@ -1,6 +1,7 @@
 import DI from './core/di';
 import Validator from './core/validator';
-import Dispatcher from './core/dispatcher';
+// import Dispatcher from './core/dispatcher';
+import Responder from './core/responder';
 
 const lib = require('./lib');
 const express = require('express');
@@ -70,23 +71,39 @@ class Airborne {
     this.express.use(bodyParser.urlencoded({ extended: true, limit: '100mb', parameterLimit: 1000000 }));
 
     /* istanbul ignore next */
-    router.use((request, response) => {
-      if (request.url.indexOf('favicon') !== -1) {
-        response.send();
-        return;
-      }
-      if (request.headers['content-type'] !== undefined && request.headers['content-type'].indexOf('multipart/form-data') !== -1) {
-        this.handleMultipart(request, response);
-      } else {
-        this.handle(request, response);
-      }
-    });
+    // router.use(this.handleRoute);
+    const routes = this.di.get('routes');
 
+    // console.log(routes);
+    // for (const i in routes) {
+    //   console.log('I', routes[i]);
+    //   for (const g in routes[i]) {
+    //     console.log('G', routes[i][g]);
+    //   }
+    // }
+    // router.get('/users', (req, res, next) => res.send('fsfdsf'))
+    
+    for (let i in routes) { //eslint-disable-line
+      // console.log('ROUTE I', i)
+      // route = { url, httpMethod, handler}
+      for (let g in routes[i]) {
+        console.log('MTHODS', i);
+        router[g](i, (request, response) => {
+          if (request.headers['content-type'] !== undefined && request.headers['content-type']
+          .indexOf('multipart/form-data') !== -1) {
+            this.handleMultipart(routes[i][g].handler, routes[i][g].method, request, response);
+          } else {
+            this.handle(routes[i][g].handler, routes[i][g].method, request, response);
+          }
+        });
+      }
+
+    }
     /* istanbul ignore next */
-    router.use((err, req, res) => {
-      console.log('Error catched: ', err);
-      res.send('Error');
-    });
+    // router.use((err, req, res) => {
+    //   console.log('Error catched: ', err);
+    //   res.send('Error');
+    // });
 
     this.express.use('/', router);
 
@@ -118,18 +135,23 @@ class Airborne {
     }
   }
 
-  handle(request, response) {
+  handle(Controller, method, request, response) {
+    console.log(Controller);
     if (typeof request !== 'object') {
       throw new Error('[Fatal] Application handle: request is not an object');
     }
     if (typeof response !== 'object') {
       throw new Error('[Fatal] Application handle: response is not an object');
     }
-    const dispatcher = new Dispatcher(this.di, request, response);
-    dispatcher.init();
-    this.setInstance(
-      dispatcher
-    );
+    this.di.set('request', request);
+    this.di.set('response', response);
+    this.responder = new Responder(this.config);
+    this.responder.setServerResponse(this.di.get('response'));
+
+    this.di.set('responder', this.responder);
+    const ctrl = new Controller(this.di);
+    console.log(request.params);
+    return this.responder.send(ctrl.validate(method, request.params));
   }
   mergeFilesInFields(body, fields, files) { // eslint-disable-line
     const newBody = body;

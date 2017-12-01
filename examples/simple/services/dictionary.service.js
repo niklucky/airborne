@@ -1,4 +1,4 @@
-const {BaseService} = require('../../../dist').default;
+const {BaseService} = require('../../../dist');
 const DictionaryMapper = require('../mappers/dictionary.mapper.js');
 
 class DictionaryService extends BaseService {
