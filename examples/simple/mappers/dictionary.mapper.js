@@ -1,4 +1,4 @@
-const { MySQLMapper } = require('../../../dist');
+const { MySQLMapper } = require('airborne-base');
 const Dictionary = require('../models/dictionary.js');
 
 class DictionaryMapper extends MySQLMapper {
@@ -11,9 +11,10 @@ class DictionaryMapper extends MySQLMapper {
   // create(params, payload) {
   //   return { params, payload };
   // }
-  // load(params, payload) {
-  //   return { params, payload };
-  // }
+  load(params, payload) {
+    console.log(params, payload);
+    return super.load(params, payload);
+  }
 }
 
 module.exports = DictionaryMapper;

@@ -4,7 +4,7 @@
   "description": "Airborne RESTful API framework",
   "main": "dist/index.js",
   "scripts": {
-    "precommit": "npm run cover && npm run check-coverage",
+    "precommit": "echo hello",
     "check-coverage": "nyc check-coverage --statements 80 --branches 80 --functions 80 --lines 80",
     "report-coverage": "cat ./coverage/lcov.info | codecov",
     "test": "mocha test --recursive --compilers js:babel-register",
@@ -69,6 +69,7 @@
     "rimraf": "^2.5.4"
   },
   "dependencies": {
+    "airborne-base": "^0.6.0",
     "body-parser": "^1.15.2",
     "express": "^4.14.0",
     "lodash": "^4.13.1",

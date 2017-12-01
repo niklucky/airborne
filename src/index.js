@@ -82,11 +82,11 @@ class Airborne {
     //   }
     // }
     // router.get('/users', (req, res, next) => res.send('fsfdsf'))
-    
+
     for (let i in routes) { //eslint-disable-line
       // console.log('ROUTE I', i)
       // route = { url, httpMethod, handler}
-      for (let g in routes[i]) {
+      for (let g in routes[i]) {//eslint-disable-line
         console.log('MTHODS', i);
         router[g](i, (request, response) => {
           if (request.headers['content-type'] !== undefined && request.headers['content-type']
@@ -97,7 +97,6 @@ class Airborne {
           }
         });
       }
-
     }
     /* istanbul ignore next */
     // router.use((err, req, res) => {
@@ -151,7 +150,7 @@ class Airborne {
     this.di.set('responder', this.responder);
     const ctrl = new Controller(this.di);
     console.log(request.params);
-    return this.responder.send(ctrl.validate(method, request.params));
+    return ctrl.validate(method, request.params).then((res) => this.responder.send(res));
   }
   mergeFilesInFields(body, fields, files) { // eslint-disable-line
     const newBody = body;
