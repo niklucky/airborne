@@ -1,11 +1,11 @@
-const {BaseService} = require('../../../dist');
-const DictionaryMapper = require('../mappers/dictionary.mapper.js');
+const { BaseService } = require('../../../dist');
+const UsersMapper = require('../mappers/dictionary.mapper.js');
 
-class DictionaryService extends BaseService {
+class UsersService extends BaseService {
   constructor(di) {
     super(di);
-    this.mapper = new DictionaryMapper(di);
+    this.mapper = new UsersMapper(di);
   }
 }
 
-module.exports = DictionaryService;
+module.exports = UsersService;

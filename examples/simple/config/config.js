@@ -10,13 +10,17 @@ module.exports = {
       port: 3306,
       user: 'root',
       password: '12345',
-      database: 'airborne_test',
+      database: 'CSKA_Food',
       driver: 'mysql',
       charset: 'utf8mb4',
       dateStrings: true
     }
   },
   sources: {
-    dictionary: 'dictionary'
-  }
+    categories: 'food_categories'
+  },
+  auth: {
+    host: 'localhost',
+    port: 3042
+  },
 };

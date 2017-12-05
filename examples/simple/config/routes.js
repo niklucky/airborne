@@ -4,27 +4,20 @@ const routes = {
   '/users/': {
     get: {
       handler: UsersController,
-      method: 'load'
+      method: 'load',
+      auth: true
     },
     post: {
       handler: UsersController,
       method: 'create'
     }
   },
-  // '/users': {
-  //   get: {
-  //     handler: UsersController,
-  //     method: 'load'
-  //   },
-  //   post: {
-  //     handler: UsersController,
-  //     method: 'create'
-  //   },
-  // },
-  // '*': {
-  //   handler: UsersController,
-  //   method: 'create'
-  // }
+  '/index/:id': {
+    get: {
+      handler: UsersController,
+      method: 'load'
+    }
+  }
 };
 
 module.exports = routes;

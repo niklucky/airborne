@@ -1,11 +1,10 @@
-class Dictionary {
+class Categories {
   constructor(data) {
-    console.log('data', data);
+    // console.log('data', data);
     this.id = data.id;
-    this.title = data.title;
-    this.description = data.description;
-    this.lang = data.lang;
+    this.name = data.name;
+    this.parent = data.parent;
   }
 }
 
-module.exports = Dictionary;
+module.exports = Categories;

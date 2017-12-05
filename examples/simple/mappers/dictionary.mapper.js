@@ -1,20 +1,23 @@
 const { MySQLMapper } = require('airborne-base');
-const Dictionary = require('../models/dictionary.js');
+const Categories = require('../models/dictionary.js');
 
-class DictionaryMapper extends MySQLMapper {
+class UsersMapper extends MySQLMapper {
   constructor(di) {
     super(di);
-    this.dbTable = di.get('config').sources.dictionary;
+    this.dbTable = di.get('config').sources.categories;
     this.db = this.di.get('db').connections.mysql;
-    this.Model = Dictionary;
+    this.Model = Categories;
   }
-  // create(params, payload) {
-  //   return { params, payload };
+  // load(params, payload) {
+  //   console.log(params, payload);
   // }
-  load(params, payload) {
+  create(params, payload) { // eslint-disable-line
     console.log(params, payload);
-    return super.load(params, payload);
+    return 'From mapper create()';
   }
+  // load(params, payload) { // eslint-disable-line
+  //   return 'From mapper load()';
+  // }
 }
 
-module.exports = DictionaryMapper;
+module.exports = UsersMapper;

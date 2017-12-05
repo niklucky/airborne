@@ -1,6 +1,6 @@
 import DI from './core/di';
 import Validator from './core/validator';
-// import Dispatcher from './core/dispatcher';
+import AuthDispatcher from './core/auth.dispatcher';
 import Responder from './core/responder';
 
 const lib = require('./lib');
@@ -21,7 +21,7 @@ class Airborne {
     this.config = Object.assign({}, defaultConfig, config);
     this.di.set('config', this.config);
     this.multipartParser = null;
-    this.responder = new Responder(this.config);
+
     if (this.di.get('config').db) {
       this.database(this.di.get('config').db);
     }
@@ -71,44 +71,34 @@ class Airborne {
     this.express.use(bodyParser.urlencoded({ extended: true, limit: '100mb', parameterLimit: 1000000 }));
 
     /* istanbul ignore next */
-    // router.use(this.handleRoute);
     const routes = this.di.get('routes');
 
-    // console.log(routes);
-    // for (const i in routes) {
-    //   console.log('I', routes[i]);
-    //   for (const g in routes[i]) {
-    //     console.log('G', routes[i][g]);
-    //   }
-    // }
-    // router.get('/users', (req, res, next) => res.send('fsfdsf'))
+    router.use((req, res, next) => {
+      this.di.set('request', req);
+      this.di.set('response', res);
+      this.responder = new Responder(this.di.get('config'));
+      this.di.set('responder', this.responder);
+      next();
+    });
 
     for (let route in routes) { // eslint-disable-line
-      console.log(route);
       for (let method in routes[route]) {// eslint-disable-line
-        console.log('MTHODS', method);
-        router[method](route, (request, response) => {
+
+        router[method](route, async(request, response) => {
           const routeSettings = routes[route][method];
+          if (routeSettings.auth) {
+            await new AuthDispatcher(this.di).initAuth();
+          }
           if (routeSettings.method === undefined) {
             routeSettings.method = 'get';
           }
           if (routeSettings.handler === undefined) {
             throw new Error('[Fatal] routes config: handler method required');
           }
-          if (request.headers['content-type'] !== undefined && request.headers['content-type']
-          .indexOf('multipart/form-data') !== -1) {
-            this.handleMultipart(routeSettings.handler, routeSettings.method, request, response);
-          } else {
-            this.handle(routeSettings.handler, routeSettings.method, request, response);
-          }
+          await this.handle(routeSettings.handler, routeSettings.method, request, response);
         });
       }
     }
-    /* istanbul ignore next */
-    // router.use((err, req, res) => {
-    //   console.log('Error catched: ', err);
-    //   res.send('Error');
-    // });
 
     this.express.use('/', router);
 
@@ -121,6 +111,15 @@ class Airborne {
       });
   }
 
+  handle(Controller, method, request, response) {
+    if (request.headers['content-type'] !== undefined && request.headers['content-type']
+    .indexOf('multipart/form-data') !== -1) {
+      this.handleMultipart(Controller, method, request, response);
+    } else {
+      this.handleSimple(Controller, method, request, response);
+    }
+  }
+
   handleMultipart(Controller, method, request, response) {
     try {
       if (this.multipartParser === null) {
@@ -131,34 +130,31 @@ class Airborne {
       form.parse(request, (err, fields, files) => {
         const req = request;
         req.body = this.mergeFilesInFields(request.body, fields, files);
-        this.handle(Controller, method, request, response);
+        this.handleSimple(Controller, method, request, response);
       });
-    } catch (e) {
+    } catch (err) {
       console.error('formidable module is not found. It is used to parse multipart form-data. Install: npm i --save formidable');
-      console.log('e', e);
+      console.log('e', err);
       response.send('Error parsing multipart/form-data');
     }
   }
 
-  handle(Controller, method, request, response) {
-    console.log(Controller, method, request, response);
+  handleSimple(Controller, method, request, response) {
     if (typeof request !== 'object') {
       throw new Error('[Fatal] Application handle: request is not an object');
     }
     if (typeof response !== 'object') {
       throw new Error('[Fatal] Application handle: response is not an object');
     }
-    this.di.set('request', request);
-    this.di.set('response', response);
     const ctrl = new Controller(this.di);
-    // console.log(request.params);
+
     return ctrl.validate(method, request.params)
       .then(res => this.createResponse(res));
   }
   createResponse(data) {
-    this.di.set('responder', this.responder);
-    this.responder.setServerResponse(this.di.get('response'));
-    return this.responder.send(data);
+    const responder = this.di.get('responder');
+    responder.setServerResponse(this.di.get('response'));
+    return responder.send(data);
   }
   mergeFilesInFields(body, fields, files) { // eslint-disable-line
     const newBody = body;
