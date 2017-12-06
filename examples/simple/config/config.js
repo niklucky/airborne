@@ -10,14 +10,14 @@ module.exports = {
       port: 3306,
       user: 'root',
       password: '12345',
-      database: 'CSKA_Food',
+      database: 'Airborne_test',
       driver: 'mysql',
       charset: 'utf8mb4',
       dateStrings: true
     }
   },
   sources: {
-    categories: 'food_categories'
+    orders: 'orders'
   },
   auth: {
     host: 'localhost',

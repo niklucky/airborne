@@ -58,7 +58,7 @@ class Responder {
   }
 
   send(data) {
-    console.log(data);
+    // console.log('RESPONSE', data);
     if (this.isResponseSent === false) {
       this.checkServerResponse();
       this.setData(data);

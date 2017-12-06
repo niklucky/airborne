@@ -1,21 +1,23 @@
-const UsersController = require('../controllers/dictionary.controller');
+const OrdersController = require('../controllers/orders.controller');
 
 const routes = {
-  '/users/': {
+  '/orders/': {
     get: {
-      handler: UsersController,
+      handler: OrdersController,
       method: 'load',
       auth: true
     },
     post: {
-      handler: UsersController,
-      method: 'create'
+      handler: OrdersController,
+      method: 'create',
+      auth: true
     }
   },
-  '/index/:id': {
+  '/order/:orderId/': {
     get: {
-      handler: UsersController,
-      method: 'load'
+      handler: OrdersController,
+      method: 'load',
+      auth: true
     }
   }
 };

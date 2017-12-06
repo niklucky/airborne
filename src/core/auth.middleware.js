@@ -1,6 +1,6 @@
 import Responder from './responder'; // eslint-disable-line
 
-class AuthDispatcher {
+class AuthMiddleware {
   constructor(di) {
     this.di = di;
     this.responder = this.di.get('responder');
@@ -19,10 +19,11 @@ class AuthDispatcher {
       .then((authData) => {
         if (!authData.status) {
           this.responder.sendError('Not authorized', 401);
-        } else {
+          return false;
+        } else { // eslint-disable-line
           this.authData = authData;
           this.di.set('authData', authData);
-          this.responder.sendError(authData);
+          return true;
         }
       })
       .catch((authData) => {
@@ -32,4 +33,4 @@ class AuthDispatcher {
   }
 }
 
-export default AuthDispatcher;
+export default AuthMiddleware;

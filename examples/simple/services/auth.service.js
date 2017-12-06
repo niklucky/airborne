@@ -9,7 +9,6 @@ class AuthService {
   init() {
     const token = this.isTokenProvided();
     return this.mapper.load({ token: token }).then((session) => {
-      console.log('AuthService init()', session);
       let result = session;
       if (result !== null) {
         result.status = 1;
@@ -32,8 +31,6 @@ class AuthService {
   }
 
   authError(message) {
-    console.log('MESSAGE', message);
-    console.log('RESPONDER', this.di.get('responder'));
     return this.di.get('responder').sendError({ message: message }, 401);
   }
 }

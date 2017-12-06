@@ -6,7 +6,6 @@ import Router from './router';
 const ERROR_PREFIX = 'Dispatcher error';
 
 class Dispatcher {
-
   constructor(di, request, response) {
     if (!(di instanceof Object)) {
       throw new Error('[Fatal] ' + ERROR_PREFIX + ': DI is not an object');

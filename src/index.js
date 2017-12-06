@@ -1,6 +1,6 @@
 import DI from './core/di';
 import Validator from './core/validator';
-import AuthDispatcher from './core/auth.dispatcher';
+import AuthMiddleware from './core/auth.middleware';
 import Responder from './core/responder';
 
 const lib = require('./lib');
@@ -64,7 +64,7 @@ class Airborne {
 
     const RouterObj = express.Router;
     const router = new RouterObj({
-      mergeParams: true,
+      mergeParams: true
     });
 
     this.express.use(bodyParser.json({ limit: '100mb' }));
@@ -87,8 +87,13 @@ class Airborne {
         router[method](route, async(request, response) => {
           const routeSettings = routes[route][method];
           if (routeSettings.auth) {
-            await new AuthDispatcher(this.di).initAuth();
+            if (!await new AuthMiddleware(this.di).initAuth()) {
+              return;
+            }
           }
+          // if (routeSettings.auth) {
+          //   this.di.set('request.auth', routeSettings.auth);
+          // }
           if (routeSettings.method === undefined) {
             routeSettings.method = 'get';
           }
@@ -130,7 +135,7 @@ class Airborne {
       form.parse(request, (err, fields, files) => {
         const req = request;
         req.body = this.mergeFilesInFields(request.body, fields, files);
-        this.handleSimple(Controller, method, request, response);
+        this.handleSimple(Controller, method, req, response);
       });
     } catch (err) {
       console.error('formidable module is not found. It is used to parse multipart form-data. Install: npm i --save formidable');
@@ -153,6 +158,7 @@ class Airborne {
   }
   createResponse(data) {
     const responder = this.di.get('responder');
+    // const responder = new Responder(this.di.get('config'));
     responder.setServerResponse(this.di.get('response'));
     return responder.send(data);
   }

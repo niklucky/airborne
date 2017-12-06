@@ -1,7 +1,7 @@
 const IndexController = require('./index.controller');
-const DictionaryController = require('./dictionary.controller');
+const OrdersController = require('./orders.controller');
 
 module.exports = {
   IndexController,
-  DictionaryController
+  OrdersController
 };

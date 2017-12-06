@@ -34,8 +34,10 @@ class BaseController {
   run(method, params, payload) {
     const result = this.beforeAction(method, params, payload);
     if (result.then !== undefined) {
+      console.log('RESULT', result);
       return result.then(() => (this[method](params, payload)));
     }
+    console.log('FROM BASE CONTROLLER', this[method](params, payload));
     return this[method](params, payload);
   }
 
