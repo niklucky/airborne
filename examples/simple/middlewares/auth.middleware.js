@@ -27,6 +27,7 @@ class AuthMiddleware {
         }
       })
       .catch((authData) => {
+        console.log('AUTHDATA', authData);
         this.responder.sendError(authData);
       });
   }

@@ -29,24 +29,15 @@ class AuthMapper extends HTTPMapper {
     this.port = port;
   }
   load(params) {
-    console.log('===========================');
-    console.log('AuthMapper', params);
-    // if (params.token )
     this.path = '/access-token';
     return request
       .get(`${this.host}:${this.port}${this.path}`)
       .query(params)
-      .then(data => this.buildCollection(data))
-      // .catch((err) => {
-      //   console.log('AuthMapper error', err.response.body);
-      //   return err;
-      // });
+      .then(data => this.buildCollection(data));
   }
   buildCollection(data) { //eslint-disable-line
-    console.log('AuthMapper', data.body.data.user);
     return data.body.data.user;
   }
 }
 
-// export default AuthMapper;
 module.exports = AuthMapper;

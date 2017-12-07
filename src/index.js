@@ -84,12 +84,16 @@ class Airborne {
 
     for (let route in routes) { // eslint-disable-line
       for (let method in routes[route]) { // eslint-disable-line
-        router[method](route, async(request, response, next) => { // eslint-disable-line
+        router[method](route, (request, response, next) => { // eslint-disable-line
           const routeSettings = routes[route][method];
           if (routeSettings.auth) {
-            if (!await new AuthMiddleware(this.di).initAuth()) {
-              return;
-            }
+            this.auth = routeSettings.auth;
+            this.method = method;
+            this.route = route;
+            this.handler = routeSettings.handler;
+            // if (!await new AuthMiddleware(this.di).initAuth()) {
+            //   return;
+            // }
           }
           if (routeSettings.method === undefined) {
             routeSettings.method = 'get';
@@ -97,7 +101,21 @@ class Airborne {
           if (routeSettings.handler === undefined) {
             throw new Error('[Fatal] routes config: handler method required');
           }
-          this.handle(routeSettings.handler, routeSettings.method, request, response);
+          return next({
+            auth: this.auth,
+            route: this.route,
+            method: this.method,
+            handler: this.handler
+          });
+        });
+        router.use(async (settings, request, response, next) => { // eslint-disable-line
+          if (settings.auth) {
+            if (!await new AuthMiddleware(this.di).initAuth()) {
+              return;
+            }
+          }
+          await this.handle(settings.handler, settings.method, request, response);
+          // next();
         });
       }
     }
