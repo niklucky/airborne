@@ -73,39 +73,39 @@ class Airborne {
     /* istanbul ignore next */
     const routes = this.di.get('routes');
 
-    router.use((req, res, next) => {
+    this.express.use((req, res, next) => {
       this.di.set('request', req);
       this.di.set('response', res);
+      this.di.set('method', req.method);
       this.responder = new Responder(this.di.get('config'));
       this.di.set('responder', this.responder);
       next();
     });
 
     for (let route in routes) { // eslint-disable-line
-      for (let method in routes[route]) {// eslint-disable-line
-
-        router[method](route, async(request, response) => {
+      for (let method in routes[route]) { // eslint-disable-line
+        router[method](route, async(request, response, next) => { // eslint-disable-line
           const routeSettings = routes[route][method];
           if (routeSettings.auth) {
             if (!await new AuthMiddleware(this.di).initAuth()) {
               return;
             }
           }
-          // if (routeSettings.auth) {
-          //   this.di.set('request.auth', routeSettings.auth);
-          // }
           if (routeSettings.method === undefined) {
             routeSettings.method = 'get';
           }
           if (routeSettings.handler === undefined) {
             throw new Error('[Fatal] routes config: handler method required');
           }
-          await this.handle(routeSettings.handler, routeSettings.method, request, response);
+          this.handle(routeSettings.handler, routeSettings.method, request, response);
         });
       }
     }
 
     this.express.use('/', router);
+    this.express.use(function (request, response, next) { // eslint-disable-line
+      response.send(404, { status: 404, message: 'Route not found' });
+    });
 
     /* istanbul ignore next */
     const server = this.express.listen(
@@ -119,9 +119,9 @@ class Airborne {
   handle(Controller, method, request, response) {
     if (request.headers['content-type'] !== undefined && request.headers['content-type']
     .indexOf('multipart/form-data') !== -1) {
-      this.handleMultipart(Controller, method, request, response);
-    } else {
-      this.handleSimple(Controller, method, request, response);
+      return this.handleMultipart(Controller, method, request, response);
+    } else { // eslint-disable-line
+      return this.handleSimple(Controller, method, request, response);
     }
   }
 
@@ -135,7 +135,7 @@ class Airborne {
       form.parse(request, (err, fields, files) => {
         const req = request;
         req.body = this.mergeFilesInFields(request.body, fields, files);
-        this.handleSimple(Controller, method, req, response);
+        return this.handleSimple(Controller, method, request, response);
       });
     } catch (err) {
       console.error('formidable module is not found. It is used to parse multipart form-data. Install: npm i --save formidable');
@@ -152,15 +152,18 @@ class Airborne {
       throw new Error('[Fatal] Application handle: response is not an object');
     }
     const ctrl = new Controller(this.di);
-
     return ctrl.validate(method, request.params)
-      .then(res => this.createResponse(res));
+      .then((data) => {
+        console.log('res from handle', data);
+        this.createResponse(data, response);
+      })
+      .catch(err => response.send(err));
   }
-  createResponse(data) {
+
+  createResponse(data, response) {
     const responder = this.di.get('responder');
-    // const responder = new Responder(this.di.get('config'));
-    responder.setServerResponse(this.di.get('response'));
-    return responder.send(data);
+    responder.setServerResponse(response);
+    responder.send(data);
   }
   mergeFilesInFields(body, fields, files) { // eslint-disable-line
     const newBody = body;

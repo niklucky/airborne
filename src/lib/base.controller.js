@@ -29,16 +29,19 @@ class BaseController {
       requestData.payload = result.validated.payload;
     }
     return this.run(method, requestData.params, requestData.payload);
+    // .then(res => console.log('res from validate', res));
   }
 
-  run(method, params, payload) {
-    const result = this.beforeAction(method, params, payload);
-    if (result.then !== undefined) {
-      console.log('RESULT', result);
-      return result.then(() => (this[method](params, payload)));
-    }
-    console.log('FROM BASE CONTROLLER', this[method](params, payload));
-    return this[method](params, payload);
+  async run(method, params, payload) {
+    // const result = this.beforeAction(method, params, payload);
+    // const result = true;
+    // if (result.then !== undefined) {
+    //   console.log('RESULT', result);
+    //   return result.then(() => (this[method](params, payload)));
+    // }
+    // console.log('FROM BASE CONTROLLER', await this[method](params, payload));
+    return await this[method](params, payload);
+    // .then((res) => console.log('res from run', res));
   }
 
   beforeAction(method, params, payload) { // eslint-disable-line
@@ -68,7 +71,8 @@ class BaseController {
   }
 
   load(params) {
-    return this.service.load(params);
+    console.log('load base controller', params);
+    return this.service.load(params).then(res => console.log(res));
   }
 
   get(params) {

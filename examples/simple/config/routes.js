@@ -13,10 +13,10 @@ const routes = {
       auth: true
     }
   },
-  '/order/:orderId/': {
+  '/orders/:orderId/': {
     get: {
       handler: OrdersController,
-      method: 'load',
+      method: 'get',
       auth: true
     }
   }

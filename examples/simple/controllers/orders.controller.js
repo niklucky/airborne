@@ -6,6 +6,9 @@ class OrdersController extends BaseController {
     super(di);
     this.service = new OrdersService(di);
     this.rules = {
+      get: {
+        orderId: { type: 'number' },
+      },
       load: {
         orderId: { type: 'number' },
         userId: { type: 'number' }
@@ -15,6 +18,9 @@ class OrdersController extends BaseController {
         userId: { type: 'number' }
       }
     };
+  }
+  load(params) {
+    return this.service.load(params);
   }
 }
 

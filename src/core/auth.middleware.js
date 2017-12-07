@@ -1,4 +1,4 @@
-import Responder from './responder'; // eslint-disable-line
+// import Responder from './responder'; // eslint-disable-line
 
 class AuthMiddleware {
   constructor(di) {
