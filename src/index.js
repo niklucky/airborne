@@ -118,10 +118,12 @@ class Airborne {
         if (middlewares !== null) { // eslint-disable-line
           for (let middleware in middlewares) { // eslint-disable-line
             console.log('mw', middleware);
-            console.log('route', middleware.route);
+            console.log(middlewares[middleware].route);
+            console.log(middlewares[middleware].module);
             router.use(async (settings, request, response, next) => { // eslint-disable-line
-              if (settings.route === middleware.route) { // eslint-disable-line
-                await new middleware.module(this.di).Init(); // eslint-disable-line
+              if (settings.route === middlewares[middleware].route) { // eslint-disable-line
+                const module = new middlewares[middleware].module(this.di);
+                await module.Init(); // eslint-disable-line
               }
               await this.handle(settings.handler, settings.method, request, response);
             });
