@@ -2,7 +2,7 @@ const AuthMiddleware = require('../middlewares/auth.middleware');
 
 const middlewares = {
   authorization: {
-    route: 'orders',
+    route: '/orders/',
     module: AuthMiddleware
   }
 };

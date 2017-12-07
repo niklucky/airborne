@@ -1,6 +1,6 @@
 import DI from './core/di';
 import Validator from './core/validator';
-import AuthMiddleware from './core/auth.middleware';
+// import AuthMiddleware from './core/auth.middleware';
 import Responder from './core/responder';
 
 const lib = require('./lib');
@@ -44,6 +44,11 @@ class Airborne {
 
   routes(routes) {
     this.di.set('routes', routes);
+    return this;
+  }
+
+  middlewares(middlewares) {
+    this.di.set('middlewares', middlewares);
     return this;
   }
 
@@ -108,15 +113,31 @@ class Airborne {
             handler: this.handler
           });
         });
-        router.use(async (settings, request, response, next) => { // eslint-disable-line
-          if (settings.auth) {
-            if (!await new AuthMiddleware(this.di).initAuth()) {
-              return;
-            }
+
+        const middlewares = this.di.get('middlewares');
+        if (middlewares !== null) { // eslint-disable-line
+          for (let middleware in middlewares) { // eslint-disable-line
+            console.log('mw', middleware);
+            console.log('route', middleware.route);
+            router.use(async (settings, request, response, next) => { // eslint-disable-line
+              if (settings.route === middleware.route) { // eslint-disable-line
+                await new middleware.module(this.di).Init(); // eslint-disable-line
+              }
+              await this.handle(settings.handler, settings.method, request, response);
+            });
           }
-          await this.handle(settings.handler, settings.method, request, response);
-          // next();
-        });
+        }
+
+
+        // router.use(async (settings, request, response, next) => { // eslint-disable-line
+        //   if (settings.auth) {
+        //     if (!await new AuthMiddleware(this.di).initAuth()) {
+        //       return;
+        //     }
+        //   }
+        //   await this.handle(settings.handler, settings.method, request, response);
+        //   // next();
+        // });
       }
     }
 

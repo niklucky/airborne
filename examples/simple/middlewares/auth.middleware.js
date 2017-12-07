@@ -6,7 +6,8 @@ class AuthMiddleware {
     this.responder = this.di.get('responder');
     this.responder.setServerResponse(this.di.get('response'));
   }
-  initAuth() {
+  Init() {
+    console.log('HERE');
     if (this.di.get('services') === undefined) {
       throw new Error('[Fatal] AUTH ERROR: services that contains Authorization service are not provided');
     }
@@ -33,4 +34,4 @@ class AuthMiddleware {
   }
 }
 
-export default AuthMiddleware;
+module.exports = AuthMiddleware;
