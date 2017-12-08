@@ -5,16 +5,19 @@ const routes = {
     get: {
       handler: OrdersController,
       method: 'load',
+      auth: true
     },
     post: {
       handler: OrdersController,
       method: 'create',
+      auth: true
     }
   },
   '/orders/:orderId/': {
     get: {
       handler: OrdersController,
       method: 'get',
+      // auth: true
     }
   }
 };

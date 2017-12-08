@@ -14,6 +14,7 @@ class BaseController {
   }
 
   validate(method, params) {
+    console.log('from validate');
     if (typeof method !== 'string') {
       throw new Error('[Fatal] BaseController.validate(): Controller method is not specified');
     }
@@ -72,7 +73,7 @@ class BaseController {
 
   load(params) {
     console.log('load base controller', params);
-    return this.service.load(params).then(res => console.log(res));
+    return this.service.load(params);
   }
 
   get(params) {

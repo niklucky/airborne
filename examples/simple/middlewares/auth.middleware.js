@@ -20,8 +20,10 @@ class AuthMiddleware {
       .then((authData) => {
         if (!authData.status) {
           this.responder.sendError('Not authorized', 401);
+          // throw new Error();
           return false;
         } else { // eslint-disable-line
+          console.log('AUTH MID');
           this.authData = authData;
           this.di.set('authData', authData);
           return true;

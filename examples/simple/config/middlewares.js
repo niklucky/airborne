@@ -1,9 +1,14 @@
 const AuthMiddleware = require('../middlewares/auth.middleware');
+const SimpleMiddleware = require('../middlewares/simple.middleware');
 
 const middlewares = {
-  authorization: {
+  // authorization: {
+  //   route: '/orders/',
+  //   module: AuthMiddleware
+  // },
+  simple: {
     route: '/orders/',
-    module: AuthMiddleware
+    module: SimpleMiddleware
   }
 };
 

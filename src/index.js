@@ -2,6 +2,7 @@ import DI from './core/di';
 import Validator from './core/validator';
 // import AuthMiddleware from './core/auth.middleware';
 import Responder from './core/responder';
+// import { request } from 'http';
 
 const lib = require('./lib');
 const express = require('express');
@@ -82,53 +83,42 @@ class Airborne {
       this.di.set('request', req);
       this.di.set('response', res);
       this.di.set('method', req.method);
+      console.log('INITIALIZED');
       this.responder = new Responder(this.di.get('config'));
       this.di.set('responder', this.responder);
+
       next();
     });
+    this.express.use((req, res, next) => {
+      console.log('ROUTE', this.di.get('request').originalUrl.match(/[a-z]*/ig));
+      console.log('URL', this.di.get('request').url);
+      console.log('PATH', this.di.get('request').path);
+      next();
+    });
+    // console.log('ROUTE', this.di.get('request'));
 
     for (let route in routes) { // eslint-disable-line
       for (let method in routes[route]) { // eslint-disable-line
         router[method](route, (request, response, next) => { // eslint-disable-line
           const routeSettings = routes[route][method];
-          if (routeSettings.auth) {
-            this.auth = routeSettings.auth;
-            this.method = method;
-            this.route = route;
-            this.handler = routeSettings.handler;
-            // if (!await new AuthMiddleware(this.di).initAuth()) {
-            //   return;
-            // }
-          }
+          const httpMethod = method;
+          const originalRoute = route;
+          const routeHandler = routeSettings.handler;
+
           if (routeSettings.method === undefined) {
             routeSettings.method = 'get';
           }
           if (routeSettings.handler === undefined) {
             throw new Error('[Fatal] routes config: handler method required');
           }
+         // console.log('HANDLER', this.handler);
           return next({
-            auth: this.auth,
-            route: this.route,
-            method: this.method,
-            handler: this.handler
+            route: originalRoute,
+            method: httpMethod,
+            handler: routeHandler,
           });
         });
-
-        const middlewares = this.di.get('middlewares');
-        if (middlewares !== null) { // eslint-disable-line
-          for (let middleware in middlewares) { // eslint-disable-line
-            console.log('mw', middleware);
-            console.log(middlewares[middleware].route);
-            console.log(middlewares[middleware].module);
-            router.use(async (settings, request, response, next) => { // eslint-disable-line
-              if (settings.route === middlewares[middleware].route) { // eslint-disable-line
-                const module = new middlewares[middleware].module(this.di);
-                await module.Init(); // eslint-disable-line
-              }
-              await this.handle(settings.handler, settings.method, request, response);
-            });
-          }
-        }
+        // console.log('AUTH', this.handler);
 
 
         // router.use(async (settings, request, response, next) => { // eslint-disable-line
@@ -142,7 +132,37 @@ class Airborne {
         // });
       }
     }
+    const middlewares = this.di.get('middlewares');
+    console.log('MW', middlewares);
+    if (middlewares !== null) { // eslint-disable-line
+      for (let middleware in middlewares) { // eslint-disable-line
+        console.log('mw', middleware);
+        console.log(middlewares[middleware].route);
+        console.log(middlewares[middleware].MDmodule);
+        router.use(async (settings, request, response, next) => { // eslint-disable-line
+          
+          // console.log('SETTINGS', settings);
+          if (settings.route === middlewares[middleware].route) { // eslint-disable-line
+            const moduleMD = new middlewares[middleware].module(this.di); // eslint-disable-line
+            await moduleMD.Init(); // eslint-disable-line
+          }
+          next(settings);
+        });
+      }
+    }
 
+    router.use(async (settings, request, response, next) => {
+      console.log('HANDLE MID');
+      // console.log('SET', settings);
+      if (settings.handler !== undefined) {
+        this.handle(settings.handler, settings.method, request, response);
+        // next();
+      }
+      //next();
+    });
+
+
+    console.log('Before app.use()');
     this.express.use('/', router);
     this.express.use(function (request, response, next) { // eslint-disable-line
       response.send(404, { status: 404, message: 'Route not found' });
@@ -158,6 +178,7 @@ class Airborne {
   }
 
   handle(Controller, method, request, response) {
+    console.log('In handle');
     if (request.headers['content-type'] !== undefined && request.headers['content-type']
     .indexOf('multipart/form-data') !== -1) {
       return this.handleMultipart(Controller, method, request, response);
@@ -186,25 +207,37 @@ class Airborne {
   }
 
   handleSimple(Controller, method, request, response) {
+    console.log('In handleSimple');
     if (typeof request !== 'object') {
       throw new Error('[Fatal] Application handle: request is not an object');
     }
     if (typeof response !== 'object') {
       throw new Error('[Fatal] Application handle: response is not an object');
     }
+    console.log('Before ctrl initializing');
+    // console.log(Controller);
     const ctrl = new Controller(this.di);
+    console.log('Controller', ctrl);
     return ctrl.validate(method, request.params)
       .then((data) => {
-        console.log('res from handle', data);
+        // console.log('res from handle', data);
         this.createResponse(data, response);
       })
-      .catch(err => response.send(err));
+      .catch((err) => {
+        this.createErrorResponse(err, response);
+      });
   }
 
   createResponse(data, response) {
     const responder = this.di.get('responder');
     responder.setServerResponse(response);
     responder.send(data);
+  }
+
+  createErrorResponse(err, response) {
+    const responder = this.di.get('responder');
+    responder.setServerResponse(response);
+    responder.sendError('ERROR', 404);
   }
   mergeFilesInFields(body, fields, files) { // eslint-disable-line
     const newBody = body;

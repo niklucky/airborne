@@ -19,9 +19,6 @@ class OrdersController extends BaseController {
       }
     };
   }
-  load(params) {
-    return this.service.load(params);
-  }
 }
 
 module.exports = OrdersController;
