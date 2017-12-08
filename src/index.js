@@ -48,10 +48,10 @@ class Airborne {
     return this;
   }
 
-  middlewares(middlewares) {
-    this.di.set('middlewares', middlewares);
-    return this;
-  }
+  // middlewares(middlewares) {
+  //   this.di.set('middlewares', middlewares);
+  //   return this;
+  // }
 
   validator(validator) {
     if (validator === true) {
@@ -103,6 +103,12 @@ class Airborne {
           const handlerMethod = routeSettings.method;
           const originalRoute = route;
           const routeHandler = routeSettings.handler;
+          let middlewares = null;
+          if (routeSettings.middleware !== undefined && routeSettings.middleware.length !== 0) {
+            console.log(routeSettings.middleware);
+            middlewares = routeSettings.middleware;
+          }
+          console.log('MID', middlewares);
 
           if (routeSettings.method === undefined) {
             routeSettings.method = 'get';
@@ -115,6 +121,7 @@ class Airborne {
             route: originalRoute,
             method: handlerMethod,
             handler: routeHandler,
+            middlewares: middlewares
           });
         });
         // console.log('AUTH', this.handler);
@@ -131,26 +138,38 @@ class Airborne {
         // });
       }
     }
-    const middlewares = this.di.get('middlewares');
-    console.log('MW', middlewares);
-    if (middlewares !== null) { // eslint-disable-line
-      for (let middleware in middlewares) { // eslint-disable-line
-        console.log('mw', middleware);
-        console.log(middlewares[middleware].route);
-        console.log(middlewares[middleware].MDmodule);
-        router.use(async (settings, request, response, next) => { // eslint-disable-line
+    // const middlewares = this.di.get('middlewares');
+    // console.log('MW', middlewares);
+    // if (middlewares !== null) { // eslint-disable-line
+    //   for (let middleware in middlewares) { // eslint-disable-line
+    //     console.log('mw', middleware);
+    //     console.log(middlewares[middleware].route);
+    //     console.log(middlewares[middleware].MDmodule);
+    //     router.use(async (settings, request, response, next) => { // eslint-disable-line
 
-          // console.log('SETTINGS', settings);
-          if (settings.route === middlewares[middleware].route) { // eslint-disable-line
-            const moduleMD = new middlewares[middleware].module(this.di); // eslint-disable-line
-            await moduleMD.Init(); // eslint-disable-line
-          }
-          next(settings);
+    //       // console.log('SETTINGS', settings);
+    //       if (settings.route === middlewares[middleware].route) { // eslint-disable-line
+    //         const moduleMD = new middlewares[middleware].module(this.di); // eslint-disable-line
+    //         await moduleMD.Init(); // eslint-disable-line
+    //       }
+    //       next(settings);
+    //     });
+    //   }
+    // }
+
+    router.use((settings, request, response, next) => {
+      console.log('SETTINGS', settings);
+      if (settings.middlewares !== undefined && settings.middlewares.length !== 0) {
+        settings.middlewares.forEach((middleware) => {
+          const mwModule = new middleware(this.di); // eslint-disable-line
+          console.log('MODULE', mwModule);
+          mwModule.Init(); // eslint-disable-line
         });
       }
-    }
+      next(settings);
+    });
 
-    router.use(async (settings, request, response, next) => { // eslint-disable-line
+    router.use((settings, request, response, next) => { // eslint-disable-line
       console.log('HANDLE MID');
       // console.log('SET', settings);
       if (settings.handler !== undefined) {

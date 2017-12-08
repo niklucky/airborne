@@ -36,6 +36,7 @@ class AuthMapper extends HTTPMapper {
       .then(data => this.buildCollection(data));
   }
   buildCollection(data) { //eslint-disable-line
+    console.log('DATA', data);
     return data.body.data.user;
   }
 }

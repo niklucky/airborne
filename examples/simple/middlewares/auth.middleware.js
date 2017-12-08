@@ -1,4 +1,4 @@
-// import Responder from './responder'; // eslint-disable-line
+// const Responder = require('../'); // eslint-disable-line
 
 class AuthMiddleware {
   constructor(di) {
@@ -30,8 +30,8 @@ class AuthMiddleware {
         }
       })
       .catch((authData) => {
-        console.log('AUTHDATA', authData);
-        this.responder.sendError(authData);
+        console.log('AUTHDATA ++++++++++++++', authData);
+        return this.responder.sendError(authData, 401);
       });
   }
 }

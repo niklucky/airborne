@@ -19,7 +19,7 @@ class AuthService {
       }
       return result;
     })
-    .catch(() => this.authError('Not authorized'));
+    // .catch((err) => this.authError('Not authorized', err));
   }
 
   isTokenProvided() {
@@ -30,7 +30,8 @@ class AuthService {
     return token;
   }
 
-  authError(message) {
+  authError(message, err) {
+    console.log('MES', err);
     return this.di.get('responder').sendError({ message: message }, 401);
   }
 }
