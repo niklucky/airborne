@@ -17,7 +17,8 @@ module.exports = {
     }
   },
   sources: {
-    orders: 'orders'
+    orders: 'orders',
+    users: 'users'
   },
   auth: {
     host: 'localhost',

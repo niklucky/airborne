@@ -1,4 +1,5 @@
 const OrdersController = require('../controllers/orders.controller');
+const UsersController = require('../controllers/users.controller');
 
 const routes = {
   '/orders/': {
@@ -6,7 +7,7 @@ const routes = {
       handler: OrdersController,
       method: 'load'
     },
-    post: {
+    put: {
       handler: OrdersController,
       method: 'create'
     }
@@ -14,6 +15,22 @@ const routes = {
   '/orders/:orderId/': {
     get: {
       handler: OrdersController,
+      method: 'get'
+    }
+  },
+  '/users/': {
+    get: {
+      handler: UsersController,
+      method: 'load'
+    },
+    put: {
+      handler: UsersController,
+      method: 'create'
+    }
+  },
+  '/users/:userId/': {
+    get: {
+      handler: UsersController,
       method: 'get'
     }
   }

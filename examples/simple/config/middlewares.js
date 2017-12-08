@@ -3,7 +3,7 @@ const SimpleMiddleware = require('../middlewares/simple.middleware');
 
 const middlewares = {
   authorization: {
-    route: '/orders/',
+    route: '/users/',
     module: AuthMiddleware
   },
   simple: {

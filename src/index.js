@@ -95,7 +95,6 @@ class Airborne {
       console.log('PATH', this.di.get('request').path);
       next();
     });
-    // console.log('ROUTE', this.di.get('request'));
 
     for (let route in routes) { // eslint-disable-line
       for (let method in routes[route]) { // eslint-disable-line
