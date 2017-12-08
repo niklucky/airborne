@@ -6,14 +6,14 @@ class OrdersController extends BaseController {
     super(di);
     this.service = new OrdersService(di);
     this.rules = {
+      create: {
+        orderId: { type: 'number' },
+        userId: { type: 'number' }
+      },
       get: {
         orderId: { type: 'number' },
       },
       load: {
-        orderId: { type: 'number' },
-        userId: { type: 'number' }
-      },
-      create: {
         orderId: { type: 'number' },
         userId: { type: 'number' }
       }

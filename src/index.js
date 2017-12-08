@@ -101,7 +101,7 @@ class Airborne {
       for (let method in routes[route]) { // eslint-disable-line
         router[method](route, (request, response, next) => { // eslint-disable-line
           const routeSettings = routes[route][method];
-          const httpMethod = method;
+          const handlerMethod = routeSettings.method;
           const originalRoute = route;
           const routeHandler = routeSettings.handler;
 
@@ -114,7 +114,7 @@ class Airborne {
          // console.log('HANDLER', this.handler);
           return next({
             route: originalRoute,
-            method: httpMethod,
+            method: handlerMethod,
             handler: routeHandler,
           });
         });
@@ -140,7 +140,7 @@ class Airborne {
         console.log(middlewares[middleware].route);
         console.log(middlewares[middleware].MDmodule);
         router.use(async (settings, request, response, next) => { // eslint-disable-line
-          
+
           // console.log('SETTINGS', settings);
           if (settings.route === middlewares[middleware].route) { // eslint-disable-line
             const moduleMD = new middlewares[middleware].module(this.di); // eslint-disable-line
@@ -151,14 +151,14 @@ class Airborne {
       }
     }
 
-    router.use(async (settings, request, response, next) => {
+    router.use(async (settings, request, response, next) => { // eslint-disable-line
       console.log('HANDLE MID');
       // console.log('SET', settings);
       if (settings.handler !== undefined) {
         this.handle(settings.handler, settings.method, request, response);
         // next();
       }
-      //next();
+      // next();
     });
 
 

@@ -81,6 +81,7 @@ class BaseController {
   }
 
   create(params, payload) {
+    console.log('from create', payload);
     return this.service.create(params, payload);
   }
 

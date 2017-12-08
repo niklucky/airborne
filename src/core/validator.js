@@ -12,11 +12,13 @@ const FILE_TYPES = {
 
 class Validator {
   constructor(rules) {
+    console.log('RULES IN CONSTRUCTOR', rules);
     this.setRules(rules);
     this.errors = null;
     this.result = true;
   }
   setRules(rules) {
+    console.log('RULES', rules);
     if (rules instanceof Object === false) {
       throw new Error('Fatal: Validator rules are invalid. You either correct rules in controller or disable validation in Engine init');
     }
