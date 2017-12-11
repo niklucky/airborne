@@ -2,7 +2,6 @@ import DI from './core/di';
 import Validator from './core/validator';
 // import AuthMiddleware from './core/auth.middleware';
 import Responder from './core/responder';
-// import { request } from 'http';
 
 const lib = require('./lib');
 const express = require('express');
@@ -48,11 +47,6 @@ class Airborne {
     return this;
   }
 
-  // middlewares(middlewares) {
-  //   this.di.set('middlewares', middlewares);
-  //   return this;
-  // }
-
   validator(validator) {
     if (validator === true) {
       this.di.set('validator', Validator);
@@ -72,10 +66,6 @@ class Airborne {
     const router = new RouterObj({
       mergeParams: true
     });
-    // const asyncMiddleware = fn => (req, res, next) => {
-    //   Promise.resolve(fn(req, res, next))
-    //     .catch(next);
-    // };
 
     this.express.use(bodyParser.json({ limit: '100mb' }));
     this.express.use(bodyParser.urlencoded({ extended: true, limit: '100mb', parameterLimit: 1000000 }));
@@ -120,7 +110,7 @@ class Airborne {
           if (routeSettings.handler === undefined) {
             throw new Error('[Fatal] routes config: handler method required');
           }
-          console.log('HANDLER', this.handler);
+
           return next({
             route: originalRoute,
             method: handlerMethod,
@@ -128,99 +118,26 @@ class Airborne {
             middlewares: middlewares
           });
         });
-        // console.log('AUTH', this.handler);
-
-        // router.use(async (settings, request, response, next) => { // eslint-disable-line
-        //   if (settings.auth) {
-        //     if (!await new AuthMiddleware(this.di).initAuth()) {
-        //       return;
-        //     }
-        //   }
-        //   await this.handle(settings.handler, settings.method, request, response);
-        //   // next();
-        // });
       }
     }
-    // const middlewares = this.di.get('middlewares');
-    // console.log('MW', middlewares);
-    // if (middlewares !== null) { // eslint-disable-line
-    //   for (let middleware in middlewares) { // eslint-disable-line
-    //     console.log('mw', middleware);
-    //     console.log(middlewares[middleware].route);
-    //     console.log(middlewares[middleware].MDmodule);
-    //     router.use(async (settings, request, response, next) => { // eslint-disable-line
-
-    //       // console.log('SETTINGS', settings);
-    //       if (settings.route === middlewares[middleware].route) { // eslint-disable-line
-    //         const moduleMD = new middlewares[middleware].module(this.di); // eslint-disable-line
-    //         await moduleMD.Init(); // eslint-disable-line
-    //       }
-    //       next(settings);
-    //     });
-    //   }
-    // }
-
-    // router.use((settings, request, response, next) => {
-    //   // console.log('SETTINGS', settings);
-    //   if (settings.middlewares !== undefined && settings.middlewares.length !== 0) {
-    //     settings.middlewares.forEach((middleware) => {
-    //       const mwModule = new middleware(this.di).Init(); // eslint-disable-line
-    //       // console.log('MODULE', mwModule);
-    //       // mwModule.Init(); // eslint-disable-line
-    //     });
-    //   }
-    //   next(settings);
-    // });
-
-    // router.use((settings, request, response, next) => {// eslint-disable-line
-    //   console.log('SETTINGS', settings);
-    //   if (settings.middlewares !== undefined && settings.middlewares.length !== 0) {
-    //     return settings.middlewares.reduce((promise, middleware) => promise.then(() => {
-    //       new middleware(this.di).Init(); // eslint-disable-line
-    //       // console.log('MODULE', mwModule);
-    //         // mwModule.Init(); // eslint-disable-line
-    //     }).then(() => next(settings)), Promise.resolve());
-    //   }
-    //   next(settings);
-    // });
-
-    // router.use((settings, request, response, next) => { // eslint-disable-line
-    //   console.log('HANDLE MID');
-    //   // console.log('SET', settings);
-    //   if (settings.middlewares !== undefined && settings.middlewares.length !== 0) {
-    //     Promise.all(settings.middlewares.map(Middleware =>
-    //       new Middleware(this.di).Init(settings, request, response, next)))
-    //     .catch((err) => console.log(err))
-
-    // });
-
-  // router.use((settings, request, response, next) => { // eslint-disable-line
-  //     console.log('HANDLE MID');
-  //     // console.log('SET', settings);
-  //     if (settings.middlewares !== undefined && settings.middlewares.length !== 0) {
-  //       Promise.all(settings.middlewares.map(Middleware =>
-  //         new Middleware(this.di).Init(settings, request, response, next)))
-  //       .catch((err) => console.log(err))
-  //   });
-
 
     router.use((settings, request, response, next) => {
-      if (settings.middlewares !== undefined && settings.middlewares.length !== 0) {
-        Promise.all(settings.middlewares.map(Middleware => new Middleware(this.di).Init(
+      if (settings.middlewares !== undefined && settings.middlewares !== null) {
+        Promise.all(settings.middlewares.map(Middleware => new Middleware(this.di).Init( // eslint-disable-line
           settings, request, response, next
         )))
-        .catch((err) => {
-          throw new Error(err);
-        });
+        .then((res) => {
+          if (res.includes(false)) {
+            throw new Error('ERROR WHILE HANDLING MIDDLEWARE');
+          } else {
+            next(settings);
+          }
+        }
+        );
+      } else {
+        next(settings);
       }
-      // next(settings);
     });
-
-    // router.use((settings, request, response, next) => { // eslint-disable-line
-    //   new settings.middlewares[0](this.di).Init(settings, request, response, next);
-    //   // next();
-    // });
-
 
     router.use((settings, request, response, next) => { // eslint-disable-line
       console.log('HANDLE MID');

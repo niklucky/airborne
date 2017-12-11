@@ -21,7 +21,7 @@ const routes = {
     get: {
       handler: OrdersController,
       method: 'get',
-      middleware: [AuthMiddleware]
+      middleware: [SimpleMiddleware]
       
     }
   },

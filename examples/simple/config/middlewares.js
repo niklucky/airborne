@@ -1,15 +1,9 @@
 const AuthMiddleware = require('../middlewares/auth.middleware');
 const SimpleMiddleware = require('../middlewares/simple.middleware');
 
-const middlewares = {
-  authorization: {
-    route: '/users/',
-    module: AuthMiddleware
-  },
-  simple: {
-    route: '/orders/',
-    module: SimpleMiddleware
-  }
-};
+const middlewares = [
+  AuthMiddleware,
+  SimpleMiddleware
+];
 
-module.exports = middlewares;
+exports.module = middlewares;

@@ -6,7 +6,7 @@ class AuthMiddleware {
     this.responder = this.di.get('responder');
     this.responder.setServerResponse(this.di.get('response'));
   }
-  Init(settings, req, res, next) {
+  Init() {
     console.log('HERE');
     if (this.di.get('services') === undefined) {
       throw new Error('[Fatal] AUTH ERROR: services that contains Authorization service are not provided');
@@ -26,15 +26,17 @@ class AuthMiddleware {
           console.log('AUTH MID');
           this.authData = authData;
           this.di.set('authData', authData);
+          return true;
         }
       })
-      .then(() => next(settings))
+      // .then(() => next())
       .catch((authData) => {
         console.log('AUTHDATA ++++++++++++++', authData);
         // const response = this.di.get('response');
         // response.send('ERROR');
         // throw new Error('Auth error');
         this.responder.sendError(authData, 401);
+        return false;
       });
   }
 }

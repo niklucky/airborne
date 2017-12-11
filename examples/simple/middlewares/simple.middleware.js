@@ -4,11 +4,11 @@ class SimpleMiddleware {
     // this.responder = this.di.get('responder');
     // this.responder.setServerResponse(this.di.get('response'));
   }
-  Init(settings, req, res, next) {
+  Init() {
     console.log('====================');
     console.log('SIMPLE MIDDLEWARE');
     console.log('====================');
-    // next(settings);
+    return true;
   }
 }
 
