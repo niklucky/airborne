@@ -203,13 +203,17 @@ class Airborne {
   //       .catch((err) => console.log(err))
   //   });
 
+
     router.use((settings, request, response, next) => {
       if (settings.middlewares !== undefined && settings.middlewares.length !== 0) {
         Promise.all(settings.middlewares.map(Middleware => new Middleware(this.di).Init(
           settings, request, response, next
         )))
-        .catch(err => console.log('ERROR IN MW HANDLING', err));
+        .catch((err) => {
+          throw new Error(err);
+        });
       }
+      // next(settings);
     });
 
     // router.use((settings, request, response, next) => { // eslint-disable-line
