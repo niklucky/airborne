@@ -72,6 +72,10 @@ class Airborne {
     const router = new RouterObj({
       mergeParams: true
     });
+    // const asyncMiddleware = fn => (req, res, next) => {
+    //   Promise.resolve(fn(req, res, next))
+    //     .catch(next);
+    // };
 
     this.express.use(bodyParser.json({ limit: '100mb' }));
     this.express.use(bodyParser.urlencoded({ extended: true, limit: '100mb', parameterLimit: 1000000 }));
@@ -116,7 +120,7 @@ class Airborne {
           if (routeSettings.handler === undefined) {
             throw new Error('[Fatal] routes config: handler method required');
           }
-         // console.log('HANDLER', this.handler);
+          console.log('HANDLER', this.handler);
           return next({
             route: originalRoute,
             method: handlerMethod,
@@ -125,7 +129,6 @@ class Airborne {
           });
         });
         // console.log('AUTH', this.handler);
-
 
         // router.use(async (settings, request, response, next) => { // eslint-disable-line
         //   if (settings.auth) {
@@ -157,21 +160,67 @@ class Airborne {
     //   }
     // }
 
+    // router.use((settings, request, response, next) => {
+    //   // console.log('SETTINGS', settings);
+    //   if (settings.middlewares !== undefined && settings.middlewares.length !== 0) {
+    //     settings.middlewares.forEach((middleware) => {
+    //       const mwModule = new middleware(this.di).Init(); // eslint-disable-line
+    //       // console.log('MODULE', mwModule);
+    //       // mwModule.Init(); // eslint-disable-line
+    //     });
+    //   }
+    //   next(settings);
+    // });
+
+    // router.use((settings, request, response, next) => {// eslint-disable-line
+    //   console.log('SETTINGS', settings);
+    //   if (settings.middlewares !== undefined && settings.middlewares.length !== 0) {
+    //     return settings.middlewares.reduce((promise, middleware) => promise.then(() => {
+    //       new middleware(this.di).Init(); // eslint-disable-line
+    //       // console.log('MODULE', mwModule);
+    //         // mwModule.Init(); // eslint-disable-line
+    //     }).then(() => next(settings)), Promise.resolve());
+    //   }
+    //   next(settings);
+    // });
+
+    // router.use((settings, request, response, next) => { // eslint-disable-line
+    //   console.log('HANDLE MID');
+    //   // console.log('SET', settings);
+    //   if (settings.middlewares !== undefined && settings.middlewares.length !== 0) {
+    //     Promise.all(settings.middlewares.map(Middleware =>
+    //       new Middleware(this.di).Init(settings, request, response, next)))
+    //     .catch((err) => console.log(err))
+
+    // });
+
+  // router.use((settings, request, response, next) => { // eslint-disable-line
+  //     console.log('HANDLE MID');
+  //     // console.log('SET', settings);
+  //     if (settings.middlewares !== undefined && settings.middlewares.length !== 0) {
+  //       Promise.all(settings.middlewares.map(Middleware =>
+  //         new Middleware(this.di).Init(settings, request, response, next)))
+  //       .catch((err) => console.log(err))
+  //   });
+
     router.use((settings, request, response, next) => {
-      console.log('SETTINGS', settings);
       if (settings.middlewares !== undefined && settings.middlewares.length !== 0) {
-        settings.middlewares.forEach((middleware) => {
-          const mwModule = new middleware(this.di); // eslint-disable-line
-          console.log('MODULE', mwModule);
-          mwModule.Init(); // eslint-disable-line
-        });
+        Promise.all(settings.middlewares.map(Middleware => new Middleware(this.di).Init(
+          settings, request, response, next
+        )))
+        .catch(err => console.log('ERROR IN MW HANDLING', err));
       }
-      next(settings);
     });
+
+    // router.use((settings, request, response, next) => { // eslint-disable-line
+    //   new settings.middlewares[0](this.di).Init(settings, request, response, next);
+    //   // next();
+    // });
+
 
     router.use((settings, request, response, next) => { // eslint-disable-line
       console.log('HANDLE MID');
-      // console.log('SET', settings);
+      console.log('SET', settings);
       if (settings.handler !== undefined) {
         this.handle(settings.handler, settings.method, request, response);
         // next();

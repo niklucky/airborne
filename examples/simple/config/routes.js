@@ -20,8 +20,7 @@ const routes = {
   '/orders/:orderId/': {
     get: {
       handler: OrdersController,
-      method: 'get',
-      middleware: [AuthMiddleware]
+      method: 'get'
     }
   },
   '/users/': {
