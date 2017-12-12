@@ -11,7 +11,8 @@ class OrdersController extends BaseController {
         userId: { type: 'number' }
       },
       get: {
-        orderId: { type: 'string' },
+        orderId: { type: 'number' },
+        userId: { type: 'number' }
       },
       load: {
         orderId: { type: 'number' },

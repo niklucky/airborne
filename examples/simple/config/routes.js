@@ -8,7 +8,7 @@ const routes = {
     get: {
       handler: OrdersController,
       method: 'load',
-      middleware: [AuthMiddleware, SimpleMiddleware]
+      middleware: [SimpleMiddleware]
     },
     put: {
       handler: OrdersController,
@@ -16,7 +16,14 @@ const routes = {
       middleware: [AuthMiddleware, SimpleMiddleware]
     }
   },
-  '/orders/:orderId': {
+  '/orders/:orderId/': {
+    get: {
+      handler: OrdersController,
+      method: 'get',
+      middleware: [SimpleMiddleware, AuthMiddleware]
+    }
+  },
+  '/orders/:orderId/:userId/': {
     get: {
       handler: OrdersController,
       method: 'get',

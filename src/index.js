@@ -1,12 +1,10 @@
 import DI from './core/di';
 import Validator from './core/validator';
-// import AuthMiddleware from './core/auth.middleware';
 import Responder from './core/responder';
 
 const lib = require('./lib');
 const express = require('express');
 const bodyParser = require('body-parser');
-// const util = require('util');
 
 const defaultConfig = require('./core/config.js');
 const DbAdapter = require('./core/db.adapter.js');
@@ -77,7 +75,6 @@ class Airborne {
       this.di.set('request', req);
       this.di.set('response', res);
       this.di.set('method', req.method);
-      console.log('INITIALIZED');
       this.responder = new Responder(this.di.get('config'));
       this.di.set('responder', this.responder);
       next();
@@ -86,15 +83,13 @@ class Airborne {
     for (let route in routes) { // eslint-disable-line
       for (let method in routes[route]) { // eslint-disable-line
         router[method](route, (request, response, next) => { // eslint-disable-line
-          console.log('PARAMS BEFORE', request.params);
-
           const routeSettings = routes[route][method];
           const handlerMethod = routeSettings.method;
           const originalRoute = route;
           const routeHandler = routeSettings.handler;
+          const params = request.params;
           let middlewares = null;
           if (routeSettings.middleware !== undefined && routeSettings.middleware.length !== 0) {
-            console.log(routeSettings.middleware);
             middlewares = routeSettings.middleware;
           }
           console.log('MID', middlewares);
@@ -105,13 +100,11 @@ class Airborne {
           if (routeSettings.handler === undefined) {
             throw new Error('[Fatal] routes config: handler method required');
           }
-
-          console.log('PARAMS AFTER', request.params);
           next({
             route: originalRoute,
             method: handlerMethod,
             handler: routeHandler,
-            params: request.params,
+            params: params,
             middlewares: middlewares
           });
         });
@@ -122,14 +115,13 @@ class Airborne {
       console.log('PARAMS FROM MW HANDLING', request.params);
       if (settings.middlewares !== undefined && settings.middlewares !== null) {
         Promise.all(settings.middlewares.map(Middleware =>
-    new Middleware(this.di).Init( // eslint-disable-line
+          new Middleware(this.di).Init( // eslint-disable-line
           settings, request, response, next
         )))
         .then((res) => {
           if (res.includes(false)) {
             this.responder.setServerResponse(response);
             this.responder.sendError('[Error] while handling middleware', 500);
-            // throw new Error('ERROR WHILE HANDLING MIDDLEWARE');
           } else {
             next(settings);
           }
@@ -145,11 +137,8 @@ class Airborne {
       console.log('HANDLE MID');
       console.log('SET', settings);
       if (settings.handler !== undefined) {
-        console.log('PARAMS FROM ROUTER USE', request.params);
         this.handle(settings.handler, settings.method, request, response, settings.params);
-        // next();
       }
-      // next();
     });
 
     console.log('Before app.use()');
@@ -168,7 +157,6 @@ class Airborne {
   }
 
   handle(Controller, method, request, response, params) {
-    console.log('PARAMS', request.params);
     if (request.headers['content-type'] !== undefined && request.headers['content-type']
     .indexOf('multipart/form-data') !== -1) {
       return this.handleMultipart(Controller, method, request, response, params);
@@ -177,7 +165,7 @@ class Airborne {
     }
   }
 
-  handleMultipart(Controller, method, request, response) {
+  handleMultipart(Controller, method, request, response, params) {
     try {
       if (this.multipartParser === null) {
         require.resolve('formidable');
@@ -187,7 +175,7 @@ class Airborne {
       form.parse(request, (err, fields, files) => {
         const req = request;
         req.body = this.mergeFilesInFields(request.body, fields, files);
-        return this.handleSimple(Controller, method, request, response);
+        return this.handleSimple(Controller, method, request, response, params);
       });
     } catch (err) {
       console.error('formidable module is not found. It is used to parse multipart form-data. Install: npm i --save formidable');
@@ -197,27 +185,21 @@ class Airborne {
   }
 
   handleSimple(Controller, method, request, response, params) {
-    console.log('PARAMS IN HANDLESIMPLE', params);
-    console.log('In handleSimple');
     if (typeof request !== 'object') {
       throw new Error('[Fatal] Application handle: request is not an object');
     }
     if (typeof response !== 'object') {
       throw new Error('[Fatal] Application handle: response is not an object');
     }
-    console.log('Before ctrl initializing');
-    // console.log(Controller);
+
     const ctrl = new Controller(this.di);
-    // console.log('Controller', ctrl);
-    // console.log('INSIDE REQ', request.params);
-    // console.log('DI REQ', this.di.get('request').params);
     return ctrl.validate(method, params)
       .then((data) => {
-        // console.log('res from handle', data);
         this.createResponse(data, response);
       })
       .catch((err) => {
-        this.createErrorResponse(err, response);
+        const responder = this.di.get('responder').setServerResponse(response);
+        responder.sendError(`[Error] Controller Initializing: ${err}`, 500);
       });
   }
 
@@ -227,11 +209,6 @@ class Airborne {
     responder.send(data);
   }
 
-  createErrorResponse(err, response) {
-    const responder = this.di.get('responder');
-    responder.setServerResponse(response);
-    responder.sendError('ERROR', 404);
-  }
   mergeFilesInFields(body, fields, files) { // eslint-disable-line
     const newBody = body;
     for (const name in files) { // eslint-disable-line
