@@ -20,7 +20,6 @@ class AuthMiddleware {
       .then((authData) => {
         if (!authData.status) {
           this.responder.sendError('Not authorized', 401);
-          // throw new Error();
           return false;
         } else { // eslint-disable-line
           console.log('AUTH MID');
@@ -32,9 +31,6 @@ class AuthMiddleware {
       // .then(() => next())
       .catch((authData) => {
         console.log('AUTHDATA ++++++++++++++', authData);
-        // const response = this.di.get('response');
-        // response.send('ERROR');
-        // throw new Error('Auth error');
         this.responder.sendError(authData, 401);
         return false;
       });

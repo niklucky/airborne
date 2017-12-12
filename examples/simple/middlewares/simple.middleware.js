@@ -13,10 +13,3 @@ class SimpleMiddleware {
 }
 
 module.exports = SimpleMiddleware;
-
-// module.exports = function Init(settings, req, res, next) {
-//   console.log('====================');
-//   console.log('SIMPLE MIDDLEWARE');
-//   console.log('====================');
-//   next(settings);
-// };

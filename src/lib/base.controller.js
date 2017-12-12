@@ -18,6 +18,7 @@ class BaseController {
     if (typeof method !== 'string') {
       throw new Error('[Fatal] BaseController.validate(): Controller method is not specified');
     }
+    console.log('validate params', params);
     const requestData = this.mergeRequestData(params);
     const Validator = this.di.get('validator');
     if (Validator) {
@@ -72,7 +73,6 @@ class BaseController {
   }
 
   load(params) {
-    console.log('load base controller', params);
     return this.service.load(params);
   }
 
@@ -81,7 +81,6 @@ class BaseController {
   }
 
   create(params, payload) {
-    console.log('from create', payload);
     return this.service.create(params, payload);
   }
 

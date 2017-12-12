@@ -3,7 +3,6 @@ const UsersController = require('../controllers/users.controller');
 const AuthMiddleware = require('../middlewares/auth.middleware');
 const SimpleMiddleware = require('../middlewares/simple.middleware');
 
-
 const routes = {
   '/orders/': {
     get: {
@@ -17,12 +16,11 @@ const routes = {
       middleware: [AuthMiddleware, SimpleMiddleware]
     }
   },
-  '/orders/:orderId/': {
+  '/orders/:orderId': {
     get: {
       handler: OrdersController,
       method: 'get',
-      middleware: [SimpleMiddleware]
-      
+      middleware: [SimpleMiddleware, AuthMiddleware]
     }
   },
   '/users/': {
@@ -35,7 +33,7 @@ const routes = {
       method: 'create'
     }
   },
-  '/users/:userId/': {
+  '/users/:userId': {
     get: {
       handler: UsersController,
       method: 'get'

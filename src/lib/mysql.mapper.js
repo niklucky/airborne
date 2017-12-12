@@ -34,6 +34,7 @@ class MySQLMapper extends BaseMapper {
           this.queryBuilder.where(params);
         }
         const query = this.queryBuilder.build();
+        console.log(query);
         return this.db.query(query, (error, rows, fields) => {
           if (error) {
             reject(error, fields);

@@ -14,8 +14,7 @@ class UsersController extends BaseController {
         age: { type: 'number' }
       },
       get: {
-        userId: { type: 'number' },
-        eMail: { type: 'string' }
+        userId: { type: 'number' }
       },
       load: {
         userId: { type: 'number' },

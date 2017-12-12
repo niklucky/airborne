@@ -80,19 +80,14 @@ class Airborne {
       console.log('INITIALIZED');
       this.responder = new Responder(this.di.get('config'));
       this.di.set('responder', this.responder);
-
-      next();
-    });
-    this.express.use((req, res, next) => {
-      console.log('ROUTE', this.di.get('request').originalUrl.match(/[a-z]*/ig));
-      console.log('URL', this.di.get('request').url);
-      console.log('PATH', this.di.get('request').path);
       next();
     });
 
     for (let route in routes) { // eslint-disable-line
       for (let method in routes[route]) { // eslint-disable-line
         router[method](route, (request, response, next) => { // eslint-disable-line
+          console.log('PARAMS BEFORE', request.params);
+
           const routeSettings = routes[route][method];
           const handlerMethod = routeSettings.method;
           const originalRoute = route;
@@ -111,10 +106,12 @@ class Airborne {
             throw new Error('[Fatal] routes config: handler method required');
           }
 
-          return next({
+          console.log('PARAMS AFTER', request.params);
+          next({
             route: originalRoute,
             method: handlerMethod,
             handler: routeHandler,
+            params: request.params,
             middlewares: middlewares
           });
         });
@@ -122,13 +119,17 @@ class Airborne {
     }
 
     router.use((settings, request, response, next) => {
+      console.log('PARAMS FROM MW HANDLING', request.params);
       if (settings.middlewares !== undefined && settings.middlewares !== null) {
-        Promise.all(settings.middlewares.map(Middleware => new Middleware(this.di).Init( // eslint-disable-line
+        Promise.all(settings.middlewares.map(Middleware =>
+    new Middleware(this.di).Init( // eslint-disable-line
           settings, request, response, next
         )))
         .then((res) => {
           if (res.includes(false)) {
-            throw new Error('ERROR WHILE HANDLING MIDDLEWARE');
+            this.responder.setServerResponse(response);
+            this.responder.sendError('[Error] while handling middleware', 500);
+            // throw new Error('ERROR WHILE HANDLING MIDDLEWARE');
           } else {
             next(settings);
           }
@@ -139,16 +140,17 @@ class Airborne {
       }
     });
 
+
     router.use((settings, request, response, next) => { // eslint-disable-line
       console.log('HANDLE MID');
       console.log('SET', settings);
       if (settings.handler !== undefined) {
-        this.handle(settings.handler, settings.method, request, response);
+        console.log('PARAMS FROM ROUTER USE', request.params);
+        this.handle(settings.handler, settings.method, request, response, settings.params);
         // next();
       }
       // next();
     });
-
 
     console.log('Before app.use()');
     this.express.use('/', router);
@@ -165,13 +167,13 @@ class Airborne {
       });
   }
 
-  handle(Controller, method, request, response) {
-    console.log('In handle');
+  handle(Controller, method, request, response, params) {
+    console.log('PARAMS', request.params);
     if (request.headers['content-type'] !== undefined && request.headers['content-type']
     .indexOf('multipart/form-data') !== -1) {
-      return this.handleMultipart(Controller, method, request, response);
+      return this.handleMultipart(Controller, method, request, response, params);
     } else { // eslint-disable-line
-      return this.handleSimple(Controller, method, request, response);
+      return this.handleSimple(Controller, method, request, response, params);
     }
   }
 
@@ -194,7 +196,8 @@ class Airborne {
     }
   }
 
-  handleSimple(Controller, method, request, response) {
+  handleSimple(Controller, method, request, response, params) {
+    console.log('PARAMS IN HANDLESIMPLE', params);
     console.log('In handleSimple');
     if (typeof request !== 'object') {
       throw new Error('[Fatal] Application handle: request is not an object');
@@ -205,8 +208,10 @@ class Airborne {
     console.log('Before ctrl initializing');
     // console.log(Controller);
     const ctrl = new Controller(this.di);
-    console.log('Controller', ctrl);
-    return ctrl.validate(method, request.params)
+    // console.log('Controller', ctrl);
+    // console.log('INSIDE REQ', request.params);
+    // console.log('DI REQ', this.di.get('request').params);
+    return ctrl.validate(method, params)
       .then((data) => {
         // console.log('res from handle', data);
         this.createResponse(data, response);
