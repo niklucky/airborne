@@ -1,5 +1,3 @@
-// const Responder = require('../'); // eslint-disable-line
-
 class AuthMiddleware {
   constructor(di) {
     this.di = di;
