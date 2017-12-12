@@ -1,4 +1,4 @@
-const { BaseService } = require('../../../dist');
+const { BaseService } = require('airborne-base');
 const OrdersMapper = require('../mappers/orders.mapper.js');
 
 class OrdersService extends BaseService {

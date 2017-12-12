@@ -5,33 +5,26 @@ const SimpleMiddleware = require('../middlewares/simple.middleware');
 const LogMiddleware = require('../middlewares/log.middleware');
 
 const routes = {
-  '/orders/': {
+  '/orders/:orderId?': {
     get: {
       handler: OrdersController,
       method: 'load',
       middleware: [LogMiddleware, SimpleMiddleware]
     },
-    put: {
+    post: {
       handler: OrdersController,
       method: 'create',
       middleware: [LogMiddleware, AuthMiddleware, SimpleMiddleware]
     }
   },
-  '/orders/:orderId/': {
+  '/orders/:orderId?/users/:userId?': {
     get: {
       handler: OrdersController,
-      method: 'get',
+      method: 'load',
       middleware: [LogMiddleware, SimpleMiddleware, AuthMiddleware]
     }
   },
-  '/orders/:orderId/:userId/': {
-    get: {
-      handler: OrdersController,
-      method: 'get',
-      middleware: [LogMiddleware, SimpleMiddleware, AuthMiddleware]
-    }
-  },
-  '/users/': {
+  '/users/:userId?': {
     get: {
       handler: UsersController,
       method: 'load'
@@ -40,13 +33,10 @@ const routes = {
       handler: UsersController,
       method: 'create'
     }
-  },
-  '/users/:userId': {
-    get: {
-      handler: UsersController,
-      method: 'get'
-    }
   }
+  /* Routes */
+
+  /* // Routes */
 };
 
 module.exports = routes;

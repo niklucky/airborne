@@ -7,7 +7,7 @@ const controllers = require('./controllers');
 const modules = require('./config/modules');
 const services = require('./config/services');
 
-const app = new Airborne.Engine(config);
+const app = new Airborne(config);
 app.routes(routes)
     .services(services)
     .modules(modules)

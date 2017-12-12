@@ -2,7 +2,6 @@ import DI from './core/di';
 import Validator from './core/validator';
 import Responder from './core/responder';
 
-const lib = require('./lib');
 const express = require('express');
 const bodyParser = require('body-parser');
 
@@ -220,10 +219,6 @@ class Airborne {
     }
     return newBody;
   }
-  setInstance(dispatcher) { // eslint-disable-line class-methods-use-this
-    this.instances.push(dispatcher);
-  }
 }
-lib.Engine = Airborne;
 
-export default lib;
+export default Airborne;
