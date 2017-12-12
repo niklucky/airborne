@@ -138,8 +138,14 @@ class Airborne {
     });
 
     this.express.use('/', router);
-    this.express.use(function (request, response, next) { // eslint-disable-line
-      response.send(404, { status: 404, message: 'Route not found' });
+    this.express.use((request, response, next) => { // eslint-disable-line
+      const responder = this.di.get('responder').setServerResponse(response);
+      responder.sendError('Route not found', 404);
+    });
+
+    this.express.use((err, request, response, next) => { // eslint-disable-line
+      const responder = this.di.get('responder').setServerResponse(response);
+      responder.sendError({ message: 'Error', stack: err }, 500);
     });
 
     /* istanbul ignore next */
