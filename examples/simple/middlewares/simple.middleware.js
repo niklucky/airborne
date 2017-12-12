@@ -1,14 +1,15 @@
 class SimpleMiddleware {
   constructor(di) {
     this.di = di;
-    // this.responder = this.di.get('responder');
-    // this.responder.setServerResponse(this.di.get('response'));
   }
   Init() {
-    console.log('====================');
-    console.log('SIMPLE MIDDLEWARE');
-    console.log('====================');
-    return true;
+    try {
+      console.log('[SIMPLE MIDDLEWARE]');
+      return true;
+    } catch (err) {
+      console.log(err);
+      return false;
+    }
   }
 }
 

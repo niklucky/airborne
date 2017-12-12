@@ -7,7 +7,7 @@ class AuthMiddleware {
     this.responder.setServerResponse(this.di.get('response'));
   }
   Init() {
-    console.log('HERE');
+    console.log('[AUTH MIDDLEWARE]');
     if (this.di.get('services') === undefined) {
       throw new Error('[Fatal] AUTH ERROR: services that contains Authorization service are not provided');
     }
@@ -22,15 +22,12 @@ class AuthMiddleware {
           this.responder.sendError('Not authorized', 401);
           return false;
         } else { // eslint-disable-line
-          console.log('AUTH MID');
           this.authData = authData;
           this.di.set('authData', authData);
           return true;
         }
       })
-      // .then(() => next())
       .catch((authData) => {
-        console.log('AUTHDATA ++++++++++++++', authData);
         this.responder.sendError(authData, 401);
         return false;
       });

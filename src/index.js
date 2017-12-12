@@ -12,7 +12,7 @@ const DbAdapter = require('./core/db.adapter.js');
 class Airborne {
   constructor(config) {
     if (typeof config !== 'object') {
-      throw new Error('Fatal: Engine error: config is not an object. Failed to start');
+      throw new Error('[Fatal] Engine error: config is not an object. Failed to start');
     }
     this.instances = [];
     this.di = new DI();
@@ -92,7 +92,6 @@ class Airborne {
           if (routeSettings.middleware !== undefined && routeSettings.middleware.length !== 0) {
             middlewares = routeSettings.middleware;
           }
-          console.log('MID', middlewares);
 
           if (routeSettings.method === undefined) {
             routeSettings.method = 'get';
@@ -112,7 +111,6 @@ class Airborne {
     }
 
     router.use((settings, request, response, next) => {
-      console.log('PARAMS FROM MW HANDLING', request.params);
       if (settings.middlewares !== undefined && settings.middlewares !== null) {
         Promise.all(settings.middlewares.map(Middleware =>
           new Middleware(this.di).Init( // eslint-disable-line
@@ -134,14 +132,11 @@ class Airborne {
 
 
     router.use((settings, request, response, next) => { // eslint-disable-line
-      console.log('HANDLE MID');
-      console.log('SET', settings);
       if (settings.handler !== undefined) {
         this.handle(settings.handler, settings.method, request, response, settings.params);
       }
     });
 
-    console.log('Before app.use()');
     this.express.use('/', router);
     this.express.use(function (request, response, next) { // eslint-disable-line
       response.send(404, { status: 404, message: 'Route not found' });

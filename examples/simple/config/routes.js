@@ -2,32 +2,33 @@ const OrdersController = require('../controllers/orders.controller');
 const UsersController = require('../controllers/users.controller');
 const AuthMiddleware = require('../middlewares/auth.middleware');
 const SimpleMiddleware = require('../middlewares/simple.middleware');
+const LogMiddleware = require('../middlewares/log.middleware');
 
 const routes = {
   '/orders/': {
     get: {
       handler: OrdersController,
       method: 'load',
-      middleware: [SimpleMiddleware]
+      middleware: [LogMiddleware, SimpleMiddleware]
     },
     put: {
       handler: OrdersController,
       method: 'create',
-      middleware: [AuthMiddleware, SimpleMiddleware]
+      middleware: [LogMiddleware, AuthMiddleware, SimpleMiddleware]
     }
   },
   '/orders/:orderId/': {
     get: {
       handler: OrdersController,
       method: 'get',
-      middleware: [SimpleMiddleware, AuthMiddleware]
+      middleware: [LogMiddleware, SimpleMiddleware, AuthMiddleware]
     }
   },
   '/orders/:orderId/:userId/': {
     get: {
       handler: OrdersController,
       method: 'get',
-      middleware: [SimpleMiddleware, AuthMiddleware]
+      middleware: [LogMiddleware, SimpleMiddleware, AuthMiddleware]
     }
   },
   '/users/': {
