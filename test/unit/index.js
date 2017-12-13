@@ -30,7 +30,7 @@ const configDb = {
       port: 3306,
       driver: 'mysql',
       password: '12345',
-      database: 'Mindset'
+      database: 'Airborne_test'
     }
   }
 };
@@ -57,13 +57,13 @@ let app;
 describe('Airborne application', () => {
   describe('Invalid params', () => {
     it('All params are undefined', () => {
-      const app = () => new Airborne.Engine();
+      app = () => new Airborne();
       expect(app).to.throw(Error, /config is not an object. Failed to start/);
     });
   });
   describe('Simple config', () => {
     beforeEach(() => {
-      app = new Airborne.Engine(config);
+      app = new Airborne(config);
     });
     it('No database, simple config', () => {
       expect(app).to.have.property('di');
@@ -108,15 +108,10 @@ describe('Airborne application', () => {
       const object = app.di.get('validator');
       expect(object).to.be.an('undefined');
     });
-    it('setInstance', () => {
-      app.setInstance({});
-      expect(app).to.have.property('instances');
-      expect(app.instances).to.be.an('array');
-    });
   });
   describe('With databases', () => {
     it('MySQL database', () => {
-      const app = new Airborne.Engine(configDb);
+      const app = new Airborne(configDb);
       expect(app).to.have.property('di');
       const db = app.di.get('db');
       expect(db.connections).to.have.property('mysql');
@@ -125,40 +120,46 @@ describe('Airborne application', () => {
   });
   describe('Start', () => {
     it('start', () => {
-      const app = new Airborne.Engine(configDb);
+      const app = new Airborne(configDb);
       app.start();
       expect(app).to.have.property('express');
     });
     it('handle with invalid params', () => {
-      const app = new Airborne.Engine(configDb);
-      const fn = () => app.handle();
-      expect(fn).to.throw(Error, /request is not an object/);
+      const app = new Airborne(configDb);
+      const fn = () => app.handleSimple(
+        {}, {}, {}, {}, undefined
+      );
+      expect(fn).to.throw(Error, /params is not an object/);
     });
     it('handle with invalid response', () => {
-      const app = new Airborne.Engine(configDb);
-      const fn = () => app.handle({});
+      const app = new Airborne(configDb);
+      const fn = () => app.handleSimple(
+        {}, {}, {}, undefined, {}
+      );
       expect(fn).to.throw(Error, /response is not an object/);
     });
     it('handle with invalid request', () => {
-      const app = new Airborne.Engine(configDb);
-      const fn = () => app.handle(undefined, {});
+      const app = new Airborne(configDb);
+      const fn = () => app.handleSimple(
+        {}, {}, undefined, {}, {}
+      );
       expect(fn).to.throw(Error, /request is not an object/);
     });
     it('handle', () => {
-      const app = new Airborne.Engine(configDb);
+      const app = new Airborne(configDb);
       app.controllers(controllers);
       app.handle(request, response);
       expect(app.setInstance).to.be.called;
     });
 
     it('handleMultipart with not available formidable', () => {
-      const app = new Airborne.Engine(configDb);
+      const app = new Airborne(configDb);
       app.controllers(controllers);
       const result = app.handleMultipart(request, response);
       expect(response.send).to.be.called;
     });
     it('handleMultipart', () => {
-      const app = new Airborne.Engine(configDb);
+      const app = new Airborne(configDb);
       app.controllers(controllers);
       app.multipartParser = formidableMock;
       const result = app.handleMultipart(request, response);

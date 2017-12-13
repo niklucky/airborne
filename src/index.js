@@ -108,22 +108,6 @@ class Airborne {
       }
     }
 
-    // router.use((settings, request, response, next) => {
-    //   try {
-    //     if (settings.middlewares !== undefined && settings.middlewares !== null) {
-    //       Promise.all(settings.middlewares.map(Middleware =>
-    //         new Middleware(this.di).init()))
-    //           .then(() => {
-    //             next(settings);
-    //           });
-    //     } else {
-    //       next(settings);
-    //     }
-    //   } catch (err) {
-    //     throw new Error('ERROR');
-    //   }
-    // });
-
     router.use((settings, request, response, next) => {
       try {
         if (settings.middlewares !== undefined && settings.middlewares !== null) {
@@ -137,7 +121,6 @@ class Airborne {
         throw Error(err);
       }
     });
-
 
     router.use((settings, request, response, next) => { // eslint-disable-line
       if (settings.handler !== undefined) {
@@ -199,6 +182,9 @@ class Airborne {
     }
     if (typeof response !== 'object') {
       throw new Error('[Fatal] Application handle: response is not an object');
+    }
+    if (typeof params !== 'object') {
+      throw new Error('[Fatal], Application handle: params is not an object');
     }
 
     const ctrl = new Controller(this.di);
