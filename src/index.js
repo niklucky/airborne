@@ -109,56 +109,34 @@ class Airborne {
     }
 
     // router.use((settings, request, response, next) => {
-    //   if (settings.middlewares !== undefined && settings.middlewares !== null) {
-    //     Promise.all(settings.middlewares.map(Middleware =>
-    //       new Middleware(this.di).Init( // eslint-disable-line
-    //       settings, request, response, next
-    //     )))
-    //     .then((res) => {
-    //       if (res.includes(false)) {
-    //         this.responder.setServerResponse(response);
-    //         this.responder.sendError('[Error] while handling middleware', 500);
-    //       } else {
-    //         next(settings);
-    //       }
+    //   try {
+    //     if (settings.middlewares !== undefined && settings.middlewares !== null) {
+    //       Promise.all(settings.middlewares.map(Middleware =>
+    //         new Middleware(this.di).init()))
+    //           .then(() => {
+    //             next(settings);
+    //           });
+    //     } else {
+    //       next(settings);
     //     }
-    //     );
-    //   } else {
-    //     next(settings);
+    //   } catch (err) {
+    //     throw new Error('ERROR');
     //   }
     // });
 
     router.use((settings, request, response, next) => {
       try {
         if (settings.middlewares !== undefined && settings.middlewares !== null) {
-          Promise.all(settings.middlewares.map(Middleware =>
-            new Middleware(this.di).Init())) // eslint-disable-line
-              .then(() => {
-                next(settings);
-              });
+          settings.middlewares.reduce((promise, Middleware) => promise
+        .then(() => new Middleware(this.di).init()), Promise.resolve())
+          .then(() => next(settings));
         } else {
           next(settings);
         }
       } catch (err) {
-        throw new Error('ERROR');
+        throw Error(err);
       }
     });
-
-    // router.use((settings, request, response, next) => { // eslint-disable-line
-    //   try {
-    //     if (settings.middlewares !== undefined && settings.middlewares !== null) {
-    //       return settings.middlewares.reduce((promise, Middleware) => promise.then(() => {
-    //         new Middleware(this.di).Init(); // eslint-disable-line
-    //       })
-    //       .then(() => next(settings)), Promise.resolve());
-    //     } else { // eslint-disable-line
-    //       next(settings);
-    //     }
-    //   } catch (err) {
-    //     console.log('ERROR', err);
-    //     throw new Error('Error', err);
-    //   }
-    // });
 
 
     router.use((settings, request, response, next) => { // eslint-disable-line

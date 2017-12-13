@@ -4,7 +4,7 @@ class AuthMiddleware {
     this.responder = this.di.get('responder');
     this.responder.setServerResponse(this.di.get('response'));
   }
-  Init() {
+  init() {
     console.log('[AUTH MIDDLEWARE]');
     if (this.di.get('services') === undefined) {
       throw new Error('[Fatal] AUTH ERROR: services that contains Authorization service are not provided');
@@ -18,7 +18,7 @@ class AuthMiddleware {
       .then((authData) => {
         if (!authData.status) {
           this.responder.sendError('Not authorized', 401);
-          throw new Error('Auth error: not authorized');
+          throw Error('Auth error: not authorized');
         } else { // eslint-disable-line
           this.authData = authData;
           this.di.set('authData', authData);
@@ -26,7 +26,7 @@ class AuthMiddleware {
       })
       .catch((authData) => {
         this.responder.sendError(authData, 401);
-        throw new Error(`Auth error: ${authData}`);
+        throw Error(`Auth error: ${authData}`);
       });
   }
 }

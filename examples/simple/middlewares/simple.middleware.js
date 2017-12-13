@@ -2,7 +2,7 @@ class SimpleMiddleware {
   constructor(di) {
     this.di = di;
   }
-  Init() {
+  init() {
     try {
       console.log('[SIMPLE MIDDLEWARE]');
     } catch (err) {
