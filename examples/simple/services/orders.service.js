@@ -6,6 +6,9 @@ class OrdersService extends BaseService {
     super(di);
     this.mapper = new OrdersMapper(di);
   }
+  get(params) {
+    return this.mapper.get(params);
+  }
 }
 
 module.exports = OrdersService;

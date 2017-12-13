@@ -18,16 +18,15 @@ class AuthMiddleware {
       .then((authData) => {
         if (!authData.status) {
           this.responder.sendError('Not authorized', 401);
-          return false;
+          throw new Error('Auth error: not authorized');
         } else { // eslint-disable-line
           this.authData = authData;
           this.di.set('authData', authData);
-          return true;
         }
       })
       .catch((authData) => {
         this.responder.sendError(authData, 401);
-        return false;
+        throw new Error(`Auth error: ${authData}`);
       });
   }
 }

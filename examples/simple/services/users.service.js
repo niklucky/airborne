@@ -6,6 +6,9 @@ class UsersService extends BaseService {
     super(di);
     this.mapper = new UsersMapper(di);
   }
+  get(params) {
+    return this.mapper.get(params);
+  }
 }
 
 module.exports = UsersService;

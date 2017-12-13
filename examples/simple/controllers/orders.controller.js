@@ -10,15 +10,17 @@ class OrdersController extends BaseController {
         orderId: { type: 'number' },
         userId: { type: 'number' }
       },
-      get: {
-        orderId: { type: 'number' },
-        userId: { type: 'number' }
-      },
       load: {
         orderId: { type: 'number' },
         userId: { type: 'number' }
       }
     };
+  }
+  load(params) {
+    if (Object.keys(params).length > 0) {
+      return this.service.get(params);
+    }
+    return this.service.load();
   }
 }
 

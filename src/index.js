@@ -13,7 +13,6 @@ class Airborne {
     if (typeof config !== 'object') {
       throw new Error('[Fatal] Engine error: config is not an object. Failed to start');
     }
-    this.instances = [];
     this.di = new DI();
     this.config = Object.assign({}, defaultConfig, config);
     this.di.set('config', this.config);
@@ -109,30 +108,62 @@ class Airborne {
       }
     }
 
+    // router.use((settings, request, response, next) => {
+    //   if (settings.middlewares !== undefined && settings.middlewares !== null) {
+    //     Promise.all(settings.middlewares.map(Middleware =>
+    //       new Middleware(this.di).Init( // eslint-disable-line
+    //       settings, request, response, next
+    //     )))
+    //     .then((res) => {
+    //       if (res.includes(false)) {
+    //         this.responder.setServerResponse(response);
+    //         this.responder.sendError('[Error] while handling middleware', 500);
+    //       } else {
+    //         next(settings);
+    //       }
+    //     }
+    //     );
+    //   } else {
+    //     next(settings);
+    //   }
+    // });
+
     router.use((settings, request, response, next) => {
-      if (settings.middlewares !== undefined && settings.middlewares !== null) {
-        Promise.all(settings.middlewares.map(Middleware =>
-          new Middleware(this.di).Init( // eslint-disable-line
-          settings, request, response, next
-        )))
-        .then((res) => {
-          if (res.includes(false)) {
-            this.responder.setServerResponse(response);
-            this.responder.sendError('[Error] while handling middleware', 500);
-          } else {
-            next(settings);
-          }
+      try {
+        if (settings.middlewares !== undefined && settings.middlewares !== null) {
+          Promise.all(settings.middlewares.map(Middleware =>
+            new Middleware(this.di).Init())) // eslint-disable-line
+              .then(() => {
+                next(settings);
+              });
+        } else {
+          next(settings);
         }
-        );
-      } else {
-        next(settings);
+      } catch (err) {
+        throw new Error('ERROR');
       }
     });
+
+    // router.use((settings, request, response, next) => { // eslint-disable-line
+    //   try {
+    //     if (settings.middlewares !== undefined && settings.middlewares !== null) {
+    //       return settings.middlewares.reduce((promise, Middleware) => promise.then(() => {
+    //         new Middleware(this.di).Init(); // eslint-disable-line
+    //       })
+    //       .then(() => next(settings)), Promise.resolve());
+    //     } else { // eslint-disable-line
+    //       next(settings);
+    //     }
+    //   } catch (err) {
+    //     console.log('ERROR', err);
+    //     throw new Error('Error', err);
+    //   }
+    // });
 
 
     router.use((settings, request, response, next) => { // eslint-disable-line
       if (settings.handler !== undefined) {
-        this.handle(settings.handler, settings.method, request, response, settings.params);
+        return this.handle(settings.handler, settings.method, request, response, settings.params);
       }
     });
 
@@ -142,9 +173,9 @@ class Airborne {
       responder.sendError('Route not found', 404);
     });
 
-    this.express.use((err, request, response, next) => { // eslint-disable-line
+    this.express.use((error, request, response, next) => { // eslint-disable-line
       const responder = this.di.get('responder').setServerResponse(response);
-      responder.sendError({ message: 'Error', stack: err }, 500);
+      responder.sendError({ message: 'Error', stack: error }, 500);
     });
 
     /* istanbul ignore next */

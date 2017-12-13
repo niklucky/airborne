@@ -13,9 +13,6 @@ class UsersController extends BaseController {
         lastName: { type: 'string' },
         age: { type: 'number' }
       },
-      get: {
-        userId: { type: 'number' }
-      },
       load: {
         userId: { type: 'number' },
         age: { type: 'number' },
@@ -23,6 +20,12 @@ class UsersController extends BaseController {
         lastName: { type: 'string' }
       }
     };
+  }
+  load(params) {
+    if (Object.keys(params).length > 0) {
+      return this.service.get(params);
+    }
+    return this.service.load();
   }
 }
 

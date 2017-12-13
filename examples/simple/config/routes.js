@@ -9,7 +9,7 @@ const routes = {
     get: {
       handler: OrdersController,
       method: 'load',
-      middleware: [LogMiddleware, SimpleMiddleware]
+      middleware: [LogMiddleware, AuthMiddleware, SimpleMiddleware]
     },
     post: {
       handler: OrdersController,

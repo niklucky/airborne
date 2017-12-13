@@ -5,10 +5,9 @@ class SimpleMiddleware {
   Init() {
     try {
       console.log('[SIMPLE MIDDLEWARE]');
-      return true;
     } catch (err) {
       console.log(err);
-      return false;
+      throw new Error(`Error in SimpleMiddleware: ${err}`);
     }
   }
 }

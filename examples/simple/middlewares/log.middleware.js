@@ -8,10 +8,9 @@ class LogMiddleware {
       const method = this.di.get('request').method;
       const currDate = new Date().toISOString();
       console.log(`[LOG] Request for ${method}: ${url} made at ${currDate}`);
-      return true;
     } catch (err) {
       console.log(err);
-      return false;
+      throw new Error(`Error in LogMiddleware: ${err}`);
     }
   }
 }
