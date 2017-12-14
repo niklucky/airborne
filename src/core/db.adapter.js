@@ -6,6 +6,9 @@ class DbAdapter {
   }
 
   init() {
+    if (this.dbConfig instanceof Object === false) {
+      throw new Error('Fatal: DbConfig is not an object');
+    }
     const configArray = Object.keys(this.dbConfig);
     for (let i = 0; i < configArray.length; i += 1) {
       const dbConnectionName = configArray[i];

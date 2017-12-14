@@ -21,7 +21,7 @@ class Authorization {
   }
 }
 
-class IndexController {
+class UsersController {
   constructor(di) {
     this.di = di;
     this.data = {
@@ -104,31 +104,33 @@ const responder = {
   response: responseObj
 };
 
-const dispatcher = {
-  config: {
-    debug: true
-  },
-  request: {
-    url: '/'
-  },
-  response: responseObj,
-  emptyControllers: {}
-};
-
 const routes = {
   '/': {},
-  '/user': { auth: true }
+  '/users': {
+    get: {
+      handler: UsersController,
+      method: 'load',
+      middlewares: []
+    }
+  }
 };
+
+// const routes = {
+//   '/': {},
+//   '/user': { auth: true }
+// };
 const services = {
   Authorization
 };
 const controllers = {
-  IndexController
+  UsersController
 };
+
+const controller = UsersController;
 
 export default {
   controllers,
-  dispatcher,
+  controller,
   responder,
   routes,
   services,

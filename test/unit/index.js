@@ -17,12 +17,12 @@ const formidableMock = {
 
 const config = {
   host: 'localhost',
-  port: 3011,
+  port: 3008,
   debug: true
 };
 const configDb = {
   host: 'localhost',
-  port: 3011,
+  port: 3008,
   debug: false,
   db: {
     mysql: {
@@ -32,15 +32,34 @@ const configDb = {
       password: '12345',
       database: 'Airborne_test'
     }
+  },
+  source: {
+    orders: 'orders',
+    users: 'users'
   }
 };
 
 const routes = {
   '/': { auth: false }
 };
+const params = { 'orderId': 2 };
+// const Controller = mocks.routes['/users'].handler;
+const Controller = mocks.controller;
+const method = mocks.routes['/users'].method;
+const responder = mocks.responder;
+
 const request = {
   url: '/',
-  body: { c: 3 }
+  body: { c: 3 },
+  headers: {}
+};
+
+const multipartRequest = {
+  url: '/',
+  body: { c: 3 },
+  headers: {
+    'Content-Type': 'multipart/form-data'
+  }
 };
 const response = {
   send: () => {
@@ -81,7 +100,7 @@ describe('Airborne application', () => {
     it('controllers init', () => {
       app.controllers({});
       expect(app).to.have.property('di');
-      const controllers = app.di.get('controllers')
+      const controllers = app.di.get('controllers');
       expect(controllers).to.be.an('object');
     });
     it('modules init', () => {
@@ -127,43 +146,95 @@ describe('Airborne application', () => {
     it('handle with invalid params', () => {
       const app = new Airborne(configDb);
       const fn = () => app.handleSimple(
-        {}, {}, {}, {}, undefined
+        Controller, method, request, response, undefined
       );
       expect(fn).to.throw(Error, /params is not an object/);
     });
     it('handle with invalid response', () => {
       const app = new Airborne(configDb);
       const fn = () => app.handleSimple(
-        {}, {}, {}, undefined, {}
+        Controller, method, request, undefined, params
       );
       expect(fn).to.throw(Error, /response is not an object/);
     });
     it('handle with invalid request', () => {
       const app = new Airborne(configDb);
       const fn = () => app.handleSimple(
-        {}, {}, undefined, {}, {}
+        Controller, method, undefined, response, params
       );
       expect(fn).to.throw(Error, /request is not an object/);
     });
-    it('handle', () => {
+    it('handleSimple', () => {
       const app = new Airborne(configDb);
-      app.controllers(controllers);
-      app.handle(request, response);
-      expect(app.setInstance).to.be.called;
-    });
-
-    it('handleMultipart with not available formidable', () => {
-      const app = new Airborne(configDb);
-      app.controllers(controllers);
-      const result = app.handleMultipart(request, response);
-      expect(response.send).to.be.called;
+      app.multipartParser = formidableMock;
+      const fn = () => app.handle(
+        Controller, method, request, response, params
+      );
+      expect(app.handleSimple).to.be.called;
     });
     it('handleMultipart', () => {
       const app = new Airborne(configDb);
-      app.controllers(controllers);
       app.multipartParser = formidableMock;
-      const result = app.handleMultipart(request, response);
-      expect(response.send).to.be.called;
+      const fn = () => app.handle(
+        Controller, method, multipartRequest, response, params
+      );
+      expect(app.handleMultipart).to.be.called;
+    });
+    it('handleMultipart with not available formidable', () => {
+      const app = new Airborne(configDb);
+      // app.controllers(controllers);
+      const fn = () => app.handleMultipart(
+        Controller, method, multipartRequest, response, {}
+      );
+      expect(fn).to.throw(Error, /formidable module is not found/);
+    });
+    it('handleMultipart calls mergeFilesInFields', () => {
+      const app = new Airborne(configDb);
+      app.multipartParser = formidableMock;
+      const fn = () => app.handleMultipart(
+        Controller, method, multipartRequest, response, params
+      );
+      expect(app.mergeFilesInFields).to.be.called;
+    });
+    it('mergefilesInFields returns Object', () => {
+      const app = new Airborne(configDb);
+      const result = app.mergeFilesInFields({}, {}, {});
+      expect(result).to.be.an('object');
+    });
+    it('handleSimple calls createResponse', () => {
+      const app = new Airborne(config);
+      // app.multipartParser = formidableMock;
+      const fn = () => app.handleSimple(
+        Controller, method, request, response, params
+      );
+      expect(app.createResponse).to.be.called;
+    });
+    describe('Routing', () => {
+      it('start calls handle', () => {
+        const app = new Airborne(configDb);
+        const fn = () => app.start();
+        expect(app.handle).to.be.called;
+      });
+      it('router.use is a function', () => {
+        const app = new Airborne(configDb);
+        const start = () => app.start();
+        const fn = () => {
+          start.router.use();
+        };
+        expect(fn).to.be.an('function');
+      });
+      it('express has request', () => {
+        const app = new Airborne(configDb);
+        app.start();
+        const express = app.express;
+        expect(express).to.have.property('request');
+      });
+      it('express has response', () => {
+        const app = new Airborne(configDb);
+        app.start();
+        const express = app.express;
+        expect(express).to.have.property('response');
+      });
     });
   });
 });

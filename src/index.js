@@ -149,6 +149,7 @@ class Airborne {
   }
 
   handle(Controller, method, request, response, params) {
+    console.log('RESPONDER', this.di.get('responder'));
     if (request.headers['content-type'] !== undefined && request.headers['content-type']
     .indexOf('multipart/form-data') !== -1) {
       return this.handleMultipart(Controller, method, request, response, params);
@@ -158,6 +159,7 @@ class Airborne {
   }
 
   handleMultipart(Controller, method, request, response, params) {
+    console.log('REQUEST In HANDLEMULTIPART', request);
     try {
       if (this.multipartParser === null) {
         require.resolve('formidable');
@@ -170,13 +172,15 @@ class Airborne {
         return this.handleSimple(Controller, method, request, response, params);
       });
     } catch (err) {
-      console.error('formidable module is not found. It is used to parse multipart form-data. Install: npm i --save formidable');
       console.log('e', err);
-      response.send('Error parsing multipart/form-data');
+      // const responder = this.di.get('responder').setServerResponse(response);
+      // responder.sendError({ message: 'Error parsing multipart/form-data', stack: err }, 500);
+      throw Error('formidable module is not found. It is used to parse multipart form-data. Install: npm i --save formidable');
     }
   }
 
   handleSimple(Controller, method, request, response, params) {
+    console.log('CONTROLLER', Controller);
     if (typeof request !== 'object') {
       throw new Error('[Fatal] Application handle: request is not an object');
     }
@@ -190,7 +194,10 @@ class Airborne {
     const ctrl = new Controller(this.di);
     return ctrl.validate(method, params)
       .then((data) => {
-        this.createResponse(data, response);
+        console.log('DATA', data);
+        if (data !== null) {
+          this.createResponse(data, response);
+        }
       })
       .catch((err) => {
         const responder = this.di.get('responder').setServerResponse(response);

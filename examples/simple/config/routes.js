@@ -29,7 +29,7 @@ const routes = {
       handler: UsersController,
       method: 'load'
     },
-    put: {
+    post: {
       handler: UsersController,
       method: 'create'
     }
