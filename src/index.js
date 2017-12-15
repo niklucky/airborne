@@ -65,8 +65,6 @@ class Airborne {
 
     this.express.use(bodyParser.json({ limit: '100mb' }));
     this.express.use(bodyParser.urlencoded({ extended: true, limit: '100mb', parameterLimit: 1000000 }));
-
-    /* istanbul ignore next */
     const routes = this.di.get('routes');
 
     this.express.use((req, res, next) => {
@@ -78,55 +76,9 @@ class Airborne {
       next();
     });
 
-    for (let route in routes) { // eslint-disable-line
-      for (let method in routes[route]) { // eslint-disable-line
-        router[method](route, (request, response, next) => { // eslint-disable-line
-          const routeSettings = routes[route][method];
-          const handlerMethod = routeSettings.method;
-          const originalRoute = route;
-          const routeHandler = routeSettings.handler;
-          const params = request.params;
-          let middlewares = null;
-          if (routeSettings.middleware !== undefined && routeSettings.middleware.length !== 0) {
-            middlewares = routeSettings.middleware;
-          }
-
-          if (routeSettings.method === undefined) {
-            routeSettings.method = 'get';
-          }
-          if (routeSettings.handler === undefined) {
-            throw new Error('[Fatal] routes config: handler method required');
-          }
-          next({
-            route: originalRoute,
-            method: handlerMethod,
-            handler: routeHandler,
-            params: params,
-            middlewares: middlewares
-          });
-        });
-      }
-    }
-
-    router.use((settings, request, response, next) => {
-      try {
-        if (settings.middlewares !== undefined && settings.middlewares !== null) {
-          settings.middlewares.reduce((promise, Middleware) => promise
-        .then(() => new Middleware(this.di).init()), Promise.resolve())
-          .then(() => next(settings));
-        } else {
-          next(settings);
-        }
-      } catch (err) {
-        throw Error(err);
-      }
-    });
-
-    router.use((settings, request, response, next) => { // eslint-disable-line
-      if (settings.handler !== undefined) {
-        return this.handle(settings.handler, settings.method, request, response, settings.params);
-      }
-    });
+    this.routeHandle(router, routes);
+    this.middlewaresHandle(router);
+    this.sendToHandler(router);
 
     this.express.use('/', router);
     this.express.use((request, response, next) => { // eslint-disable-line
@@ -139,7 +91,6 @@ class Airborne {
       responder.sendError({ message: 'Error', stack: error }, 500);
     });
 
-    /* istanbul ignore next */
     const server = this.express.listen(
       this.config.port,
       this.config.host,
@@ -220,6 +171,59 @@ class Airborne {
       newBody[name] = fields[name];
     }
     return newBody;
+  }
+
+  routeHandle(router, routes) { // eslint-disable-line
+    for (let route in routes) { // eslint-disable-line
+      for (let method in routes[route]) { // eslint-disable-line
+        router[method](route, (request, response, next) => { // eslint-disable-line
+          const routeSettings = routes[route][method];
+          const handlerMethod = routeSettings.method;
+          const originalRoute = route;
+          const routeHandler = routeSettings.handler;
+          const params = request.params;
+          let middlewares = null;
+          if (routeSettings.middleware !== undefined && routeSettings.middleware.length !== 0) {
+            middlewares = routeSettings.middleware;
+          }
+          if (routeSettings.method === undefined) {
+            routeSettings.method = 'get';
+          }
+          if (routeSettings.handler === undefined) {
+            throw new Error('[Fatal] routes config: handler method required');
+          }
+          next({
+            route: originalRoute,
+            method: handlerMethod,
+            handler: routeHandler,
+            params: params,
+            middlewares: middlewares
+          });
+        });
+      }
+    }
+  }
+  middlewaresHandle(router) {
+    router.use((settings, request, response, next) => {
+      try {
+        if (settings.middlewares !== undefined && settings.middlewares !== null) {
+          settings.middlewares.reduce((promise, Middleware) => promise
+        .then(() => new Middleware(this.di).init()), Promise.resolve())
+          .then(() => next(settings));
+        } else {
+          next(settings);
+        }
+      } catch (err) {
+        throw Error(err);
+      }
+    });
+  }
+  sendToHandler(router) {
+    router.use((settings, request, response, next) => { // eslint-disable-line
+      if (settings.handler !== undefined) {
+        return this.handle(settings.handler, settings.method, request, response, settings.params);
+      }
+    });
   }
 }
 

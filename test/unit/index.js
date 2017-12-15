@@ -209,32 +209,30 @@ describe('Airborne application', () => {
       );
       expect(app.createResponse).to.be.called;
     });
-    describe('Routing', () => {
-      it('start calls handle', () => {
-        const app = new Airborne(configDb);
-        const fn = () => app.start();
-        expect(app.handle).to.be.called;
-      });
-      it('router.use is a function', () => {
-        const app = new Airborne(configDb);
-        const start = () => app.start();
-        const fn = () => {
-          start.router.use();
-        };
-        expect(fn).to.be.an('function');
-      });
-      it('express has request', () => {
-        const app = new Airborne(configDb);
-        app.start();
-        const express = app.express;
-        expect(express).to.have.property('request');
-      });
-      it('express has response', () => {
-        const app = new Airborne(configDb);
-        app.start();
-        const express = app.express;
-        expect(express).to.have.property('response');
-      });
+    it('start calls handle', () => {
+      const app = new Airborne(configDb);
+      const fn = () => app.start();
+      expect(app.handle).to.be.called;
+    });
+    it('router.use is a function', () => {
+      const app = new Airborne(configDb);
+      const start = () => app.start();
+      const fn = () => {
+        start.router.use();
+      };
+      expect(fn).to.be.an('function');
+    });
+    it('express has request', () => {
+      const app = new Airborne(configDb);
+      app.start();
+      const express = app.express;
+      expect(express).to.have.property('request');
+    });
+    it('express has response', () => {
+      const app = new Airborne(configDb);
+      app.start();
+      const express = app.express;
+      expect(express).to.have.property('response');
     });
   });
 });
