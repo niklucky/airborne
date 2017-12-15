@@ -5,6 +5,11 @@ const SimpleMiddleware = require('../middlewares/simple.middleware');
 const LogMiddleware = require('../middlewares/log.middleware');
 
 const routes = {
+  '/nohandler/': {
+    get: {
+      method: 'load'
+    }
+  },
   '/orders/:orderId?': {
     get: {
       handler: OrdersController,

@@ -42,11 +42,13 @@ const configDb = {
 const routes = {
   '/': { auth: false }
 };
+const routesNoHandler = mocks.routesNoHandler;
 const params = { 'orderId': 2 };
 // const Controller = mocks.routes['/users'].handler;
 const Controller = mocks.controller;
 const method = mocks.routes['/users'].method;
 const responder = mocks.responder;
+const router = mocks.router;
 
 const request = {
   url: '/',
@@ -143,6 +145,13 @@ describe('Airborne application', () => {
       app.start();
       expect(app).to.have.property('express');
     });
+    it('start calls express middlewares methods', () => {
+      const app = new Airborne(configDb);
+      app.start();
+      expect(app.routeHandle).to.be.called;
+      expect(app.middlewaresHandle).to.be.called;
+      expect(app.sendToHandler).to.be.called;
+    });
     it('handle with invalid params', () => {
       const app = new Airborne(configDb);
       const fn = () => app.handleSimple(
@@ -179,14 +188,6 @@ describe('Airborne application', () => {
         Controller, method, multipartRequest, response, params
       );
       expect(app.handleMultipart).to.be.called;
-    });
-    it('handleMultipart with not available formidable', () => {
-      const app = new Airborne(configDb);
-      // app.controllers(controllers);
-      const fn = () => app.handleMultipart(
-        Controller, method, multipartRequest, response, {}
-      );
-      expect(fn).to.throw(Error, /formidable module is not found/);
     });
     it('handleMultipart calls mergeFilesInFields', () => {
       const app = new Airborne(configDb);
@@ -233,6 +234,23 @@ describe('Airborne application', () => {
       app.start();
       const express = app.express;
       expect(express).to.have.property('response');
+    });
+  });
+  describe('Handling methods', () => {
+    it('middlewaresHandle', () => {
+      const app = Airborne;
+      const fn = () => app.middlewaresHandle(router);
+      expect(fn.next).to.be.called;
+    });
+    it('routeHandle()', () => {
+      const app = Airborne;
+      const fn = () => app.routeHandle(routes, router);
+      expect(fn.next).to.be.called;
+    });
+    it('sendToHandler calls handle()', () => {
+      const app = Airborne;
+      const fn = () => app.sendToHandler(router);
+      expect(app.handle).to.be.called;
     });
   });
 });

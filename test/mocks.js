@@ -126,6 +126,19 @@ const controllers = {
   UsersController
 };
 
+const routesNoHandler = {
+  '/orders': {
+    post: {
+      method: 'load'
+    },
+  }
+};
+
+const router = function router(req, res, next) {
+  router.handle(req, res, next);
+};
+
+
 const controller = UsersController;
 
 export default {
@@ -133,6 +146,8 @@ export default {
   controller,
   responder,
   routes,
+  routesNoHandler,
   services,
-  validator
+  validator,
+  router
 };

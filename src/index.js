@@ -62,6 +62,7 @@ class Airborne {
     const router = new RouterObj({
       mergeParams: true
     });
+    console.log('ROUTER', router);
 
     this.express.use(bodyParser.json({ limit: '100mb' }));
     this.express.use(bodyParser.urlencoded({ extended: true, limit: '100mb', parameterLimit: 1000000 }));
@@ -100,7 +101,6 @@ class Airborne {
   }
 
   handle(Controller, method, request, response, params) {
-    console.log('RESPONDER', this.di.get('responder'));
     if (request.headers['content-type'] !== undefined && request.headers['content-type']
     .indexOf('multipart/form-data') !== -1) {
       return this.handleMultipart(Controller, method, request, response, params);
@@ -110,7 +110,6 @@ class Airborne {
   }
 
   handleMultipart(Controller, method, request, response, params) {
-    console.log('REQUEST In HANDLEMULTIPART', request);
     try {
       if (this.multipartParser === null) {
         require.resolve('formidable');
@@ -124,8 +123,8 @@ class Airborne {
       });
     } catch (err) {
       console.log('e', err);
-      // const responder = this.di.get('responder').setServerResponse(response);
-      // responder.sendError({ message: 'Error parsing multipart/form-data', stack: err }, 500);
+      const responder = this.di.get('responder').setServerResponse(response);
+      responder.sendError({ message: 'Error parsing multipart/form-data', stack: err }, 500);
       throw Error('formidable module is not found. It is used to parse multipart form-data. Install: npm i --save formidable');
     }
   }
@@ -174,8 +173,10 @@ class Airborne {
   }
 
   routeHandle(router, routes) { // eslint-disable-line
+    console.log('ROUTERR', router);
     for (let route in routes) { // eslint-disable-line
       for (let method in routes[route]) { // eslint-disable-line
+        console.log('METHOD', method);
         router[method](route, (request, response, next) => { // eslint-disable-line
           const routeSettings = routes[route][method];
           const handlerMethod = routeSettings.method;
@@ -189,8 +190,10 @@ class Airborne {
           if (routeSettings.method === undefined) {
             routeSettings.method = 'get';
           }
-          if (routeSettings.handler === undefined) {
-            throw new Error('[Fatal] routes config: handler method required');
+          if (routeSettings.handler === undefined || routeSettings.handler === null) {
+            const responder = this.di.get('responder').setServerResponse(response);
+            responder.sendError('[Fatal] routes config: handler method required', 500);
+            // throw Error('[Fatal] routes config: handler method required');
           }
           next({
             route: originalRoute,
@@ -203,6 +206,7 @@ class Airborne {
       }
     }
   }
+
   middlewaresHandle(router) {
     router.use((settings, request, response, next) => {
       try {
@@ -218,6 +222,7 @@ class Airborne {
       }
     });
   }
+
   sendToHandler(router) {
     router.use((settings, request, response, next) => { // eslint-disable-line
       if (settings.handler !== undefined) {
