@@ -8,6 +8,9 @@ class OrdersMapper extends MySQLMapper {
     this.db = this.di.get('db').connections.mysql;
     this.Model = Orders;
   }
+  load(params) {
+    console.log(params);
+  }
 }
 
 module.exports = OrdersMapper;

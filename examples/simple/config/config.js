@@ -10,7 +10,7 @@ module.exports = {
       port: 3306,
       user: 'root',
       password: '12345',
-      database: 'Airborne_test',
+      database: 'airborne_test',
       driver: 'mysql',
       charset: 'utf8mb4',
       dateStrings: true

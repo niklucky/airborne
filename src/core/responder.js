@@ -39,7 +39,7 @@ class Responder {
     if (errorData instanceof Error === true) {
       error.message = errorData.message;
       if (this.config.debug === true) {
-        error.stackTrace = errorData.stack;
+        error.stack = errorData.stack;
       }
     } else if (typeof errorData === 'string') {
       error.message = errorData;

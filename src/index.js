@@ -89,7 +89,7 @@ class Airborne {
 
     this.express.use((error, request, response, next) => { // eslint-disable-line
       const responder = this.di.get('responder').setServerResponse(response);
-      responder.sendError({ message: 'Error', stack: error }, 500);
+      responder.sendError(error, 500);
     });
 
     const server = this.express.listen(
