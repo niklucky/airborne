@@ -141,6 +141,7 @@ class Airborne {
       throw new Error('[Fatal], Application handle: params is not an object');
     }
 
+    const responder = this.di.get('responder').setServerResponse(response);
     const ctrl = new Controller(this.di);
     return ctrl.validate(method, params)
       .then((data) => {
@@ -150,8 +151,7 @@ class Airborne {
         }
       })
       .catch((err) => {
-        const responder = this.di.get('responder').setServerResponse(response);
-        responder.sendError(`[Error] Controller Initializing: ${err}`, 500);
+        responder.sendError(err, 500);
       });
   }
 
