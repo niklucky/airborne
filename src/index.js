@@ -129,30 +129,29 @@ class Airborne {
     }
   }
 
-  handleSimple(Controller, method, request, response, params) {
-    console.log('CONTROLLER', Controller);
-    if (typeof request !== 'object') {
-      throw new Error('[Fatal] Application handle: request is not an object');
+  async handleSimple(Controller, method, request, response, params) {
+    try {
+      if (typeof request !== 'object') {
+        throw new Error('[Fatal] Application handle: request is not an object');
+      }
+      if (typeof response !== 'object') {
+        throw new Error('[Fatal] Application handle: response is not an object');
+      }
+      if (typeof params !== 'object') {
+        throw new Error('[Fatal], Application handle: params is not an object');
+      }
+  
+      const responder = this.di.get('responder').setServerResponse(response);
+      const ctrl = new Controller(this.di);
+      const validatedData = await ctrl.validate(method, params);
+      if (validatedData !== null) {
+        return this.createResponse(validatedData, response);
+      }
+      return responder.sendError('No data');
+    } catch (err) {
+      console.log(err);
+      return err;
     }
-    if (typeof response !== 'object') {
-      throw new Error('[Fatal] Application handle: response is not an object');
-    }
-    if (typeof params !== 'object') {
-      throw new Error('[Fatal], Application handle: params is not an object');
-    }
-
-    const responder = this.di.get('responder').setServerResponse(response);
-    const ctrl = new Controller(this.di);
-    return ctrl.validate(method, params)
-      .then((data) => {
-        console.log('DATA', data);
-        if (data !== null) {
-          this.createResponse(data, response);
-        }
-      })
-      .catch((err) => {
-        responder.sendError(err, 500);
-      });
   }
 
   createResponse(data, response) {
