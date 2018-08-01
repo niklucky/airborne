@@ -73,17 +73,27 @@ class DbAdapter {
     conn.on('connect', () => {
       console.log('Connected');
     });
-    conn.ping((error) => {
-      if (error) {
-        console.log('Server ping error, reconnecting: ', error.code);
-        // conn.end();
-        setTimeout(() => {
-          this.initMySQL(name, connection);
-        }, 1000);
-      }
-    });
+
+    // this.ping(() => {
+    //   conn.ping((error) => {
+    //     if (error) {
+    //       console.log('Server ping error, reconnecting: ', error.code);
+    //       // conn.end();
+    //       setTimeout(() => {
+    //         this.initMySQL(name, connection);
+    //       }, 1000);
+    //     }
+    //   });
+    // });
     this.connections[name] = conn;
   }
+  // ping(cb) { // eslint-disable-line
+  //   setTimeout(() => {
+  //     console.log('Server ping...');
+  //     cb();
+  //     this.ping(cb);
+  //   }, 5000);
+  // }
 }
 
 module.exports = DbAdapter;
