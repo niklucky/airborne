@@ -3,6 +3,7 @@ class DbAdapter {
     this.dbConfig = dbConfig;
     this.connections = {};
     this.init();
+    this.isPingActivated = false;
   }
 
   init() {
@@ -67,33 +68,26 @@ class DbAdapter {
     conn.on('error', (err) => {
       console.log('Connection down. Reconnecting...', err);
       setTimeout(() => {
+        conn.destroy();
         this.initMySQL(name, connection);
       }, 1000);
     });
     conn.on('connect', () => {
+      if (!this.isPingActivated) {
+        this.ping(conn, name);
+      }
+      console.log(this.connections);
       console.log('Connected');
     });
-
-    // this.ping(() => {
-    //   conn.ping((error) => {
-    //     if (error) {
-    //       console.log('Server ping error, reconnecting: ', error.code);
-    //       // conn.end();
-    //       setTimeout(() => {
-    //         this.initMySQL(name, connection);
-    //       }, 1000);
-    //     }
-    //   });
-    // });
     this.connections[name] = conn;
   }
-  // ping(cb) { // eslint-disable-line
-  //   setTimeout(() => {
-  //     console.log('Server ping...');
-  //     cb();
-  //     this.ping(cb);
-  //   }, 5000);
-  // }
+  ping(connection, name) { //eslint-disable-line
+    this.isPingActivated = true;
+    connection.ping();
+    setTimeout(() => {
+      this.ping(connection, name);
+    }, 10000);
+  }
 }
 
 module.exports = DbAdapter;
