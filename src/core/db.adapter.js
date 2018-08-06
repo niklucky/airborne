@@ -3,6 +3,7 @@ class DbAdapter {
     this.dbConfig = dbConfig;
     this.connections = {};
     this.init();
+    this.pingFlag = false;
   }
 
   init() {
@@ -67,14 +68,25 @@ class DbAdapter {
     conn.on('error', (err) => {
       console.log('Connection down. Reconnecting...', err);
       setTimeout(() => {
+        conn.destroy();
         this.initMySQL(name, connection);
       }, 1000);
     });
     conn.on('connect', () => {
+      if (!this.pingFlag) {
+        this.ping(conn, name);
+      }
+      console.log(this.connections);
       console.log('Connected');
     });
-
     this.connections[name] = conn;
+  }
+  ping(connection, name) { //eslint-disable-line
+    this.pingFlag = true;
+    connection.ping();
+    setTimeout(() => {
+      this.ping(connection, name);
+    }, 1000);
   }
 }
 
