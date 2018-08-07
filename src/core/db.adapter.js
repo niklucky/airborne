@@ -74,19 +74,23 @@ class DbAdapter {
     });
     conn.on('connect', () => {
       if (!this.isPingActivated) {
-        this.ping(conn, name);
+        this.ping(name);
       }
-      console.log(this.connections);
       console.log('Connected');
     });
     this.connections[name] = conn;
   }
-  ping(connection, name) { //eslint-disable-line
+  ping(name) {
     this.isPingActivated = true;
-    connection.ping();
+    this.connections[name].ping((err) => {
+      if (err) {
+        console.log('ping err', err);
+      }
+      console.log('ping');
+    });
     setTimeout(() => {
-      this.ping(connection, name);
-    }, 10000);
+      this.ping(name);
+    }, 5000);
   }
 }
 
