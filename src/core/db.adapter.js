@@ -82,7 +82,7 @@ class DbAdapter {
   }
   ping(name) {
     this.isPingActivated = true;
-    this.connections[name].ping((err) => {
+    this.connections[name].query('SELECT 1', (err) => {
       if (err) {
         console.log('ping err', err);
       }
