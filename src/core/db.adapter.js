@@ -64,21 +64,21 @@ class DbAdapter {
       : false;
 
     const conn = mysql.createConnection(connection);
-    conn.connect();
-    conn.on('error', (err) => {
+    this.connections[name] = conn;
+    this.connections[name].connect();
+    this.connections[name].on('error', (err) => {
       console.log('Connection down. Reconnecting...', err);
       setTimeout(() => {
-        conn.destroy();
+        this.connections[name].end();
         this.initMySQL(name, connection);
       }, 1000);
     });
-    conn.on('connect', () => {
+    this.connections[name].on('connect', () => {
       if (!this.isPingActivated) {
         this.ping(name);
       }
       console.log('Connected');
     });
-    this.connections[name] = conn;
   }
   ping(name) {
     this.isPingActivated = true;

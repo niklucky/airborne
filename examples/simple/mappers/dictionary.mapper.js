@@ -1,4 +1,4 @@
-const { MySQLMapper } = require('../../../dist').default;
+const MySQLMapper = require('../../../../airborne-base/dist/lib/mysql.mapper').default;
 const Dictionary = require('../models/dictionary.js');
 
 class DictionaryMapper extends MySQLMapper {

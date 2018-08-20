@@ -11,6 +11,9 @@ class DictionaryController extends BaseController {
         translation: { type: 'string', required: true },
         lang: { type: 'string', required: true },
         avatar: { type: 'file', fileTypes: ['xls'], size: 2, required: true }
+      },
+      load: {
+
       }
     };
   }
