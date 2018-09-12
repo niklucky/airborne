@@ -147,7 +147,7 @@ describe('Validator', () => {
     it('validateString is not a string (null)', () => {
       const validator = new Validator(rules.load);
       const result = validator.validateString('key', null);
-      expect(result).to.be.false;
+      expect(result).is.equal('');
     });
     it('validateString is a string (string)', () => {
       const validator = new Validator(rules.load);

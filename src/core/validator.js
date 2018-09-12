@@ -106,6 +106,9 @@ class Validator {
 
   validateString(key, inputValue) {
     let value = inputValue;
+    if (value === null || value === undefined) {
+      value = '';
+    }
     if (typeof value === 'string') {
       value = sanitizer.sanitize(value);
       this.setResult(true);
