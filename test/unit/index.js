@@ -108,11 +108,6 @@ describe('Airborne application', () => {
       const object = app.di.get('validator');
       expect(object).to.be.an('undefined');
     });
-    it('setInstance', () => {
-      app.setInstance({});
-      expect(app).to.have.property('instances');
-      expect(app.instances).to.be.an('array');
-    });
   });
   describe('With databases', () => {
     it('MySQL database', () => {
@@ -148,7 +143,6 @@ describe('Airborne application', () => {
       const app = new Airborne.Engine(configDb);
       app.controllers(controllers);
       app.handle(request, response);
-      expect(app.setInstance).to.be.called;
     });
 
     it('handleMultipart with not available formidable', () => {

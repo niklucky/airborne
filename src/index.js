@@ -15,7 +15,6 @@ class Airborne {
     if (typeof config !== 'object') {
       throw new Error('Fatal: Engine error: config is not an object. Failed to start');
     }
-    this.instances = [];
     this.di = new DI();
     this.config = Object.assign({}, defaultConfig, config);
     this.di.set('config', this.config);
@@ -127,9 +126,6 @@ class Airborne {
     }
     const dispatcher = new Dispatcher(this.di, request, response);
     dispatcher.init();
-    this.setInstance(
-      dispatcher
-    );
   }
   mergeFilesInFields(body, fields, files) { // eslint-disable-line
     const newBody = body;
@@ -140,9 +136,6 @@ class Airborne {
       newBody[name] = fields[name];
     }
     return newBody;
-  }
-  setInstance(dispatcher) { // eslint-disable-line class-methods-use-this
-    this.instances.push(dispatcher);
   }
 }
 lib.Engine = Airborne;
